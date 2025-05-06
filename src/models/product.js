@@ -8,15 +8,15 @@ const productoSchema = new mongoose.Schema({
     },
     n_producto: {
         type: Number,
-        required: true
+        required: false
     },
     marca: {
         type: String,
-        required: true
+        required: false
     },
     categoria: {
         type: String,
-        required: true
+        required: false
     },
     nombre: {
         type: String,
@@ -86,12 +86,6 @@ const productoSchema = new mongoose.Schema({
         type: String, 
         required: false 
     }
-});
-
-// Middleware para establecer _id como COD_PRODUCTO
-productoSchema.pre('save', function (next) {
-    this._id = this.cod_producto;
-    next();
 });
 
 const producto = mongoose.models.producto || mongoose.model('producto', productoSchema);

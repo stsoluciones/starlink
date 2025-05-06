@@ -24,30 +24,81 @@ const Register = () => {
     const { register, handleSubmit, formState: { errors } } = useForm(); // Usa el hook useForm
   
     const onSubmit = async (data) => {
-      setLoading(true);
-      try {
-        const res = await signUp(data);
-        setInLocalStorage('USER', res.user);
-        router.push('/dashboard');
-      } catch (error) {
-        handleAuthError(error.code);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const handleGoogleSignUp = async () => {
         setLoading(true);
         try {
-          const res = await signInWithGoogle();
-          setInLocalStorage('USER', res.user);
-          router.push('/dashboard');
+          const res = await signUp(data); // Registro en Firebase
+          const { user } = res;
+      
+          // Intentar guardar o actualizar en MongoDB
+          const response = await fetch('/api/usuarios', {
+            method: 'POST', // Deberías cambiar a PUT si ya existe
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              uid: user.uid,
+              correo: user.email,
+              nombreCompleto: data.nombreCompleto || '',
+              dniOCuit: data.dniOCuit || '',
+              telefono: data.telefono || '',
+              direccion: data.direccion || {},
+            }),
+          });
+      
+          // Verificar si el usuario fue creado o actualizado
+          if (response.status === 200) {
+            console.log("Usuario actualizado");
+          } else if (response.status === 201) {
+            console.log("Usuario creado");
+          }
+      
+          setInLocalStorage('USER', user);
+          router.push('/');
         } catch (error) {
           handleAuthError(error.code);
         } finally {
           setLoading(false);
         }
       };
+      
+      const handleGoogleSignUp = async () => {
+        setLoading(true);
+        try {
+          const res = await signInWithGoogle(); // Login con Google
+          const { user } = res;
+      
+          // Intentar guardar o actualizar en MongoDB
+          const response = await fetch('/api/usuarios', {
+            method: 'POST', // Deberías cambiar a PUT si ya existe
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              uid: user.uid,
+              correo: user.email,
+              nombreCompleto: user.displayName || '',
+              dniOCuit: '',
+              telefono: user.phoneNumber || '',
+              direccion: {},
+            }),
+          }).catch(err => {
+            if (err?.status !== 409) {
+              throw err;
+            }
+          });
+      
+          // Verificar si el usuario fue creado o actualizado
+          if (response.status === 200) {
+            console.log("Usuario actualizado");
+          } else if (response.status === 201) {
+            console.log("Usuario creado");
+          }
+      
+          setInLocalStorage('USER', user);
+          router.push('/');
+        } catch (error) {
+          handleAuthError(error.code);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
   
     const togglePasswordVisibility = () => {
       setShowPassword(!showPassword);

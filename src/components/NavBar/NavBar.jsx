@@ -9,9 +9,9 @@ import UserMenu from './UserMenu';
 import { IoCartOutline } from 'react-icons/io5';
 import { CartContext } from '../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
-import { toast } from 'react-toastify';
 import useLinks from '../../components/constants/Links';
 import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const logOut = dynamic(()=> import( '../../lib/firebase'))
 
@@ -19,6 +19,7 @@ const NavBar = () => {
   const [cart, setCart] = useContext(CartContext);
   const Links = useLinks(); 
   const path =usePathname()
+  const router = useRouter();
 
   const quantity = cart ? cart.reduce((acc, curr) => acc + curr.quantity, 0) : 0;
 
@@ -40,22 +41,24 @@ const NavBar = () => {
     setCurrentLink(href);
   };
 
-  const handleLogOut = () => {
-    try{
-      Swal.fire({
-        icon:'info',
-        title:'¿Esta seguro quiere salir?',
-        showCancelButton:true,
-        showConfirmButton:true
-      }).then(async(result) =>{
-        if(result.isConfirmed){
-          const salir = logOut();
-          removeFromLocalStorage('USER');
-          setUser(null);
-          Swal.fire(salir.message);
-        }})
-    }catch(error){
-      toast.error(error)
+  const handleLogOut = async () => {
+    try {
+      const result = await Swal.fire({
+        icon: 'info',
+        title: '¿Está seguro que quiere salir?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+      });
+
+      if (result.isConfirmed) {
+        await logOut();
+        removeFromLocalStorage('USER');
+        await Swal.fire('Sesión cerrada con éxito', '', 'success');
+        router.push('/');
+      }
+    } catch (error) {
+      Swal.fire('Error', error.message || 'Ocurrió un problema', 'error');
     }
   };
 

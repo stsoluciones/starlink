@@ -11,6 +11,13 @@ const UserMenu = ({user,toggleDropdown,isDropdownOpen,handleLogOut}) => {
         toggleDropdown()
     };
 
+    const handleGoToLogin = () => {
+        router.push('/user/Login');
+    }
+    const handleGoToRegister = () => {
+        router.push('/user/Register');
+    };
+
   return (
     <>
             {user ? (
@@ -25,7 +32,7 @@ const UserMenu = ({user,toggleDropdown,isDropdownOpen,handleLogOut}) => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-40">
                     <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={handleAdminRedirect} aria-label="administrador">
-                      Administrador
+                      Administrar
                     </button>
                     <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={handleLogOut} aria-label="cerrar sesion">
                       Cerrar Sesión
@@ -33,7 +40,18 @@ const UserMenu = ({user,toggleDropdown,isDropdownOpen,handleLogOut}) => {
                   </div>
                 )}
               </div>
-            ) : null}
+            ) : (
+              <div className="relative z-50 gap-2">
+                <button className="hidden items-center justify-center text-base font-bold leading-tight tracking-tight md:inline-flex text-gray-900 md:text-base px-2" onClick={handleGoToLogin} title="Login usuario" aria-label="Login usuario">
+                  Ingresar
+                </button>
+                <button className="hidden items-center justify-center text-base font-bold leading-tight tracking-tight text-gray-900  md:inline-flex md:text-base px-2" onClick={handleGoToRegister} title="registrar usuario" aria-label="registrar usuario">
+                  Registrate
+                </button>
+              </div>
+            )
+            
+            }
     </>
   )
 }
