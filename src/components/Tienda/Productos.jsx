@@ -45,7 +45,7 @@ export default function Productos() {
   };
 
   return (
-    <article id="productos" className="col-span-1 md:col-start-4 md:col-span-9 grid grid-rows-[auto_1fr_auto] min-h-screen">
+    <article id="productos" className="col-span-1 md:col-start-4 md:col-span-9 grid grid-rows-[auto_1fr_auto]">
       {/* Cards con productos paginados */}
       <div className='md:justify-self-center'>
         <Cards productos={filteredProducts} isLoading={isLoading} currentPage={currentPage} handlePageChange={handlePageChange} handleProductSelect={handleProductSelect} />

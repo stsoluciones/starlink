@@ -31,7 +31,7 @@ module.exports = {
           whatsHover: '#20B458' // Un poco más oscuro para hover
         },
         secondary: {
-          DEFAULT: '#FF5733',  // Naranja vibrante para atraer la atención
+          DEFAULT: '#FFC926',  // Naranja vibrante para atraer la atención
           hover: '#C7391F',    // Un naranja más oscuro al pasar el mouse
           active: '#A0281A',   // O un tono marrón para clic
           background: '#2C2F33' // Color de fondo secundario gris oscuro

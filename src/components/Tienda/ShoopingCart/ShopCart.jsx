@@ -57,9 +57,9 @@ const ShopCart = () => {
               </svg>
             </Link>
           </div>
-        <h1 className="md:text-3xl text-xl font-bold text-primary text-center mb-6 md:mb-10">CARRITO DE CONSULTAS</h1>
+        <h1 className="md:text-3xl text-xl font-bold text-primary text-center mb-6 md:mb-10">CARRITO DE COMPRAS</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div className="flex flex-col">
+          <div className="flex flex-col m">
             {cart.length ? (
               cart.map((item) => (
                 <div key={item.cod_producto} className="relative flex items-center shadow-xl rounded-lg bg-white border border-gray-50 gap-2 m-2 p-2">
@@ -97,7 +97,7 @@ const ShopCart = () => {
               className="bg-slate-100 rounded-lg shadow-xl p-7 relative flex flex-col justify-between"
               style={{ alignSelf: "start" }}
             >
-              <h2 className="text-2xl mb-2">Resumen de Consulta</h2>
+              <h2 className="text-2xl mb-2">Resumen de Compra</h2>
               <div className="grid grid-cols-1  flex-grow">
                
                 <span >
@@ -107,8 +107,6 @@ const ShopCart = () => {
                   <strong>Usted va a enviar: </strong>
                 </span>
                 <span id="preguntar" ref={preguntarRef}>
-                  Hola, me gustaría consultar precio y disponibilidad de los
-                  siguientes artículos:
                   <br />
                   {cart.map((item) => (
                     <span key={item.cod_producto} className="text-right">

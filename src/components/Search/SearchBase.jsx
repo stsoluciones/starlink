@@ -46,7 +46,7 @@ const SearchBase = ({ inputClassName = '', placeholder = 'Buscar...' }) => {
 
   const cartBadgeVisible = quantity > 0;
   const isHomePage = path === '/';
-  const containerClass = `flex items-center justify-between max-w-xl mx-auto sticky top-0 z-40 ${
+  const containerClass = `flex items-center justify-between max-w-xl mx-auto sticky top-0 z-40 my-4 ${
     isScrolled ? 'bg-white w-full rounded-lg shadow-md' : ''
   }`;
 

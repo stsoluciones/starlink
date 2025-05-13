@@ -1,13 +1,13 @@
 const userData = {
-    name:'Eshop Devices',
-    contact:1136317470,
+    name:'SLS',
+    contact:1151012478,
     codigoPais:54,
     textBoton:'¡Contáctame!',
     botonNav:'CONTACTAME',
-    direccion:'Las Flores 1600, Wilde',
-    email:'infoeshopdevices@gmail.com',
+    direccion:'Quilmes',
+    email:'infostarlinksoluciones@gmail.com',
     textoPredefinido:'Hola, me gustaria consultar sobre, ',
-    cuil:'23331083739'
+    cuil:'23xxxxxxxxxx3'
 };
 
 export default userData;
