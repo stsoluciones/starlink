@@ -66,15 +66,6 @@ const Card = ({ product, handleProductSelect }) => {
               loading="lazy"
               title='Imagen del producto'
             />
-            <Image
-              className="absolute bottom-1 right-1 shadow-md rounded z-10"
-              src={product.usado ? '/images/USADO.webp' : '/images/NUEVO.webp'}
-              alt={product.usado ? 'producto usado' : 'producto nuevo'}
-              width={product.usado ? 112 : 64}
-              height={32}
-              loading="lazy"
-              title='Estado del producto'
-            />
             <div className="absolute top-1 left-1 text-sm bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-tr-lg rounded-bl-lg shadow-md">
               {Number(product.precio).toLocaleString('es-AR', {
                 style: 'currency',

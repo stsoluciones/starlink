@@ -7,7 +7,6 @@ import SearchBase from '../../components/Search/SearchBase';
 import PreguntasFrecuentes from '../../components/PreguntasFrecuentas/PreguntasFrecuentas';
 import Productos from '../../components/Tienda/Productos';
 import Header from '../../components/Banner/Header';
-import ConsoleCleaningService from '../../components/Productos/Servicios/ServiciosLimpieza';
 
 export default function MainContent() {
 
@@ -16,7 +15,6 @@ export default function MainContent() {
       {/* Top part */}
       <Banner />
       <Header />
-      {/* <ConsoleCleaningService /> */}
       {/* Middle part */}
       <Sobre />
       <SearchBase />
