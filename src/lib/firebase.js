@@ -44,10 +44,5 @@ export const signInWithGoogle = async () => {
 
 // Cerrar sesión
 export const logOut = async () => {
-  try {
-    await signOut(auth);
-    return { message: 'Cerró la sesión exitosamente' };
-  } catch (error) {
-    throw new Error(error.message);  // Maneja y lanza el error si ocurre algún problema al cerrar sesión
-  }
-}
+  await fetch('/api/logout', { method: 'POST' });
+};

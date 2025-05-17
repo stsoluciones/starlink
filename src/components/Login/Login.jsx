@@ -9,8 +9,11 @@ import { ToastContainer } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { setInLocalStorage } from '../../Hooks/localStorage';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
+import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { signIn } from '../../lib/firebase';
+import { auth } from '../../../pages/api/firebase';
 
 
 // Carga diferida de ProtectedRoute y React Toastify
@@ -28,6 +31,18 @@ const Login = () => {
     try {
       const res = await signIn(data);
       setInLocalStorage('USER', res.user);
+      const token = await res.user.getIdToken();
+      await fetch('/api/usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          uid: res.user.uid,
+          nombreCompleto: res.user.displayName,
+          correo: res.user.email,
+          rol: 'admin' // o 'cliente' según el contexto
+        }),
+      });
       router.push('/Admin');
     } catch (error) {
       handleAuthError(error.code);
@@ -38,6 +53,33 @@ const Login = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+    const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    setLoading(true);
+    try {
+      const res = await signInWithPopup(auth, provider);
+      setInLocalStorage('USER', res.user);
+      const token = await res.user.getIdToken();
+      await fetch('/api/usuarios', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          uid: res.user.uid,
+          nombreCompleto: res.user.displayName,
+          correo: res.user.email,
+          rol: 'admin' // o 'cliente' según el contexto
+        }),
+      });
+      router.push('/Admin');
+    } catch (error) {
+      console.error(error);
+      handleAuthError(error.code);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,25 +108,25 @@ const Login = () => {
                       {errors.email && <p className="text-sm text-red-600">Este campo es requerido</p>}
                     </div>
                     <div>
-                      <label htmlFor="passwordLogin" className="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+                      <label htmlFor="passwordLogin" className="block mb-2 text-sm font-medium text-gray-900">password</label>
                       <div className="relative">
                         <input 
                           type={showPassword ? "text" : "password"} 
                           id="passwordLogin" 
                           className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-3 focus:ring-primary focus:border-primary block w-full p-2.5 placeholder-gray-400"
                           placeholder="••••••••" 
-                          {...register('contraseña', { required: true })} 
+                          {...register('password', { required: true })} 
                         />
                         <button 
                           type="button" 
                           onClick={togglePasswordVisibility} 
                           className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" 
-                          aria-label="ver contraseña"
+                          aria-label="ver password"
                         >
                           <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                         </button>
                       </div>
-                      {errors.contraseña && <p className="text-sm text-red-600">Este campo es requerido</p>}
+                      {errors.password && <p className="text-sm text-red-600">Este campo es requerido</p>}
                     </div>
 
                     <button 
@@ -94,6 +136,15 @@ const Login = () => {
                       aria-label="iniciar sesion"
                     >
                        {loading ? <Loading /> : 'INICIAR SESION'}
+                    </button>
+                  <button type="button"
+                      onClick={loginWithGoogle}
+                      className="mt-2 w-full flex justify-center items-center gap-2 text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                      aria-label="Iniciar sesión con Google"
+                      disabled={loading}
+                      >
+                      <FontAwesomeIcon icon={faGoogle} className="text-white" />
+                      {loading ? <Loading /> : 'Iniciar sesión con Google'}
                     </button>
                     <p className="text-sm font-light text-gray-500">
                         ¿No tienes una cuenta? <Link href="/user/Register" className="font-medium text-primary-600 hover:underline">Creala aquí</Link>

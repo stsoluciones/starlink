@@ -34,6 +34,7 @@ const Register = () => {
             method: 'POST', // Deberías cambiar a PUT si ya existe
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              token,
               uid: user.uid,
               correo: user.email,
               nombreCompleto: data.nombreCompleto || '',
@@ -42,7 +43,6 @@ const Register = () => {
               direccion: data.direccion || {},
             }),
           });
-      
           // Verificar si el usuario fue creado o actualizado
           if (response.status === 200) {
             console.log("Usuario actualizado");
@@ -70,6 +70,7 @@ const Register = () => {
             method: 'POST', // Deberías cambiar a PUT si ya existe
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              token,
               uid: user.uid,
               correo: user.email,
               nombreCompleto: user.displayName || '',
@@ -130,46 +131,46 @@ const Register = () => {
                       {errors.email && <p className="text-sm text-red-600">Este campo es requerido</p>}
                     </div>
                         <div>
-                            <label htmlFor="passwordRegister" className="block mb-2 text-sm font-medium text-gray-900">Contraseña</label>
+                            <label htmlFor="passwordRegister" className="block mb-2 text-sm font-medium text-gray-900">password</label>
                             <div className="relative">
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     id="passwordRegister" 
                                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-3 focus:ring-primary focus:border-primary block w-full p-2.5 placeholder-gray-400"
                                     placeholder="••••••••" 
-                                    {...register('contraseña', { required: true })} 
+                                    {...register('password', { required: true })} 
                                 />
                                 <button 
                                     type="button" 
                                     onClick={togglePasswordVisibility} 
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" 
-                                    aria-label="ver contraseña"
+                                    aria-label="ver password"
                                     >
                                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                                 </button>
                             </div>
-                            {errors.contraseña && <p className="text-sm text-red-600">Este campo es requerido</p>}
+                            {errors.password && <p className="text-sm text-red-600">Este campo es requerido</p>}
                         </div>
                         <div>
-                            <label htmlFor="confirm-passwordRegister" className="block mb-2 text-sm font-medium text-gray-900">Confirmar contraseña</label>
+                            <label htmlFor="confirm-passwordRegister" className="block mb-2 text-sm font-medium text-gray-900">Confirmar password</label>
                             <div className="relative">
                                 <input 
                                     type={showPassword ? "text" : "password"} 
                                     id="confirm-passwordRegister" 
                                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-3 focus:ring-primary focus:border-primary block w-full p-2.5 placeholder-gray-400"
                                     placeholder="••••••••" 
-                                    {...register('confirmcontraseña', { required: true })} 
+                                    {...register('confirmpassword', { required: true })} 
                                 />
                                 <button 
                                     type="button" 
                                     onClick={togglePasswordVisibility} 
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5" 
-                                    aria-label="ver contraseña"
+                                    aria-label="ver password"
                                     >
                                     <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                                 </button>
                             </div>
-                            {errors.confirmcontraseña && <p className="text-sm text-red-600">Este campo es requerido</p>}
+                            {errors.confirmpassword && <p className="text-sm text-red-600">Este campo es requerido</p>}
                         </div>
                         <div className="flex items-start">
                             <div className="flex items-center h-5">
@@ -196,7 +197,7 @@ const Register = () => {
                                 >
                                 <FontAwesomeIcon icon={faGoogle} className="text-white" />
                                 {loading ? <Loading /> : 'Crear cuenta con Google'}
-                                </button>
+                              </button>
 
                         <p className="text-sm font-light text-gray-500">
                             ¿Ya tienes una cuenta? <Link href="/user/Login" className="font-medium text-primary-600 hover:underline">Inicia sesión aquí</Link>

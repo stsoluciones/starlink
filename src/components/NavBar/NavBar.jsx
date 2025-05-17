@@ -52,8 +52,8 @@ const NavBar = () => {
       });
 
       if (result.isConfirmed) {
-        await logOut();
-        removeFromLocalStorage('USER');
+        await logOut(); // 🧹 Elimina cookie en el backend
+        removeFromLocalStorage('USER'); // 🧹 Elimina localStorage
         await Swal.fire('Sesión cerrada con éxito', '', 'success');
         router.push('/');
       }
