@@ -2,55 +2,91 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import Usuario from '../../../models/User';
 import jwt from 'jsonwebtoken';
+import { auth } from '../../../../pages/api/firebaseAdminConfig';
 
 export async function POST(req: Request) {
-  try {
-    await connectDB();
+    try {
+        await connectDB();
+        const { uid, nombreCompleto, correo, dniOCuit, telefono, direccion } = await req.json();
+        const authorizationHeader = req.headers.get('Authorization');
 
-    const body = await req.json();
-    const { uid, nombreCompleto, correo } = body;
+        console.log('Authorization Header:', authorizationHeader);
+        if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+            console.error('Error: Missing or invalid Authorization header');
+            return NextResponse.json({ error: 'Unauthorized: Missing or invalid Authorization header' }, { status: 401 });
+        }
 
-    // Buscar si el usuario ya existe
-    let usuario = await Usuario.findOne({ uid });
+        const idToken = authorizationHeader.split(' ')[1];
+        console.log('Firebase ID Token:', idToken);
 
-    // Si no existe, lo creamos
-    let isNew = false;
-    if (!usuario) {
-      usuario = new Usuario({
-        uid,
-        nombreCompleto,
-        correo,
-        rol: 'cliente', // rol por defecto si no se envía
-      });
-      await usuario.save();
-      isNew = true;
+        try {
+            const decodedToken = await auth.verifyIdToken(idToken);
+            console.log('Firebase ID Token Verified:', decodedToken);
+        } catch (error) {
+            console.error("Error verifying Firebase ID token:", error);
+            return NextResponse.json({ error: 'Unauthorized: Invalid Firebase ID token' }, { status: 401 });
+        }
+
+        //  Validación de dniOCuit
+        if (dniOCuit) {
+            const usuarioConMismoDni = await Usuario.findOne({ dniOCuit });
+            if (usuarioConMismoDni) {
+                return NextResponse.json(
+                    { error: 'DNI/CUIT ya está en uso' },
+                    { status: 400 }
+                );
+            }
+        }
+
+        let usuario = await Usuario.findOne({ uid });
+        let isNew = false;
+
+        if (!usuario) {
+            usuario = new Usuario({
+                uid,
+                nombreCompleto,
+                correo,
+                dniOCuit,
+                telefono,
+                direccion,
+                rol: 'cliente',
+            });
+            await usuario.save();
+            isNew = true;
+        } else {
+            usuario.nombreCompleto = nombreCompleto || usuario.nombreCompleto;
+            usuario.correo = correo || usuario.correo;
+            usuario.dniOCuit = dniOCuit || usuario.dniOCuit;
+            usuario.telefono = telefono || usuario.telefono;
+            usuario.direccion = direccion || usuario.direccion;
+            await usuario.save();
+        }
+
+        const token = jwt.sign(
+            {
+                id: usuario._id,
+                uid: usuario.uid,
+                rol: usuario.rol,
+            },
+            process.env.JWT_SECRET!,
+            { expiresIn: '1d' }
+        );
+
+        const response = NextResponse.json({ usuario, token }, { status: isNew ? 201 : 200 });
+
+        response.cookies.set('token', token, {
+            httpOnly: true,
+            path: '/',
+            maxAge: 60 * 60 * 24,
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production',
+        });
+
+        return response;
+
+    } catch (error) {
+        console.error('Error en /api/usuarios:', error);
+        return NextResponse.json({ error: 'Error al crear/actualizar usuario' }, { status: 500 });
     }
-
-    // Crear token con id y rol
-    const token = jwt.sign(
-      {
-        id: usuario._id,
-        uid: usuario.uid,
-        rol: usuario.rol,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: '1d' }
-    );
-
-    // Crear respuesta y setear cookie
-    const response = NextResponse.json({ usuario, token }, { status: isNew ? 201 : 200 });
-
-    response.cookies.set('token', token, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 60 * 60 * 24, // 1 día
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
-
-    return response;
-  } catch (error) {
-    console.error('Error en /api/usuarios:', error);
-    return NextResponse.json({ error: 'Error al autenticar usuario' }, { status: 500 });
-  }
 }
+

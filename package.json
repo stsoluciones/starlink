@@ -25,6 +25,7 @@
     "cookie": "^1.0.2",
     "dotenv": "^16.4.5",
     "firebase": "^10.12.3",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.4.3",
     "heic2any": "^0.0.4",
     "json2csv": "^6.0.0-alpha.2",

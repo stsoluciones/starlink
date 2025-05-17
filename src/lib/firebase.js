@@ -1,6 +1,5 @@
 import {
     signInWithEmailAndPassword,
-    signOut,
     createUserWithEmailAndPassword,
     signInWithPopup,
     GoogleAuthProvider,
@@ -11,9 +10,9 @@ import { auth } from '../../pages/api/firebase';
 
 // Iniciar sesión con usuario y contraseña
 export const signIn = async (data) => {
-  const { email, contraseña } = data;
+  const { email, password } = data;
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, contraseña);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential;  // Retorna el objeto completo con el usuario autenticado
   } catch (error) {
     throw new Error(error.message);  // Maneja y lanza el error para capturarlo en el frontend
@@ -22,9 +21,9 @@ export const signIn = async (data) => {
 
 // Crear un nuevo usuario con email y contraseña
 export const signUp = async (data) => {
-  const { email, contraseña } = data;
+  const { email, password } = data;
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, contraseña);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return userCredential;  // Retorna el objeto completo con el nuevo usuario
   } catch (error) {
     throw new Error(error.message);  // Maneja y lanza el error para capturarlo en el frontend
