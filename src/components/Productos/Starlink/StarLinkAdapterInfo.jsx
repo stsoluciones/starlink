@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import userData from "../../constants/userData";
 
 
 
@@ -25,7 +26,7 @@ export default function StarLinkAdapterInfo() {
       </div>
 
       <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-lg md:text-2xl font-bold md:text-center text-gray-700 mb-6 text-justify tracking-tight">
-        Distribuidor autorizado de fuente adaptadora con cable para antena Starlink Mini, diseñada especialmente para optimizar el rendimiento de tu conexión a internet en la ruta, asegurando máxima eficiencia y seguridad en todo momento.
+        Fuente adaptadora con cable para antena Starlink Mini, diseñada especialmente para optimizar el rendimiento de tu conexión a internet en la ruta, asegurando máxima eficiencia y seguridad en todo momento.
       </motion.h2>
       <div className="bg-slate-300 p-1 mb-4" />
       <h3 className="text-xl text-gray-900 mb-4 text-center ">¿Cuántas veces te quedaste sin señal y pensaste que la culpa era del satélite?</h3>
@@ -204,7 +205,7 @@ export default function StarLinkAdapterInfo() {
 
       <div className="text-center">
         <Link
-          href="https://api.whatsapp.com/send/?phone=%2B541136317470&text=Hola%2C+me+gustaria+consultar+sobre%2C+el+adaptador+SL1230+&type=phone_number&app_absent=0"
+          href={`https://api.whatsapp.com/send/?phone=%2B${userData.codigoPais}${userData.contact}&text=Hola%2C+me+gustaria+consultar+sobre%2C+el+adaptador+SL1230+&type=phone_number&app_absent=0`}
           className="inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
           title="Consulta ahora y asegura tu conexión confiable"
           aria-label="Botón para consultar y asegurar la conexión confiable"

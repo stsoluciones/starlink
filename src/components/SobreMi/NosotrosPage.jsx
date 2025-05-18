@@ -24,19 +24,6 @@ const NosotrosPage = () => {
             Actualmente aceptamos productos en Wilde, Don Bosco, Bernal y Quilmes.
           </p>
         </article>
-        <article id="forma-de-trabajar" className="mt-6 text-justify">
-          <h2 className="mb-8 text-2xl md:text-3xl xl:text-4xl text-center font-extrabold text-primary uppercase" title="Servicios Ofrecidos">Servicios ofrecidos</h2>
-          <ul className="max-w-md space-y-1 text-gray-500 list-inside py-4">
-              {infoWeb.ofrece.map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <svg className="w-3.5 h-3.5 mr-2 text-primary-whats flex-shrink-0" aria-label="tilde ok" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-                  </svg>
-                  {item}
-                </li>
-              ))}
-            </ul>
-        </article>
       </section>
 
       {/* Sección: Qué Ofrecemos */}

@@ -59,3 +59,22 @@ export const shippingOptions = [
     icon: "",
   }
 ];
+
+export const imagesGaleria = [
+  {
+    src: 'https://res.cloudinary.com/dtfibzv3v/image/upload/v1747603344/auto_qldyxb.webp',
+    alt: 'Cable Starlink Mini – 12 V a 35 V',
+  },
+  {
+    src: 'https://res.cloudinary.com/dtfibzv3v/image/upload/v1747603344/antenaEnAuto_xw3yhy.webp',
+    alt: 'Pegalo en el auto y segui en movimiento',
+  },
+  {
+    src: 'https://res.cloudinary.com/dtfibzv3v/image/upload/v1747603752/conector_zh1hpb.webp ',
+    alt: 'Conector sellado antihumedad',
+  },
+  {
+    src: 'https://res.cloudinary.com/dtfibzv3v/image/upload/v1747603345/antena_cvb9w0.webp',
+    alt: 'Usalo donde lo necesites',
+  },
+]

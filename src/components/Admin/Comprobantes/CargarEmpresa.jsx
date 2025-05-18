@@ -15,7 +15,7 @@ export default function CargarEmpresaModal({ empresas, onEmpresaSeleccionada }) 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Buttons type="button" className='my-2'>Cargar una empresa</Buttons>
+        <Buttons type="button" className='text-white uppercase'>Cargar empresa</Buttons>
       </Dialog.Trigger>
 
       <Dialog.Portal>

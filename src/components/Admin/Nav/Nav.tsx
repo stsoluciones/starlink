@@ -117,10 +117,11 @@ export default function Nav({ handleSelectSection }) {
         <ul className="py-4 space-y-2 font-medium">
           <NavItemButton label="Productos" onClick={() => { handleSelectSection('Productos'); toggleMenu(); }} />
           <NavItemButton label="Productos destacados" onClick={() => { handleSelectSection('Destacados'); toggleMenu(); }} />
-          <li><DownloadCSVButton toggleMenu={toggleMenu} /></li>
           <NavItemButton label="Comprobantes" onClick={() => { handleSelectSection('Comprobantes'); toggleMenu(); }} />
           <NavItemButton label="Empresas" onClick={() => { handleSelectSection('Empresas'); toggleMenu(); }} />
+          <NavItemButton label="Etiquetas Manuales" onClick={() => { handleSelectSection('Etiquetas'); toggleMenu(); }} />
           <NavItemLink label="Regresar a la Web" href="/" onClick={toggleMenu} />
+          <li><DownloadCSVButton toggleMenu={toggleMenu} /></li>
           <NavItemButton label="Logout" onClick={handleLogOut} />
         </ul>
       </div>

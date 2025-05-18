@@ -3,6 +3,7 @@ import html2pdf from 'html2pdf.js';
 import userData from '../../constants/userData';
 import CargarEmpresaModal from '../Comprobantes/CargarEmpresa';
 import useEmpresas from '../../../Hooks/useEmpresas'
+import { Buttons } from '../../ui/Buttons';
 
 
 function Etiquetas({ data }) {
@@ -11,7 +12,7 @@ function Etiquetas({ data }) {
       {/* Encabezado */}
       <div className="bg-primary text-white text-2xl font-bold p-2 flex justify-around items-center rounded-md uppercase text-center">
         <span>ENVÍO</span>
-        <img src="/logos/LogoCentral2.webp" className="h-12" />
+        <img src="/logos/logo.webp" className="h-12 rounded-lg" />
       </div>
 
       {/* Cuerpo en dos columnas */}
@@ -85,10 +86,30 @@ export default function EtiquetaFormPDF() {
   const totalBultos = parseInt(formData.totalBulto, 10);
   const isValidTotal = !isNaN(totalBultos) && totalBultos > 0;
 
+  const handleClean = () => {
+    setFormData({
+        de: userData.name,
+        cel: userData.contact,
+        para: '',
+        direccion:'',
+        telefono:'',
+        totalBulto: '',
+        despacharPor: '',
+        bultoN: '',
+    });
+    setEmpresa({
+      nombre: '',
+      direccion: '',
+      mail: '',
+      telefono: '',
+      cuil: '',
+      observaciones:'',
+      tipo: ''
+    })
+  }
   return (
     <div className="space-y-4">
-        <div className="flex flex-col">
-
+        <div className="flex gap-2 m-2">
             <CargarEmpresaModal empresas={empresas}
                 onEmpresaSeleccionada={(empresaSeleccionada) => {
                     setEmpresa({
@@ -106,6 +127,7 @@ export default function EtiquetaFormPDF() {
                         telefono: empresaSeleccionada.telefono,
                     }))
                 }} />
+                <Buttons onClick={handleClean} className='bg-primary text-white uppercase'>Limpiar etiqueta</Buttons>
         </div>
       <form className="flex flex-wrap md:grid md:grid-cols-2 gap-4">
       {Object.keys(formData).map((key) => (

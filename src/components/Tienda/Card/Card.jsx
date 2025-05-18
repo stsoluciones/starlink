@@ -10,8 +10,11 @@ import { CartContext } from '../../../components/Context/ShoopingCartContext';
 import Link from 'next/link';
 import Image from 'next/image';
 import handleShare from '../../../Utils/handleShare';
+import { useRouter } from 'next/navigation';
+import { getInLocalStorage } from '../../../Hooks/localStorage';
 
 const Card = ({ product, handleProductSelect }) => {
+  const router = useRouter();
   const [cart, setCart] = useContext(CartContext);
 
   const handleAddToCart = (e) => {
@@ -30,7 +33,17 @@ const Card = ({ product, handleProductSelect }) => {
   const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(
     consultMessage || userData.textoPredefinido
   )}`;
- 
+  const user = getInLocalStorage('USER');
+  const handleComprar = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product, cart, setCart);
+    if(user){
+      router.push('/Shopcart');
+    }else{
+      router.push('/user/Login');
+    }
+  }
   
 
   return (
@@ -153,19 +166,38 @@ const Card = ({ product, handleProductSelect }) => {
               </div>
             </>
           ) : (
-            <button
-              onClick={handleConsult}
-              className={`flex items-center justify-center w-full px-4 py-2 gap-2   text-white rounded-lg shadow  transition duration-300 ${product.vendido?'bg-slate-500':'bg-primary-whats hover:bg-primary-whatsHover'}`}
-              title="Consultar por WhatsApp"
-              aria-label="Consultar por WhatsApp"
-              type="button"
-              disabled={product.vendido?true:false}
-              
+            <div className="flex flex-col md:flex-row gap-1">
+              <button
+                onClick={handleConsult}
+                className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow transition duration-300 ${
+                  product.vendido
+                    ? 'bg-slate-500'
+                    : 'bg-primary-whats hover:bg-primary-whatsHover'
+                }`}
+                title="Consultar por WhatsApp"
+                aria-label="Consultar por WhatsApp"
+                type="button"
+                disabled={product.vendido}
               >
-              <RiWhatsappLine size={16} /> <span>Consultar</span>
-            </button>
+                <RiWhatsappLine size={14} />
+                <span className="md:inline text-base">Consultar</span>
+              </button>
 
-              )}
+              <button
+                onClick={handleComprar}
+                className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow transition duration-300 ${
+                  product.vendido ? 'bg-slate-500' : 'bg-primary hover:bg-primary-hover'
+                }`}
+                title="Comprar ahora"
+                aria-label="Comprar ahora"
+                type="button"
+                disabled={product.vendido}
+              >
+                <IconShoopingCart ancho={14} alto={14} color="#ffffff" />
+                <span className="md:inline text-base">Comprar</span>
+              </button>
+            </div>
+          )}
         </div>
 
       </div>
