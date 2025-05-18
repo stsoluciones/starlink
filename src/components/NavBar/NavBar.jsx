@@ -2,7 +2,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { removeFromLocalStorage, getInLocalStorage } from '../../Hooks/localStorage';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Logo from '../../../public/logos/logoSLS120.webp';
 import UserMenu from './UserMenu';
@@ -12,8 +11,8 @@ import Swal from 'sweetalert2';
 import useLinks from '../../components/constants/Links';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
+import { logOutBack } from '../../lib/firebase';
 
-const logOut = dynamic(()=> import( '../../lib/firebase'))
 
 const NavBar = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -52,8 +51,11 @@ const NavBar = () => {
       });
 
       if (result.isConfirmed) {
-        await logOut(); // 🧹 Elimina cookie en el backend
+        console.log('Cerrando sesión en front...');
+        
+        await logOutBack(); // 🧹 Elimina cookie en el backend
         removeFromLocalStorage('USER'); // 🧹 Elimina localStorage
+        setUser(null); // 🧹 Elimina el estado del usuario
         await Swal.fire('Sesión cerrada con éxito', '', 'success');
         router.push('/');
       }

@@ -4,7 +4,7 @@ const nextConfig = {
   images: {
     loader: 'cloudinary',
     path: 'https://res.cloudinary.com/dnbrxpca3/',
-    domains: ['localhost', 'res.cloudinary.com', 'eshopdevices.vercel.app', 'eshopdevices.com'],
+    domains: ['localhost', 'res.cloudinary.com'],
     unoptimized: true,
   },
   compress: true,

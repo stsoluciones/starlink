@@ -6,8 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { removeFromLocalStorage } from '../../../Hooks/localStorage';
 import Swal from 'sweetalert2';
+import { logOutBack } from '../../../lib/firebase';
 
-const logOut = dynamic(()=> import( '../../../lib/firebase'))
 const DownloadCSVButton = dynamic(()=> import( '../../../components/DownloadCSVButton/DownloadCSVButton'))
 
 export default function Nav({ handleSelectSection }) {
@@ -27,7 +27,7 @@ export default function Nav({ handleSelectSection }) {
       });
 
       if (result.isConfirmed) {
-        await logOut();
+        await logOutBack();
         removeFromLocalStorage('USER');
         await Swal.fire('Sesión cerrada con éxito', '', 'success');
         router.push('/');

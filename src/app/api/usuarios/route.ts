@@ -9,8 +9,8 @@ export async function POST(req: Request) {
         await connectDB();
         const { uid, nombreCompleto, correo, dniOCuit, telefono, direccion } = await req.json();
         const authorizationHeader = req.headers.get('Authorization');
-
-        console.log('Authorization Header:', authorizationHeader);
+        console.log('Request Body back:', { uid, nombreCompleto, correo, dniOCuit, telefono, direccion });
+        console.log('Authorization Header back:', authorizationHeader);
         if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
             console.error('Error: Missing or invalid Authorization header');
             return NextResponse.json({ error: 'Unauthorized: Missing or invalid Authorization header' }, { status: 401 });
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
             });
             await usuario.save();
             isNew = true;
+            console.log('usuario creado:', usuario);
         } else {
             usuario.nombreCompleto = nombreCompleto || usuario.nombreCompleto;
             usuario.correo = correo || usuario.correo;
@@ -61,7 +62,6 @@ export async function POST(req: Request) {
             usuario.direccion = direccion || usuario.direccion;
             await usuario.save();
         }
-
         const token = jwt.sign(
             {
                 id: usuario._id,

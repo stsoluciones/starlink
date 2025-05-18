@@ -42,6 +42,9 @@ export const signInWithGoogle = async () => {
 }
 
 // Cerrar sesión
-export const logOut = async () => {
-  await fetch('/api/logout', { method: 'POST' });
+export const logOutBack = async () => {
+  console.log('Cerrando sesión en Firebase...');
+  await fetch('/api/logout', { method: 'POST', credentials: 'include' });
 };
+
+

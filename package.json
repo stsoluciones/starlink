@@ -28,6 +28,7 @@
     "firebase-admin": "^13.4.0",
     "framer-motion": "^12.4.3",
     "heic2any": "^0.0.4",
+    "jose": "^6.0.11",
     "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",

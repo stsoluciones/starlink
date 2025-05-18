@@ -32,6 +32,8 @@ const Login = () => {
             const res = await signIn(data);
             setInLocalStorage('USER', res.user);
             const token = await res.user.getIdToken();
+            console.log('token en front', token);
+            console.log('user en front', res.user);
             await fetch('/api/usuarios', {
                 method: 'POST',
                 headers: {
@@ -46,6 +48,7 @@ const Login = () => {
                 }),
             });
             router.push('/');
+            console.log('token en front en /', token);
         } catch (error) {
             handleAuthError(error.code);
         } finally {
@@ -64,6 +67,8 @@ const Login = () => {
             const res = await signInWithPopup(auth, provider);
             setInLocalStorage('USER', res.user);
             const token = await res.user.getIdToken();
+            console.log('token en front', token);
+            console.log('user en front', res.user);
             await fetch('/api/usuarios', {
                 method: 'POST',
                 headers: {
