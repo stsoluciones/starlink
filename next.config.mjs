@@ -4,7 +4,7 @@ const nextConfig = {
   images: {
     loader: 'cloudinary',
     path: 'https://res.cloudinary.com/dnbrxpca3/',
-    domains: ['localhost', 'res.cloudinary.com'],
+    domains: ['localhost', 'res.cloudinary.com','starlink-beta.vercel.app'],
     unoptimized: true,
   },
   compress: true,
