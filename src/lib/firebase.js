@@ -33,6 +33,7 @@ export const signUp = async (data) => {
 // Iniciar sesión con Google
 export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({prompt: 'select_account'});
   try {
     const result = await signInWithPopup(auth, provider);
     return result;  // Retorna el resultado de la autenticación con Google
@@ -45,6 +46,8 @@ export const signInWithGoogle = async () => {
 export const logOutBack = async () => {
   console.log('Cerrando sesión en Firebase...');
   await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+  localStorage.clear();
+  sessionStorage.clear();
 };
 
 

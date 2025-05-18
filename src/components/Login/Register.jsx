@@ -55,7 +55,9 @@ const Register = () => {
         try {
             const res = await signUp(data);
             const { user } = res;
-            const token = await createUserInMongoDB(user, data);
+            console.log('user', user);
+            
+            await createUserInMongoDB(user, data);
             setInLocalStorage('USER', user);
             router.push('/');
         } catch (error) {

@@ -1,5 +1,5 @@
 import userData from "../components/constants/userData"
-import logoEmpresa from '../../public/icons/icon-96x96.png'
+import logoEmpresa from '../../public/logos/logoSLS_BG_w.webp'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import getImageBase64 from "./getImageBase64"
@@ -84,7 +84,7 @@ const generarPDF = async (empresa, items) => {
 
     doc.setFontSize(10)
     doc.setTextColor(0, 0, 0)
-    doc.text(`Observaciones: ${empresa.observaciones}`, 15, 275)
+    doc.text(`Observaciones: ${empresa.observaciones?empresa.observaciones:''}`, 15, 275)
 
     doc.setFillColor(28, 58, 109) // azul (tu color institucional)
     doc.rect(0, 280, 210, 17, 'F') // x, y, width, height, 'F' = filled
@@ -94,7 +94,7 @@ const generarPDF = async (empresa, items) => {
     doc.text('Este documento no es válido como factura, es un presupuesto con impuestos incluidos.', 30, 285)
 
     // 🌐 URL clickeable debajo
-    doc.textWithLink('Para ver más productos puede ingresar en www.centralcamshop.com', 30, 291, { url: 'https://www.centralcamshop.com' })
+    doc.textWithLink(`Para ver más productos puede ingresar en ${userData.urlWWW}`, 30, 291, { url: `${userData.urlWWW}` })
 
     const pdfBlob = doc.output('blob')
     const file = new File([pdfBlob], `presupuesto_${empresa.nombre}.pdf`, {

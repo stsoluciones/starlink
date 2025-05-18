@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 
 
   //Manejo de Errores de Firebase
-  export const handleAuthError = (errorCode) => {
+  const handleAuthError = (errorCode) => {
     switch (errorCode) {
       case "auth/invalid-email":
         toast.error("Correo Inválido");
@@ -34,3 +34,5 @@ import { toast } from 'react-toastify';
         break;
     }
   };
+
+  export default handleAuthError;

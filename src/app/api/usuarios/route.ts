@@ -9,27 +9,27 @@ export async function POST(req: Request) {
         await connectDB();
         const { uid, nombreCompleto, correo, dniOCuit, telefono, direccion } = await req.json();
         const authorizationHeader = req.headers.get('Authorization');
-        console.log('Request Body back:', { uid, nombreCompleto, correo, dniOCuit, telefono, direccion });
-        console.log('Authorization Header back:', authorizationHeader);
+        //console.log('Request Body back:', { uid, nombreCompleto, correo, dniOCuit, telefono, direccion });
+        //console.log('Authorization Header back:', authorizationHeader);
         if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
-            console.error('Error: Missing or invalid Authorization header');
+            //console.error('Error: Missing or invalid Authorization header');
             return NextResponse.json({ error: 'Unauthorized: Missing or invalid Authorization header' }, { status: 401 });
         }
 
         const idToken = authorizationHeader.split(' ')[1];
-        console.log('Firebase ID Token:', idToken);
-
+        //console.log('Firebase ID Token:', idToken);
         try {
-            const decodedToken = await auth.verifyIdToken(idToken);
-            console.log('Firebase ID Token Verified:', decodedToken);
+            await auth.verifyIdToken(idToken);
+            //console.log('Firebase ID Token Verified:', decodedToken);
         } catch (error) {
-            console.error("Error verifying Firebase ID token:", error);
+            //console.error("Error verifying Firebase ID token:", error);
             return NextResponse.json({ error: 'Unauthorized: Invalid Firebase ID token' }, { status: 401 });
         }
-
+        
+        const cleanDniOCuit = dniOCuit?.trim() || undefined;
         //  Validación de dniOCuit
-        if (dniOCuit) {
-            const usuarioConMismoDni = await Usuario.findOne({ dniOCuit });
+        if (cleanDniOCuit) {
+            const usuarioConMismoDni = await Usuario.findOne({ dniOCuit: cleanDniOCuit });
             if (usuarioConMismoDni) {
                 return NextResponse.json(
                     { error: 'DNI/CUIT ya está en uso' },
@@ -46,14 +46,14 @@ export async function POST(req: Request) {
                 uid,
                 nombreCompleto,
                 correo,
-                dniOCuit,
+                dniOCuit: cleanDniOCuit,
                 telefono,
                 direccion,
                 rol: 'cliente',
             });
             await usuario.save();
             isNew = true;
-            console.log('usuario creado:', usuario);
+            //console.log('usuario creado:', usuario);
         } else {
             usuario.nombreCompleto = nombreCompleto || usuario.nombreCompleto;
             usuario.correo = correo || usuario.correo;

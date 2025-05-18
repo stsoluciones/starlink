@@ -1,7 +1,7 @@
 import React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { cn } from "../../lib/utils";
+import { cn } from "../../Utils/utils";
 
 // Definir las variantes de estilo del botón
 const buttonVariants = cva(
@@ -31,7 +31,7 @@ const buttonVariants = cva(
 );
 
 // Función refactorizada del botón
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Buttons = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
   const Component = asChild ? Slot : "button"; // Selección dinámica del tipo de componente
   return (
     <Component
@@ -40,8 +40,8 @@ const Button = React.forwardRef(({ className, variant, size, asChild = false, ..
       {...props}
     />
   );
-});
+}); 
 
-Button.displayName = "Button"; // Asegurarse de que el nombre del componente sea correcto
+Buttons.displayName = "Buttons"; // Asegurarse de que el nombre del componente sea correcto
 
-export { Button, buttonVariants };
+export { Buttons, buttonVariants };

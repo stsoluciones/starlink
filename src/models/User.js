@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true }, // Firebase UID
   nombreCompleto: { type: String, required: false },
   correo: { type: String, required: true, unique: true },
-  dniOCuit: { type: String, required: false, unique: true },
+  dniOCuit: { type: String, required: false, unique: true, sparse: true },
   telefono: { type: String },
   rol: { type: String, enum: ['cliente', 'admin'], default: 'cliente' },
   direccion: addressSchema,

@@ -12,7 +12,7 @@ export async function POST() {
     httpOnly: true,              // Debe coincidir también si la cookie original era httpOnly
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-  });
+  }); 
 
   return response;
 }

@@ -1,7 +1,5 @@
-import dynamic from 'next/dynamic';
+import AuthForm from '../../../components/Login/AuthForm';
 
-const Register = dynamic(() => import('../../../components/Login/Register.jsx'));
-
-export default function loginPage() {
-  return <Register />
+export default function RegisterPage() {
+    return <AuthForm mode="register" />;
 }
