@@ -1,5 +1,4 @@
 import Order from "../../../../models/Order";
-import mongoose from "mongoose";
 
 export async function PUT(req, { params }) {
   const { id } = params; // ID del pedido

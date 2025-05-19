@@ -1,9 +1,8 @@
 import { MercadoPagoConfig, Payment } from 'mercadopago';
-import mongoose from 'mongoose';
 import Order from '../../../models/Order';  // Asegurate que el path sea correcto
 import User from '../../../models/User';    // Para buscar info del usuario
 
-const mercadopago = MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
 
 export async function POST(req) {
   const { payment_id } = await req.json();

@@ -2,7 +2,10 @@
 
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
-const mercadopago = MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+const mercadopago = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+  options: { timeout: 5000 } // opcional
+});
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
