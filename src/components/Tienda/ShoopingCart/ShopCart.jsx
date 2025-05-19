@@ -7,22 +7,44 @@ import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
+import mercadopago from "mercadopago";
+import {MercadoPagoConfig, Preference, Payment} from 'mercadopago';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
   const [consulta, setConsulta] = useState('');
   const preguntarRef = useRef(null);
+  const mercadopago = new MercadoPagoConfig({accessToken:process.env.MP_ACCESS_TOKEN})
   const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(consulta || userData.textoPredefinido)}`;
 
   useEffect(() => {
     if (consulta) window.open(enviar, '_blank');
   }, [consulta]);
 
-  const handleConsulta = () => {
-    setConsulta(preguntarRef.current.innerText);
-    setCart([]);
+  const handleComprar = async () => {
+    try {
+      const response = await fetch("/api/crear-preferencia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cart, consulta }),
+      });
+
+      const data = await response.json();
+
+      if (data.init_point) {
+        setCart([]);
+        window.location.href = data.init_point;
+      } else {
+        console.error("No se pudo obtener el init_point");
+      }
+    } catch (error) {
+      console.error("Error en el checkout:", error);
+    }
   };
 
+
+
+  console.log('cart:',cart)
   const handleDelete = (producto) => {
     setCart((currItems) =>
       currItems.find((item) => item.cod_producto === producto.cod_producto)?.quantity === 1
@@ -127,7 +149,7 @@ const ShopCart = () => {
                 </span>
               </div>
               <div className="flex justify-between items-center mt-4"></div>
-              <button onClick={handleConsulta} className="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active w-full rounded-lg"
+              <button onClick={handleComprar} className="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active w-full rounded-lg"
                 aria-label="contactar por todo el carrito">COMPRAR</button>
             </div>
           </div>
