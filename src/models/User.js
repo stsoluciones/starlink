@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import orderSchema from './Order';
 
 const addressSchema = new mongoose.Schema({
   pais: { type: String, required: false },
@@ -19,7 +20,8 @@ const userSchema = new mongoose.Schema({
   telefono: { type: String },
   rol: { type: String, enum: ['cliente', 'admin'], default: 'cliente' },
   direccion: addressSchema,
-  fechaRegistro: { type: Date, default: Date.now }
+  fechaRegistro: { type: Date, default: Date.now },
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }]
 });
 
 const usuario = mongoose.models.User || mongoose.model('User', userSchema);

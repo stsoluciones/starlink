@@ -1,9 +1,7 @@
 // app/api/crear-preferencia/route.js
-import mercadopago from "mercadopago";
+import {MercadoPagoConfig, Preference, Payment} from "mercadopago";
 
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN, // usa variables de entorno
-});
+const mercadopago =MercadoPagoConfig({accessToken: process.env.MP_ACCESS_TOKEN});
 
 export async function POST(req) {
   try {
@@ -17,17 +15,18 @@ export async function POST(req) {
       currency_id: "ARS",
     }));
 
-    const preference = await mercadopago.preferences.create({
-      items,
-      metadata: { consulta },
-      back_urls: {
-        success: "https://tusitio.com/mp/success",
-        failure: "https://tusitio.com/mp/failure",
-        pending: "https://tusitio.com/mp/pending",
-      },
-      auto_return: "approved",
+    const preference = await new Preference(mercadopago).create({
+        body:{
+            items,
+            metadata: { consulta, uid },
+            back_urls: {
+                success: "https://tusitio.com/mp/success",
+                failure: "https://tusitio.com/mp/failure",
+                pending: "https://tusitio.com/mp/pending",
+            },
+            auto_return: "approved",
+        }
     });
-
     return Response.json({ init_point: preference.body.init_point });
   } catch (error) {
     console.error("Error al crear la preferencia:", error);

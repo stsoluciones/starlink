@@ -11,6 +11,7 @@ import AddProduct from "./AddProduct/AddProduct";
 import EmpresaForm from "./Empresas/Empresas";
 import Etiquetas from "./Etiquetas/Etiquetas";
 import fetchFiltersData, { startAutoUpdateFilters } from "../../Hooks/useBrandsCategories";
+import AdminPedidos from "./AdminPedidos/AdminPedidos";
 
 // const Swal = dynamic(() => import("sweetalert2"), { ssr: false });
 // const AddProduct = dynamic(() => import("./AddProduct/AddProduct"), { ssr: false });
@@ -300,6 +301,11 @@ export default function Admin() {
           {section === 'Etiquetas' && (
             <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
               <Etiquetas />
+            </div>
+          )}
+          {section === 'Pedidos' && (
+            <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
+              <AdminPedidos />
             </div>
           )}
         </div>
