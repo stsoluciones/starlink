@@ -7,26 +7,28 @@ import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
-import mercadopago from "mercadopago";
-import {MercadoPagoConfig, Preference, Payment} from 'mercadopago';
+import { getInLocalStorage } from '../../../Hooks/localStorage';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
+  const [user, setUser] = useState(null);
   const [consulta, setConsulta] = useState('');
   const preguntarRef = useRef(null);
-  const mercadopago = new MercadoPagoConfig({accessToken:process.env.MP_ACCESS_TOKEN})
-  const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(consulta || userData.textoPredefinido)}`;
 
-  useEffect(() => {
-    if (consulta) window.open(enviar, '_blank');
-  }, [consulta]);
-
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const userFromStorage = getInLocalStorage('USER');
+    console.log('user:', userFromStorage);
+    setUser(userFromStorage);
+  }
+}, []);
+  
   const handleComprar = async () => {
     try {
       const response = await fetch("/api/crear-preferencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, consulta }),
+        body: JSON.stringify({ cart, uid: user.uid }),
       });
 
       const data = await response.json();

@@ -1,13 +1,19 @@
-// app/api/crear-preferencia/route.js
-import {MercadoPagoConfig, Preference, Payment} from "mercadopago";
+import { MercadoPagoConfig, Preference } from 'mercadopago';
+import userData from '../../../components/constants/userData';
 
-const mercadopago =MercadoPagoConfig({accessToken: process.env.MP_ACCESS_TOKEN});
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+  options: { timeout: 5000 } // opcional
+});
 
 export async function POST(req) {
   try {
-    const { cart, consulta } = await req.json();
+    //console.log("Iniciando creación de preferencia");
+    const { cart, uid } = await req.json();
+    //console.log("cart:", cart);
+    //console.log("uid:", uid);
 
-    const items = cart.map((item) => ({
+    const items = cart.map(item => ({
       id: item.cod_producto,
       title: item.nombre,
       unit_price: Number(item.precio),
@@ -15,23 +21,40 @@ export async function POST(req) {
       currency_id: "ARS",
     }));
 
-    const preference = await new Preference(mercadopago).create({
-        body:{
-            items,
-            metadata: { consulta, uid },
-            back_urls: {
-                success: "https://tusitio.com/mp/success",
-                failure: "https://tusitio.com/mp/failure",
-                pending: "https://tusitio.com/mp/pending",
-            },
-            auto_return: "approved",
-        }
+    //console.log("Items para preferencia:", items);
+
+    const preference = new Preference(client);
+    
+    const response = await preference.create({
+      body: {
+        items,
+        metadata: { uid },
+        back_urls: {
+          success: `${userData.urlHttps}/mp/success`,
+          failure: `${userData.urlHttps}/mp/failure`,
+          pending: `${userData.urlHttps}/mp/pending`,
+        },
+        auto_return: "approved",
+      }
     });
-    return Response.json({ init_point: preference.body.init_point });
+
+    //console.log("Respuesta de MercadoPago:", response);
+
+    return new Response(
+      JSON.stringify({ init_point: response.init_point }),
+      {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      }
+    );
   } catch (error) {
     console.error("Error al crear la preferencia:", error);
-    return new Response(JSON.stringify({ error: "Error al generar preferencia" }), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ error: error.message || "Error al generar preferencia" }),
+      {
+        headers: { "Content-Type": "application/json" },
+        status: 500,
+      }
+    );
   }
 }
