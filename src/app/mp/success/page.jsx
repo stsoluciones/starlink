@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function SuccessPage() {
+function SuccessContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -23,4 +23,12 @@ export default function SuccessPage() {
   }, [searchParams]);
 
   return <h1>Gracias por tu compra</h1>;
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SuccessContent />
+    </Suspense>
+  );
 }
