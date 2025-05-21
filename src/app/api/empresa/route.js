@@ -8,7 +8,7 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  console.log('back:',req.body)
+  //console.log('back:',req.body)
   try {
     await connectDB();
     const data = await req.json();

@@ -55,7 +55,7 @@ const Register = () => {
         try {
             const res = await signUp(data);
             const { user } = res;
-            console.log('user', user);
+            //console.log('user', user);
             
             await createUserInMongoDB(user, data);
             setInLocalStorage('USER', user);

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST() {
   const response = NextResponse.json({ message: 'Sesión cerrada' });
-  console.log('estoy cerrando la sesión en logout.ts'); 
+  //console.log('estoy cerrando la sesión en logout.ts'); 
   response.cookies.delete('token'); // Eliminar la cookie 'token'
   response.cookies.delete('refreshToken'); // Eliminar la cookie 'refreshToken'
   // Eliminar la cookie asegurándote que los valores coincidan con la creación

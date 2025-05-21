@@ -5,7 +5,7 @@ export default async function GET(req, res) {
   await connectDB();
   try {
     const productos = await Producto.find({ destacados: true }).lean();
-    //console.log("Productos obtenidos:", productos);  // Debugging line
+    //console.log("Productos destacados:", productos);  // Debugging line
     res.status(200).json({ productos });
   } catch (error) {
     console.error("Error en la API:", error);

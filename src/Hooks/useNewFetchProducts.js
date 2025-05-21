@@ -15,7 +15,8 @@ const newFetchProductos = async () => {
 
         // Si no hay productos o han pasado más de 3 minutos, hacer la petición
         const res = await fetch("/api/productos");
-
+        //console.log('res:', res);
+        
         if (!res.ok) {
             throw new Error("Error al cargar los productos");
         }

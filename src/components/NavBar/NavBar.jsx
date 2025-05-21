@@ -51,7 +51,7 @@ const NavBar = () => {
       });
 
       if (result.isConfirmed) {
-        console.log('Cerrando sesión en front...');
+        //console.log('Cerrando sesión en front...');
         
         await logOutBack(); // 🧹 Elimina cookie en el backend
         removeFromLocalStorage('USER'); // 🧹 Elimina localStorage

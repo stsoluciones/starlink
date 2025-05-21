@@ -18,7 +18,7 @@ const ShopCart = () => {
 useEffect(() => {
   if (typeof window !== "undefined") {
     const userFromStorage = getInLocalStorage('USER');
-    console.log('user:', userFromStorage);
+    //console.log('user:', userFromStorage);
     setUser(userFromStorage);
   }
 }, []);
@@ -46,7 +46,7 @@ useEffect(() => {
 
 
 
-  console.log('cart:',cart)
+  //console.log('cart:',cart)
   const handleDelete = (producto) => {
     setCart((currItems) =>
       currItems.find((item) => item.cod_producto === producto.cod_producto)?.quantity === 1
