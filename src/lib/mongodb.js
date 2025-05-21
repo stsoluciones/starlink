@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const url = process.env.MONGOURL;
-console.log('URL de MongoDB:', url);
+//console.log('URL de MongoDB:', url);
 
 export async function connectDB() {
   // Verifica si ya existe una conexión activa para evitar reconectar innecesariamente.
