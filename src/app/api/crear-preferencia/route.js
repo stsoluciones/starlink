@@ -30,6 +30,9 @@ export async function POST(req) {
         items,
         metadata: { uid },
         back_urls: {
+          // success: `http://localhost:3000/mp/success`,
+          // failure: `http://localhost:3000/mp/failure`,
+          // pending: `http://localhost:3000/mp/pending`,
           success: `${userData.urlHttps}/mp/success`,
           failure: `${userData.urlHttps}/mp/failure`,
           pending: `${userData.urlHttps}/mp/pending`,

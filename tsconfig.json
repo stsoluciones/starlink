@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/app/api/guardar-pedido/route.js"  ],
   "exclude": [
     "node_modules"
   ]

@@ -34,6 +34,7 @@ const Card = ({ product, handleProductSelect }) => {
     consultMessage || userData.textoPredefinido
   )}`;
   const user = getInLocalStorage('USER');
+
   const handleComprar = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -121,15 +122,6 @@ const Card = ({ product, handleProductSelect }) => {
               </div>
               {/* Para pantallas xl */}
               <div className="hidden xl:flex justify-around gap-2 text-xs xl:text-sm">
-                <Link href={product.n_electronica} passHref
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title="Ver producto en MercadoShop"
-                    aria-label="Ver producto en MercadoShop"
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition duration-200"
-                  >
-                    <MdStore size={16} /> <span>MercadoShop</span>
-                </Link>
                 <button
                   onClick={handleConsult}
                   className={`flex items-center gap-2 px-4 py-2 text-white rounded-lg shadow transition duration-300 ${product.vendido?'bg-slate-500':'bg-primary-whats hover:bg-primary-whatsHover'}`}
@@ -193,7 +185,8 @@ const Card = ({ product, handleProductSelect }) => {
                 type="button"
                 disabled={product.vendido}
               >
-                <IconShoopingCart ancho={14} alto={14} color="#ffffff" />
+                <MdStore size={16} />
+                {/* <IconShoopingCart ancho={14} alto={14} color="#ffffff" /> */}
                 <span className="md:inline text-base">Comprar</span>
               </button>
             </div>

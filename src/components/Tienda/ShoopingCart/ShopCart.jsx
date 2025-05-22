@@ -8,9 +8,12 @@ import { CartContext } from '../../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
+import Loading from '../../Loading/Loading';
+import { set } from 'mongoose';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [consulta, setConsulta] = useState('');
   const preguntarRef = useRef(null);
@@ -24,7 +27,23 @@ useEffect(() => {
 }, []);
   
   const handleComprar = async () => {
+    if (cart.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'El carrito está vacío',
+        text: 'Agrega productos al carrito antes de continuar.',
+      });
+      return;
+    }if(user === null){
+      Swal.fire({
+        icon: 'warning',
+        title: 'Inicia sesión para continuar',
+        text: 'Debes iniciar sesión para realizar la compra.',
+      });
+      return;
+    }
     try {
+      setLoading(true);
       const response = await fetch("/api/crear-preferencia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -34,6 +53,7 @@ useEffect(() => {
       const data = await response.json();
 
       if (data.init_point) {
+        setLoading(false);
         setCart([]);
         window.location.href = data.init_point;
       } else {
@@ -152,7 +172,7 @@ useEffect(() => {
               </div>
               <div className="flex justify-between items-center mt-4"></div>
               <button onClick={handleComprar} className="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active w-full rounded-lg"
-                aria-label="contactar por todo el carrito">COMPRAR</button>
+                aria-label="contactar por todo el carrito">{loading?<Loading/>:'COMPRAR'}</button>
             </div>
           </div>
         </div>

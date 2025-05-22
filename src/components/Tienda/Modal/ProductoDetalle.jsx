@@ -1,19 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { MdStore } from "react-icons/md";
 import { RiShareFill } from "react-icons/ri";
+import { getInLocalStorage } from "../../../Hooks/localStorage";
 
 const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thumbnails, handleShare, handleAddToCart, enviar  }) => {
     const path = usePathname()
+    const router = useRouter();
+
+     const handleComprar = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleAddToCart(e);
+        const user = getInLocalStorage('USER');
+        if(user){
+            router.push('/Shopcart');
+        }else{
+            router.push('/user/Login');
+        }
+    }
     return(
     <article className="py-0 bg-white md:py-4 antialiased">
         <div className="max-w-screen-xl px-2 mx-auto 2xl:px-0">
             <div className="lg:grid lg:grid-cols-2 lg:gap-6 xl:gap-12">
                 {/* Sección de imágenes */}
                 <div id="imagenes" className="shrink-0 max-w-md lg:max-w-lg mx-auto flex flex-col justify-center" >
-                {selectedProduct.vendido && (
-                <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-3xl font-bold shadow-lg bg-red-400 px-2 rounded-md">VENDIDO</p>
-                )}
                 <div className="flex justify-center relative">
                     {mainImage ? (
                     <Image
@@ -106,24 +118,18 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
 
                 <div className="mt-1 md:mt-4 gap-2 items-center flex flex-col md:flex-row justify-center md:items-start">
                     {/* Enlace a MercadoShop (si la URL está definida) */}
-                    {/* {selectedProduct.n_electronica && (
-                    <Link
-                        href={selectedProduct.n_electronica}
-                        title="Ver en MercadoShop"
-                        aria-label="Ver producto en MercadoShop"
-                        className="w-full text-gray-500 mt-2 md:mt-4 py-2 hover:bg-boton-primary-hover font-medium rounded-lg text-sm px-4 flex items-center justify-center"
-                        target="_blank"
+                    <button
+                        onClick={handleComprar}
+                        className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow transition duration-300 bg-primary hover:bg-primary-hover'
+                        `}
+                        title="Comprar ahora"
+                        aria-label="Comprar ahora"
+                        type="button"
                     >
-                        {selectedProduct.vendido?'':<>
-                        <MdStore size={16} aria-label="boton para compartir" />
-                        <span className="ms-1">MercadoShop</span>
-                        </>
-                    }
-                    </Link>
-                    )} */}
+                        <MdStore ancho={14} alto={14} color="#ffffff" aria-label="boton para comprar"/>
+                        <span className="md:inline text-base">Comprar</span>
+                    </button>
 
-                    {/* Botón para agregar al carrito */}
-                    {selectedProduct.vendido?'':
                     <button
                         onClick={handleAddToCart}
                         type="button"
@@ -150,8 +156,6 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                         </svg>
                         <span>AGREGAR</span>
                     </button>
-                    }
-                    {selectedProduct.vendido?'':
                     <div className='flex items-center justify-items-center'>
                         {/* Enlace para consultar vía WhatsApp */}
                         <Link
@@ -167,7 +171,6 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                             <IoShareSocialSharp />
                             </button> */}
                     </div>
-                    }
                 </div>
                 </div>
             </div>

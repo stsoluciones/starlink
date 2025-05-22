@@ -1,59 +1,72 @@
-import { MercadoPagoConfig, Payment } from 'mercadopago';
-import Order from '../../../models/Order';  // Asegurate que el path sea correcto
-import User from '../../../models/User';    // Para buscar info del usuario
+import { connectDB } from "../../../lib/mongodb";
+import Order from "../../../models/Order";
+import { MercadoPagoConfig, Payment } from "mercadopago";
 
-const mercadopago = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+});
 
 export async function POST(req) {
-  const { payment_id } = await req.json();
-
-  if (!payment_id) {
-    return new Response(JSON.stringify({ error: 'Falta el payment_id' }), { status: 400 });
-  }
+  await connectDB();
 
   try {
-    // Consultar el estado del pago en MP
-    const payment = await new Payment(mercadopago).get({ id: payment_id });
+    const body = await req.json();
+    const paymentId = body.data?.id || body.payment_id;
 
-    if (payment.body.status !== 'approved') {
-      return new Response(JSON.stringify({ error: 'El pago no fue aprobado' }), { status: 400 });
+    if (!paymentId) {
+      return new Response(
+        JSON.stringify({ message: "Falta paymentId" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    const metadata = payment.body.metadata;
-    const items = payment.body.additional_info?.items || [];
-
-    // Buscar usuario por UID (desde metadata o email)
-    const user = await User.findOne({ uid: metadata.uid }); // Suponiendo que mandás el UID
-
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Usuario no encontrado' }), { status: 404 });
+    const existe = await Order.findOne({ paymentId: paymentId.toString() });
+    if (existe) {
+      return new Response(
+        JSON.stringify({ message: "Ya procesado" }),
+        { status: 200, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    // Convertir items para order
-    const orderItems = items.map((item) => ({
-      producto: item.id,  // O el _id si lo tenés
-      cantidad: item.quantity,
-      precioUnitario: item.unit_price
-    }));
+    const payment = await new Payment(client).get({ id: paymentId });
+    if (!payment) {
+      return new Response(
+        JSON.stringify({ error: "Pago no encontrado" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-    const nuevaOrden = new Order({
-      usuarioUid: user.uid,
-      usuarioInfo: {
-        nombreCompleto: user.nombreCompleto,
-        correo: user.correo
-      },
-      items: orderItems,
-      direccionEnvio: user.direccion,
-      estado: 'pendiente',
-      total: payment.body.transaction_amount,
-      fechaPedido: new Date()
-    });
+    const payer = payment.payer;
+
+  const nuevaOrden = new Order({
+    paymentId: payment.id.toString(),
+    collectionId: payment.id.toString(),
+    collectionStatus: payment.status,
+    paymentType: payment.payment_type_id,
+    merchantOrderId: payment.order?.id?.toString() || "",
+    preferenceId: payment.metadata?.preference_id || "",
+    siteId: payment.site_id,
+    processingMode: payment.processing_mode,
+    merchantAccountId: payment.metadata?.merchant_account_id || "",
+    payerEmail: payer?.email || "",
+    status: payment.status,
+
+    // Agregar estos dos campos requeridos
+    total: payment.transaction_amount, // o el campo correcto desde la respuesta
+    usuarioUid: payment.payer?.id || "desconocido", // reemplazar si tenés una mejor fuente
+  });
 
     await nuevaOrden.save();
 
-    return Response.json({ success: true, orderId: nuevaOrden._id });
+    return new Response(
+      JSON.stringify({ message: "Orden guardada", paymentId: payment.id }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (error) {
-    console.error('Error al guardar el pedido:', error);
-    return new Response(JSON.stringify({ error: 'No se pudo guardar el pedido' }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Error interno", details: error.message || error }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }
+
