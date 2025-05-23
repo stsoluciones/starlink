@@ -10,8 +10,8 @@ import Comprobantes from "./Comprobantes/Comprobantes";
 import AddProduct from "./AddProduct/AddProduct";
 import EmpresaForm from "./Empresas/Empresas";
 import Etiquetas from "./Etiquetas/Etiquetas";
-import fetchFiltersData, { startAutoUpdateFilters } from "../../Hooks/useBrandsCategories";
 import AdminPedidos from "./AdminPedidos/AdminPedidos";
+import fetchFiltersData, { startAutoUpdateFilters } from "../../Hooks/useBrandsCategories";
 
 // const Swal = dynamic(() => import("sweetalert2"), { ssr: false });
 // const AddProduct = dynamic(() => import("./AddProduct/AddProduct"), { ssr: false });
@@ -228,17 +228,14 @@ export default function Admin() {
                               <td scope="row" title={product.descripcion} className="px-1 py-1 md:px-4 md:py-3 text-center text-ellipsis hidden lg:table-cell">{product.descripcion.length > 50 ? `${product.descripcion.slice(0, 50)}...` : product.descripcion}</td>
                               <td scope="row" className="px-1 py-6 md:px-4 md:py-4">
                                 <div className="flex justify-evenly items-center mx-1">
-                                  <button
-                                    aria-label="editar producto"
-                                    id="updateProductButton"
-                                    data-modal-target="updateProductModal"
-                                    data-modal-toggle="updateProductModal"
-                                    className="px-3 py-2 text-xs items-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg me-2 "
-                                    type="button"
-                                    onClick={() => openModal('update', product)}>Editar</button>
-                                  <button aria-label="Eliminar Producto" onClick={() => handleEliminarArchivos(product)} type="button" className="px-3 py-2 text-xs focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg ">
+                                  <button aria-label="editar producto" id="updateProductButton" data-modal-target="updateProductModal" data-modal-toggle="updateProductModal"
+                                    className="hidden md:flex px-3 py-2 text-xs items-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg me-2 " type="button" onClick={() => openModal('update', product)}>Editar</button>
+                                  <button aria-label="Eliminar Producto" onClick={() => handleEliminarArchivos(product)} type="button" className="hidden md:flex px-3 py-2 text-xs focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg ">
                                     Eliminar
                                   </button>
+                                  <button aria-label="editar producto" id="updateProductButton" data-modal-target="updateProductModal" data-modal-toggle="updateProductModal"
+                                    className=" md:hidden px-3 py-2 text-xs items-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg me-2 " type="button" onClick={() => openModal('update', product)}>E</button>
+                                  <button aria-label="Eliminar Producto" onClick={() => handleEliminarArchivos(product)} type="button" className=" md:hidden px-3 py-2 text-xs focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg ">X </button>
                                 </div>
                               </td>
                             </tr>

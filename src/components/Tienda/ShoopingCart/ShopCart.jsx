@@ -2,20 +2,17 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import producto from '../../../../public/images/sinFoto.webp';
 import Link from 'next/link';
-import userData from '../../constants/userData';
 import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
 import Image from 'next/image';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
 import Loading from '../../Loading/Loading';
-import { set } from 'mongoose';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [consulta, setConsulta] = useState('');
   const preguntarRef = useRef(null);
 
 useEffect(() => {
@@ -65,8 +62,8 @@ useEffect(() => {
   };
 
 
+  console.log('cart:',cart)
 
-  //console.log('cart:',cart)
   const handleDelete = (producto) => {
     setCart((currItems) =>
       currItems.find((item) => item.cod_producto === producto.cod_producto)?.quantity === 1

@@ -28,7 +28,7 @@ export async function POST(req) {
     const response = await preference.create({
       body: {
         items,
-        metadata: { uid },
+        metadata: { uid, cart },
         back_urls: {
           // success: `http://localhost:3000/mp/success`,
           // failure: `http://localhost:3000/mp/failure`,

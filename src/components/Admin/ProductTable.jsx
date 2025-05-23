@@ -118,18 +118,12 @@ const ProductTable = ({ handleEliminarArchivos }) => {
                 <td className="px-4 py-3">{producto.marca || "N/A"}</td>
                 <td className="px-4 py-3">{producto.categoria || "N/A"}</td>
                 <td className="px-4 py-3 flex space-x-2">
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
-                    onClick={() => openModal(producto, "#update")}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    onClick={() => handleEliminarArchivos(producto)}
-                  >
-                    Eliminar
-                  </button>
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onClick={() => openModal(producto, "#update")}>E</button>
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded" onClick={() => openModal(producto, "#update")}>E</button>
+
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" onClick={() => handleEliminarArchivos(producto)}>X</button>
+                  <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" onClick={() => handleEliminarArchivos(producto)}>X</button>
+
                 </td>
               </tr>
             ))
