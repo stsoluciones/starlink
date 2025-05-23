@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Loading from "../../Loading/Loading";
 
 export default function AdminPedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -85,7 +86,7 @@ useEffect(() => {
     }
   };
 
-  if (loading) return <div className="p-4">Cargando pedidos...</div>;
+  if (loading) return <div className="p-4"><Loading /></div>;
 
  return (
         <div className="p-0 md:p-4">
@@ -131,26 +132,21 @@ useEffect(() => {
                   <th className="px-4 py-2 whitespace-nowrap">Cliente</th>
                   <th className="hidden md:flex px-4 py-2 whitespace-nowrap">Correo</th>
                   <th className="px-4 py-2 whitespace-nowrap">Estado</th>
-                  <th className="hidden md:flex px-4 py-2 whitespace-nowrap">Total</th>
-                  <th className="px-4 py-2 whitespace-nowrap">Cambiar Estado</th>
+                  <th className="hidden md:flex-col px-4 py-2 whitespace-nowrap">Total</th>
+                  <th className="hidden md:flex px-4 py-2 whitespace-nowrap">Cambiar Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {pedidosPaginados.map((pedido) => (
                   <tr key={pedido._id} className="border-t">
-                    <td className="hidden md:flex px-4 py-2 break-all">{pedido._id}</td>
+                    <td className="hidden md:flex px-4 py-2">{pedido._id}</td>
                     <td className="px-4 py-2">{new Date(pedido.fechaPedido).toLocaleDateString()}</td>
                     <td className="px-4 py-2">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</td>
                     <td className="hidden md:flex px-4 py-2">{pedido.usuarioInfo?.correo || "-"}</td>
                     <td className="px-4 py-2 font-semibold">{pedido.estado}</td>
-                    <td className="hidden md:flex px-4 py-2">${pedido.total.toFixed(2)}</td>
-                    <td className="px-4 py-2">
-                      <select
-                        disabled={actualizandoId === pedido._id}
-                        className="border rounded px-2 py-1 w-full sm:w-auto"
-                        value={pedido.estado}
-                        onChange={(e) => actualizarEstado(pedido._id, e.target.value)}
-                      >
+                    <td className="hidden md:flex-col px-4 py-2">${pedido.total.toFixed(2)}</td>
+                    <td className="hidden md:flex px-4 py-2">
+                      <select disabled={actualizandoId === pedido._id} className="border rounded px-2 py-1 w-full sm:w-auto" value={pedido.estado} onChange={(e) => actualizarEstado(pedido._id, e.target.value)}>
                         {estados.map((estado) => (
                           <option key={estado} value={estado}>
                             {estado}

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import orderSchema from './Order';
 
 const addressSchema = new mongoose.Schema({
   pais: { type: String, required: false },

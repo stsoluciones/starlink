@@ -51,6 +51,10 @@ export async function middleware(request: NextRequest) {
             if (pathname.startsWith('/Dashboard') && rol !== 'cliente') {
                 return NextResponse.redirect(new URL('/Admin', request.url));
             }
+         
+            if (pathname.startsWith('/perfil') && rol !== 'cliente') {
+                return NextResponse.redirect(new URL(rol === 'cliente' ? '/perfil' : '/Dashboard', request.url));
+            }
             //console.log('[Middleware] Token decodificado:', payload);
             //console.log('[Middleware] Token válido. Acceso permitido.');
             return NextResponse.next();
@@ -65,6 +69,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
     matcher: [
         '/Admin/:path*',
+        '/perfil/:path*',
         '/Dashboard/:path*',
         '/Ordenes/:path*',
         '/user/:path*',

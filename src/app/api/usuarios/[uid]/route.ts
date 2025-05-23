@@ -1,3 +1,4 @@
+// src/app/api/usuarios/[uid]/route.ts
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { verify } from 'jsonwebtoken';
@@ -7,47 +8,71 @@ import Usuario from '../../../../models/User';
 // Función para validar el token y el acceso
 async function verificarAutenticacion(uid: string) {
     const token = cookies().get('token')?.value;
-
+    console.log('Token en verificarAutenticacion:', token);
+    
     if (!token) {
-        return { autorizado: false, error: 'No autorizado', status: 401 };
+        return { autorizado: false, error: 'No autorizado - Token no proporcionado', status: 401 };
     }
 
     try {
         const decoded = verify(token, process.env.JWT_SECRET!) as any;
-
-        if (decoded.id !== uid && decoded.rol !== 'admin') {
-            return { autorizado: false, error: 'Acceso denegado', status: 403 };
+        console.log('Token decodificado:', decoded);
+        
+        // Verificación modificada para permitir acceso al propio usuario o a admin
+        if (decoded.uid !== uid && decoded.rol !== 'admin') {
+            return { 
+                autorizado: false, 
+                error: 'Acceso denegado - Solo puedes acceder a tu propia información', 
+                status: 403 
+            };
         }
 
         return { autorizado: true, decoded };
     } catch (err) {
-        return { autorizado: false, error: 'Token inválido o expirado', status: 403 };
+        console.error('Error al verificar token:', err);
+        return { 
+            autorizado: false, 
+            error: 'Token inválido o expirado', 
+            status: 403 
+        };
     }
 }
 
 export async function GET(req: Request, context: { params: { uid: string } }) {
     const { uid } = context.params;
+    console.log(`Solicitud GET para usuario ${uid}`);
 
     const auth = await verificarAutenticacion(uid);
     if (!auth.autorizado) {
+        console.error('Error de autorización:', auth.error);
         return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
 
     try {
         await connectDB();
-        const usuario = await Usuario.findOne({ uid });
+        const usuario = await Usuario.findOne({ uid }).select('-__v'); // Excluir campos innecesarios
 
         if (!usuario) {
+            console.error(`Usuario con UID ${uid} no encontrado`);
             return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
         }
 
-        return NextResponse.json(usuario);
+        // No enviar información sensible incluso si es el propio usuario
+        const usuarioSafe = usuario.toObject();
+        delete usuarioSafe._id; // Opcional: eliminar el _id de MongoDB si no es necesario
+
+        console.log(`Datos devueltos para usuario ${uid}`);
+        return NextResponse.json(usuarioSafe);
     } catch (error) {
-        console.error(error);
-        return NextResponse.json({ error: 'Error al obtener usuario' }, { status: 500 });
+        console.error('Error en GET /api/usuarios/[uid]:', error);
+        return NextResponse.json(
+            { error: 'Error al obtener usuario' }, 
+            { status: 500 }
+        );
     }
 }
 
+// Los métodos PUT y DELETE pueden permanecer iguales, pero con los mismos ajustes en verificarAutenticacion
 export async function PUT(req: Request, context: { params: { uid: string } }) {
     const { uid } = context.params;
 
