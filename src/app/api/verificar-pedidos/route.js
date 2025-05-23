@@ -1,6 +1,6 @@
 // app/api/verificar-pedidos/route.js
 import { NextResponse } from "next/server";
-import Order from "../../../../models/Order";
+import Order from "../../../models/Order";
 
 export async function POST() {
   try {
