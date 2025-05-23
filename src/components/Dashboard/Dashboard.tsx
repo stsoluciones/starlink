@@ -9,7 +9,7 @@
   import PerfilPage from '../Perfil/Perfil'
 
   // Constantes para estados
-  const ESTADOS_ACTIVOS = ['pendiente', 'procesando', 'enviado'] as const
+  const ESTADOS_ACTIVOS = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"] as const
   type EstadoActivo = typeof ESTADOS_ACTIVOS[number]
   type EstadoPedido = EstadoActivo | 'completado' | 'cancelado'
 
@@ -84,7 +84,7 @@
     }, [pedidos])
 
     // Estados de carga y error
-    if (loading) return <LoadingPage />
+    if (loading) return <Loading />
     if (error) return <ErrorPage message={error} />
 
     return (
@@ -152,13 +152,6 @@
     )
   }
 
-  // Componentes auxiliares (mantenemos los mismos)
-  const LoadingPage = () => (
-    <div className="flex justify-center items-center h-64">
-      <Loading />
-      <span className="ml-2">Cargando tus datos...</span>
-    </div>
-  )
 
   const ErrorPage = ({ message }: { message: string }) => (
     <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700">

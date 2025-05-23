@@ -8,7 +8,7 @@ import Usuario from '../../../../models/User';
 // Función para validar el token y el acceso
 async function verificarAutenticacion(uid: string) {
     const token = cookies().get('token')?.value;
-    console.log('Token en verificarAutenticacion:', token);
+    //console.log('Token en verificarAutenticacion:', token);
     
     if (!token) {
         return { autorizado: false, error: 'No autorizado - Token no proporcionado', status: 401 };
@@ -16,7 +16,7 @@ async function verificarAutenticacion(uid: string) {
 
     try {
         const decoded = verify(token, process.env.JWT_SECRET!) as any;
-        console.log('Token decodificado:', decoded);
+        //console.log('Token decodificado:', decoded);
         
         // Verificación modificada para permitir acceso al propio usuario o a admin
         if (decoded.uid !== uid && decoded.rol !== 'admin') {
@@ -40,7 +40,7 @@ async function verificarAutenticacion(uid: string) {
 
 export async function GET(req: Request, context: { params: { uid: string } }) {
     const { uid } = context.params;
-    console.log(`Solicitud GET para usuario ${uid}`);
+    //console.log(`Solicitud GET para usuario ${uid}`);
 
     const auth = await verificarAutenticacion(uid);
     if (!auth.autorizado) {
@@ -61,7 +61,7 @@ export async function GET(req: Request, context: { params: { uid: string } }) {
         const usuarioSafe = usuario.toObject();
         delete usuarioSafe._id; // Opcional: eliminar el _id de MongoDB si no es necesario
 
-        console.log(`Datos devueltos para usuario ${uid}`);
+        //console.log(`Datos devueltos para usuario ${uid}`);
         return NextResponse.json(usuarioSafe);
     } catch (error) {
         console.error('Error en GET /api/usuarios/[uid]:', error);
