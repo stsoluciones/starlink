@@ -1,6 +1,11 @@
+// app/api/actualizar-pedido/[id]/route.js
+
+import { connectDB } from "../../../../lib/mongodb";
 import Order from "../../../../models/Order";
 
 export async function PUT(req, { params }) {
+  await connectDB();
+
   const { id } = params; // ID del pedido
   const { nuevoEstado } = await req.json();
 

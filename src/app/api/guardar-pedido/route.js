@@ -1,6 +1,6 @@
 import { connectDB } from "../../../lib/mongodb";
 import Order from "../../../models/Order";
-import Product from "../../../models/Product";
+import Product from "../../../models/product";
 import User from "../../../models/User"; // Asegurate de importar esto correctamente
 import mongoose from "mongoose";
 import { MercadoPagoConfig, Payment } from "mercadopago";

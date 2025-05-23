@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema({
     nombreCompleto: String,
     correo: String
   },
+  paymentId: { type: String, required: true },
   items: [orderItemSchema],
   direccionEnvio: {
     pais: String,

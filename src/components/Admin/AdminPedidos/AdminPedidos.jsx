@@ -11,35 +11,35 @@ export default function AdminPedidos() {
   const pedidosPorPagina = 5;
   const estados = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"];
 
-  useEffect(() => {
-    const cargarPedidos = async () => {
-      try {
-        const res = await fetch("/api/obtener-pedidos");
-        const data = await res.json();
-        console.log('data pedidos:', data);
-        
-        if (!Array.isArray(data)) {
-          if (Array.isArray(data.pedidos)) {
-            const ordenados = data.pedidos.sort(
-              (a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido)
-            );
-            setPedidos(ordenados);
-          } else {
-            throw new Error("Respuesta inesperada del servidor.");
-          }
-        } else {
-          const ordenados = data.sort((a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido));
-          setPedidos(ordenados);
-        }
-      } catch (err) {
-        console.error("Error al obtener pedidos:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const cargarPedidos = async () => {
+    try {
+      const res = await fetch("/api/obtener-pedidos");
+      const data = await res.json();
 
-    cargarPedidos();
-  }, []);
+      const pedidosData = Array.isArray(data) ? data : data.pedidos;
+      if (!Array.isArray(pedidosData)) {
+        throw new Error("Respuesta inesperada del servidor.");
+      }
+
+      const ordenados = pedidosData.sort(
+        (a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido)
+      );
+      setPedidos(ordenados);
+
+      // Llama a la API protegida que hace la verificación desde el servidor
+      await fetch("/api/verificar-pedidos", { method: "POST" });
+    } catch (err) {
+      console.error("Error al obtener pedidos:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  cargarPedidos();
+}, []);
+
+
 
   const actualizarEstado = async (id, nuevoEstado) => {
     try {
