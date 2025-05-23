@@ -6,7 +6,7 @@ const EnviosPage = () => {
   return (
       <section id="opciones-envio" aria-labelledby="envio-heading" className="mb-12">
         <h1 id="envio-heading" className="text-3xl font-semibold text-center" title="Opciones de Envío">
-          Opciones de Envío de ESHOP DEVICES
+          Opciones de Envío de SLS
         </h1>
         <div className="mt-6 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {shippingOptions.map((option) => (

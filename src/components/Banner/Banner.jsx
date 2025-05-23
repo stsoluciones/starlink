@@ -5,7 +5,7 @@ const Banner = () => {
     <header
       id="home"
       role="banner"
-      aria-label="Banner principal de Eshop Devices"
+      aria-label="Banner principal de SLS"
       className="relative w-screen h-screen overflow-hidden flex items-center justify-center"
     >
       {/* Video de fondo */}

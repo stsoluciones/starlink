@@ -72,7 +72,7 @@ export default function Nav({ handleSelectSection }) {
             width={64}
             height={64}
             className="rounded-full"
-            alt="Logo eshop device"
+            alt="Logo sls device"
             loading="lazy"
           />
         </Link>

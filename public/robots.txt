@@ -2,5 +2,5 @@
 User-agent: *
 Disallow: /user/Login
 Disallow: /Admin
-Sitemap: https://eshopdevices.com/sitemap.xml
+Sitemap: https://starlinksoluciones.com/sitemap.xml
 

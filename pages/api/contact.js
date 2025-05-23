@@ -8,7 +8,7 @@ export default function contactHandler(req, res) {
   let subject="";
   let html = "";
   if (!req.body.Newsletter) {
-    subject= `Mensaje enviado desde Website eshopdevices`,
+    subject= `Mensaje enviado desde Website starlinksoluciones`,
     html = `
     <p>La Persona ha hecho contacto desde el sitio web:</p>
     <p>Nombre: ${req.body.name}</p>
@@ -16,7 +16,7 @@ export default function contactHandler(req, res) {
     <p>Mensaje: ${req.body.message}</p>
     `;
   } else {
-    subject= `Agregar Email al NEWSLETTER - eshopDevices`,
+    subject= `Agregar Email al NEWSLETTER - starlinksoluciones`,
     html = `
       <p>La Persona ha hecho contacto desde el sitio web:</p>
       <p>Quiere sumarse al Newsletter</p>

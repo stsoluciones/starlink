@@ -1,8 +1,8 @@
 {
   "id": "1",
-  "name": "ESHOP DEVICES",
-  "short_name": "ESHOP",
-  "description": "Eshop Devices es tu aliado tecnológico en Wilde, especializado en la venta de insumos informáticos y dispositivos electrónicos. Con atención personalizada y asesoramiento experto, te ayudamos a encontrar la solución ideal para el hogar y negocio. Descubre componentes, accesorios y gadgets de última generación.",
+  "name": "SLS",
+  "short_name": "SLS",
+  "description": "SLS es tu aliado tecnológico en Wilde, especializado en la venta de insumos informáticos y dispositivos electrónicos. Con atención personalizada y asesoramiento experto, te ayudamos a encontrar la solución ideal para el hogar y negocio. Descubre componentes, accesorios y gadgets de última generación.",
   "icons": [
     {
       "src": "icons/icon-48x48.png",

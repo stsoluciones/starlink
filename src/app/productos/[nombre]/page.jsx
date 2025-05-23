@@ -23,13 +23,13 @@ export async function generateMetadata({ params }) {
   return {
     ...defaultMetadata, // Usa los valores por defecto si no están definidos en el producto
     title: `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - E-ShopDevices` || defaultMetadata.title,
-    description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - E-Shop Devices ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
-    keywords: `${product.titulo_de_producto} - E-Shop Devices ${product.descripcion.slice(0, 200)}` || defaultMetadata.keywords,
+    description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - SLS ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
+    keywords: `${product.titulo_de_producto} - SLS ${product.descripcion.slice(0, 200)}` || defaultMetadata.keywords,
     icons: [{ url: product.foto_1_1 || defaultMetadata.openGraph.images[0].url }],
     openGraph: {
       ...defaultMetadata.openGraph,
       title: `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - E-ShopDevices` || defaultMetadata.openGraph.title,
-      description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - E-Shop Devices ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
+      description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - SLS ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
       images: [{ url: product.foto_1_1 || defaultMetadata.openGraph.images[0].url }],
       url: `${process.env.NEXT_PUBLIC_SITE_URL}/productos/${params.nombre}`,
       type: 'website',
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }) {
     twitter: {
       ...defaultMetadata.twitter,
       title: `${product.nombre} ` || defaultMetadata.twitter.title,
-      description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - E-Shop Devices ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
+      description: product.nombre? `${product.nombre} - ${product.modelo} - ${product.categoria} - ${product.marca} - SLS ${product.descripcion.slice(0, 200)}`: defaultMetadata.description,
       images: [{ url: product.foto_1_1 || defaultMetadata.twitter.images[0].url }],
     },
     alternates: {
