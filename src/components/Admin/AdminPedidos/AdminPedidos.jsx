@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Loading from "../../Loading/Loading";
 import ParaEnviar from "./ParaEnviar";
+import EnTransito from "./EnTransito";
+import Estadisticas from "./Estadisticas";
 import Todos from "./Todos";
 import cargarPedidos from "../../../Utils/cargarPedidos";
 import actualizarEstado from "../../../Utils/actualizarEstado";
@@ -21,8 +23,8 @@ export default function AdminPedidos() {
   // Tabs disponibles
   const TABS = {
     PEDIDOS: "pedidos",
-    CONFIGURACION: "configuracion",
-    REPORTES: "reportes",
+    ESTADISTICAS: "ESTADISTICAS",
+    TRANSITO: "TRANSITO",
     ENVIAR: "ENVIAR"
   };
 
@@ -73,11 +75,11 @@ const handleStados = (id, nuevoEstado) => {
       <h1 className="text-2xl font-bold mb-4 uppercase">Administración de Pedidos</h1>
       
       {/* Navegación por tabs */}
-      <div className="flex border-b mb-6">
+      <div className="flex flex-col md:flex-row  border-b mb-6">
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.PEDIDOS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.PEDIDOS)}>TODOS</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENVIAR ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENVIAR)}>ENVIAR</button>
-        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.REPORTES ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.REPORTES)}>Reportes</button>
-        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.CONFIGURACION ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.CONFIGURACION)}>Configuración</button>
+        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.TRANSITO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.TRANSITO)}>EN TRANSITO</button>
+        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ESTADISTICAS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ESTADISTICAS)}>ESTADISTICAS</button>
       </div>
 
       {/* Contenido de los tabs */}
@@ -89,18 +91,12 @@ const handleStados = (id, nuevoEstado) => {
         <ParaEnviar />
       )}
 
-      {tabActivo === TABS.REPORTES && (
-        <div className="bg-gray-50 p-8 rounded-lg text-center">
-          <h2 className="text-xl font-semibold mb-4">Reportes y Estadísticas</h2>
-          <p className="text-gray-600">Aquí encontrarás reportes de ventas y estadísticas (en desarrollo)</p>
-        </div>
+      {tabActivo === TABS.TRANSITO && (
+        <EnTransito />
       )}
 
-      {tabActivo === TABS.CONFIGURACION && (
-        <div className="bg-gray-50 p-8 rounded-lg text-center">
-          <h2 className="text-xl font-semibold mb-4">Configuración del Sistema</h2>
-          <p className="text-gray-600">Configura los parámetros de tu tienda (en desarrollo)</p>
-        </div>
+      {tabActivo === TABS.ESTADISTICAS && (
+        <Estadisticas />
       )}
     </div>
   );

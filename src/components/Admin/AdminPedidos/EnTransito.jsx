@@ -1,4 +1,4 @@
-// componentes/Admin/AdminPedidos/ParaEnviar.jsx
+// componentes/Admin/AdminPedidos/AdminPedidos.jsx
 "use client";
 import { useEffect, useState } from "react";
 import cargarPedidos from "../../../Utils/cargarPedidos";
@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 // Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
-const ParaEnviar = () => {
+const EnTransito= () => {
   const [loading, setLoading] = useState(false);
   const [pedidosProcesando, setPedidosProcesando] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
@@ -22,7 +22,7 @@ const ParaEnviar = () => {
     const obtenerPedidos = async () => {
       await cargarPedidos((todosLosPedidos) => {
         const filtrados = todosLosPedidos.filter(
-          (pedido) => pedido.estado === 'procesando'
+          (pedido) => pedido.estado === "enviado"
         );
         setPedidosProcesando(filtrados);
       }, setLoading);
@@ -104,7 +104,7 @@ const ParaEnviar = () => {
       const resultadosPromises = pedidosAActualizar.map(pedido =>
         actualizarEstado(
           pedido._id,
-          "enviado",
+          "entregado",
           setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
           setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
           true // Importante: Omitir la confirmación individual de actualizarEstado
@@ -155,12 +155,12 @@ const ParaEnviar = () => {
   };
 
   return (
-    <section className="bg-gray-50 p-0 md:p-8 rounded-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">Pedidos para Enviar</h2>
+    <section className="bg-gray-50 p-8 rounded-lg text-center">
+      <h2 className="text-xl font-semibold mb-4">Pedidos Entregados</h2>
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (
-        <p className="text-gray-600">No hay pedidos en estado &quot;procesando&quot;.</p>
+        <p className="text-gray-600">No hay pedidos en estado "Entregado".</p>
       ) : (
         <>
           <div className="mb-2 flex items-center gap-2 text-left">
@@ -175,7 +175,7 @@ const ParaEnviar = () => {
 
           <ul className="text-left space-y-2 mb-4">
             {pedidosProcesando.map((pedido, index) => (
-              <li key={pedido._id || index} className="flex items-center gap-2 p-1 text-sm md:text-base md:p-2 border rounded hover:bg-gray-100"> {/* Usar pedido._id para key si es único */}
+              <li key={pedido._id || index} className="flex items-center gap-2 p-2 border rounded hover:bg-gray-100"> {/* Usar pedido._id para key si es único */}
                 <input
                   type="checkbox"
                   id={`pedido-${pedido._id || index}`} // ID único para el input
@@ -202,7 +202,7 @@ const ParaEnviar = () => {
             disabled={seleccionados.length === 0 || loading} // Deshabilitar si está cargando
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300"
           >
-            Generar etiquetas y Marcar como Enviados ({seleccionados.length})
+            Generar etiquetas y Marcar como Entregados ({seleccionados.length})
           </button>
         </>
       )}
@@ -210,4 +210,4 @@ const ParaEnviar = () => {
   );
 };
 
-export default ParaEnviar;
+export default EnTransito;

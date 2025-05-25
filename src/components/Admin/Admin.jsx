@@ -286,22 +286,22 @@ export default function Admin() {
             </div>
           )}
           {section === 'Comprobantes' && (
-            <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
+            <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
               <Comprobantes />
             </div>
           )}
           {section === 'Empresas' && (
-            <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
+            <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
               <EmpresaForm />
             </div>
           )}
           {section === 'Etiquetas' && (
-            <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
+            <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
               <Etiquetas />
             </div>
           )}
           {section === 'Pedidos' && (
-            <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
+            <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
               <AdminPedidos />
             </div>
           )}
