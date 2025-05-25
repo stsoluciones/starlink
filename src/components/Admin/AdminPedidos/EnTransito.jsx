@@ -22,7 +22,7 @@ const EnTransito= () => {
     const obtenerPedidos = async () => {
       await cargarPedidos((todosLosPedidos) => {
         const filtrados = todosLosPedidos.filter(
-          (pedido) => pedido.estado === "enviado"
+          (pedido) => pedido.estado === 'enviado'
         );
         setPedidosProcesando(filtrados);
       }, setLoading);
