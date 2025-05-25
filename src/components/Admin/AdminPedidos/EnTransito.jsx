@@ -160,7 +160,7 @@ const EnTransito= () => {
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (
-        <p className="text-gray-600">No hay pedidos en estado "Entregado".</p>
+        <p className="text-gray-600">No hay pedidos en estado &quot;Entregado&quot;.</p>
       ) : (
         <>
           <div className="mb-2 flex items-center gap-2 text-left">
