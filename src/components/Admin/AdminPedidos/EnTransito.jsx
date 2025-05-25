@@ -55,13 +55,13 @@ const EnTransito= () => {
     setTodosSeleccionados(!todosSeleccionados);
   };
 
-  const generarEtiquetas = async () => {
+  const handleEntregados = async () => {
     const pedidosAActualizar = pedidosProcesando.filter((p) =>
       seleccionados.includes(p._id)
     );
 
     if (pedidosAActualizar.length === 0) {
-      Swal.fire("Atención", "No hay pedidos seleccionados para generar etiquetas.", "info");
+      Swal.fire("Atención", "No hay pedidos seleccionados.", "info");
       return;
     }
 
@@ -80,12 +80,12 @@ const EnTransito= () => {
     try {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
-        text: `Vas a generar etiquetas y actualizar ${pedidosAActualizar.length} pedido(s) a "enviado".`,
+        text: `Vas a actualizar ${pedidosAActualizar.length} pedido(s) a "entregados".`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, generar y actualizar',
+        confirmButtonText: 'Sí, actualizar',
         cancelButtonText: 'Cancelar',
         reverseButtons: true
       });
@@ -130,13 +130,13 @@ const EnTransito= () => {
       if (actualizadosConError > 0) {
         Swal.fire({
           title: 'Operación Parcialmente Exitosa',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "entregado". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
           icon: 'warning'
         });
       } else {
         Swal.fire({
           title: '¡Éxito!',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "entregado".`,
           icon: 'success'
         });
       }
@@ -156,7 +156,7 @@ const EnTransito= () => {
 
   return (
     <section className="bg-gray-50 p-8 rounded-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">Pedidos Entregados</h2>
+      <h2 className="text-xl font-semibold mb-4">Pedidos En Transito</h2>
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (
@@ -198,11 +198,10 @@ const EnTransito= () => {
           </ul>
 
           <button
-            onClick={generarEtiquetas}
+            onClick={handleEntregados}
             disabled={seleccionados.length === 0 || loading} // Deshabilitar si está cargando
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300"
-          >
-            Generar etiquetas y Marcar como Entregados ({seleccionados.length})
+          > Marcar como Entregados ({seleccionados.length})
           </button>
         </>
       )}
