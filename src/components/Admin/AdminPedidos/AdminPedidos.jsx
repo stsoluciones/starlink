@@ -1,8 +1,10 @@
+// componentes/Admin/AdminPedidos/AdminPedidos.jsx
 import { useEffect, useState } from "react";
 import Loading from "../../Loading/Loading";
-import Swal from 'sweetalert2';
 import ParaEnviar from "./ParaEnviar";
 import Todos from "./Todos";
+import cargarPedidos from "../../../Utils/cargarPedidos";
+import actualizarEstado from "../../../Utils/actualizarEstado";
 
 export default function AdminPedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -12,7 +14,7 @@ export default function AdminPedidos() {
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [paginaActual, setPaginaActual] = useState(1);
   const [tabActivo, setTabActivo] = useState("pedidos"); // Estado para controlar la pestaña activa
-
+  const [error, setError] = useState(null);
   const pedidosPorPagina = 5;
   const estados = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"];
 
@@ -24,91 +26,24 @@ export default function AdminPedidos() {
     ENVIAR: "ENVIAR"
   };
 
-  useEffect(() => {
-    const cargarPedidos = async () => {
+    useEffect(() => {
+    const fetchData = async () => {
       try {
-        const res = await fetch("/api/obtener-pedidos");
-        const data = await res.json();
-
-        const pedidosData = Array.isArray(data) ? data : data.pedidos;
-        if (!Array.isArray(pedidosData)) {
-          throw new Error("Respuesta inesperada del servidor.");
-        }
-
-        const ordenados = pedidosData.sort(
-          (a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido)
-        );
-        setPedidos(ordenados);
-
-        await fetch("/api/verificar-pedidos", { method: "POST" });
+        await cargarPedidos(setPedidos, setLoading);
       } catch (err) {
-        console.error("Error al obtener pedidos:", err);
-      } finally {
-        setLoading(false);
+        setError(err.message);
       }
     };
-
     if (tabActivo === TABS.PEDIDOS) {
-      cargarPedidos();
+    
+    fetchData();
     }
+
   }, [tabActivo]);
 
-  const actualizarEstado = async (id, nuevoEstado) => {
-    try {
-      const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: `Vas a cambiar el estado del pedido a "${nuevoEstado}"`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, cambiar estado',
-        cancelButtonText: 'Cancelar',
-        reverseButtons: true
-      });
-
-      if (!result.isConfirmed) return;
-
-      setActualizandoId(id);
-      
-      const res = await fetch(`/api/actualizar-pedido/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nuevoEstado }),
-      });
-      
-      const data = await res.json();
-      
-      if (data.success) {
-        await Swal.fire({
-          title: '¡Actualizado!',
-          text: `El estado del pedido ha sido cambiado a "${nuevoEstado}"`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false
-        });
-        
-        setPedidos((prev) =>
-          prev.map((p) => (p._id === id ? data.pedido : p))
-        );
-      } else {
-        await Swal.fire({
-          title: 'Error',
-          text: data.message || 'Error al actualizar estado',
-          icon: 'error'
-        });
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      await Swal.fire({
-        title: 'Error de conexión',
-        text: 'No se pudo conectar con el servidor',
-        icon: 'error'
-      });
-    } finally {
-      setActualizandoId(null);
-    }
-  };
+const handleStados = (id, nuevoEstado) => {
+  actualizarEstado(id, nuevoEstado, setActualizandoId, setPedidos);
+};
 
   const pedidosFiltrados = pedidos.filter((pedido) => {
     const texto = search.toLowerCase();
@@ -147,7 +82,7 @@ export default function AdminPedidos() {
 
       {/* Contenido de los tabs */}
       {tabActivo === TABS.PEDIDOS && (
-        <Todos search={search} filtroEstado={filtroEstado} setSearch={setSearch} setFiltroEstado={setFiltroEstado} setPaginaActual={setPaginaActual} estados={estados} pedidosPaginados={pedidosPaginados} actualizandoId={actualizandoId} paginaActual={paginaActual} totalPaginas={totalPaginas} actualizarEstado={actualizarEstado} />
+        <Todos search={search} filtroEstado={filtroEstado} setSearch={setSearch} setFiltroEstado={setFiltroEstado} cambiarPagina={cambiarPagina} estados={estados} pedidosPaginados={pedidosPaginados} actualizandoId={actualizandoId} paginaActual={paginaActual} totalPaginas={totalPaginas} handleStados={handleStados} />
       )}
 
       {tabActivo === TABS.ENVIAR && (

@@ -1,34 +1,16 @@
 import React from 'react'
+import Loading from '../../Loading/Loading';
 
-const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, setPaginaActual, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, actualizarEstado }) => {
+const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, handleStados }) => {
   return (
             <section>
           {/* Filtros */}
           <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-4">
-            <input
-              type="text"
-              placeholder="Buscar por nombre o correo..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPaginaActual(1);
-              }}
-              className="border px-3 py-2 rounded w-full sm:w-60"
-            />
-
-            <select
-              value={filtroEstado}
-              onChange={(e) => {
-                setFiltroEstado(e.target.value);
-                setPaginaActual(1);
-              }}
-              className="border px-3 py-2 rounded w-full sm:w-auto"
-            >
+            <input type="text" placeholder="Buscar por nombre o correo..." value={search} onChange={(e) => {setSearch(e.target.value); cambiarPagina(1);;}} className="border px-3 py-2 rounded w-full sm:w-60" />
+            <select value={filtroEstado} onChange={(e) => {setFiltroEstado(e.target.value); cambiarPagina(1);; }} className="border px-3 py-2 rounded w-full sm:w-auto">
               <option value="todos">Todos los estados</option>
               {estados.map((estado) => (
-                <option key={estado} value={estado}>
-                  {estado}
-                </option>
+                <option key={estado} value={estado}>{estado}</option>
               ))}
             </select>
           </div>
@@ -57,20 +39,15 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, setPaginaActua
                     <td className="px-4 py-2 font-semibold">{pedido.estado}</td>
                     <td className="hidden md:flex-col px-4 py-2">${pedido.total.toFixed(2)}</td>
                     <td className="hidden md:flex px-4 py-2">
-                      <select 
-                        disabled={actualizandoId === pedido._id} 
-                        className="border rounded px-2 py-1 w-full sm:w-auto" 
-                        value={pedido.estado} 
-                        onChange={(e) => actualizarEstado(pedido._id, e.target.value)}
-                      >
+                      <select disabled={actualizandoId === pedido._id} className="border rounded px-2 py-1 w-full sm:w-auto" value={pedido.estado} onChange={(e) => handleStados(pedido._id, e.target.value)}>
                         {estados.map((estado) => (
-                          <option key={estado} value={estado}>
-                            {estado}
-                          </option>
+                          <option key={estado} value={estado}>{estado}</option>
                         ))}
                       </select>
                       {actualizandoId === pedido._id && (
-                        <span className="ml-2 text-xs text-gray-500">Guardando...</span>
+                        <>
+                          <span className="ml-2 text-xs text-gray-500">Guardando</span><Loading />
+                        </>
                       )}
                     </td>
                   </tr>
@@ -81,21 +58,11 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, setPaginaActua
 
           {/* Paginación */}
           <div className="mt-4 flex flex-col sm:flex-row items-center gap-2">
-            <button
-              onClick={() => cambiarPagina(paginaActual - 1)}
-              disabled={paginaActual === 1}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
+            <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} className="px-3 py-1 border rounded disabled:opacity-50">
               Anterior
             </button>
-            <span>
-              Página {paginaActual} de {totalPaginas}
-            </span>
-            <button
-              onClick={() => cambiarPagina(paginaActual + 1)}
-              disabled={paginaActual === totalPaginas}
-              className="px-3 py-1 border rounded disabled:opacity-50"
-            >
+            <span>Página {paginaActual} de {totalPaginas}</span>
+            <button onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas} className="px-3 py-1 border rounded disabled:opacity-50">
               Siguiente
             </button>
           </div>
