@@ -9,9 +9,9 @@
   import PerfilPage from '../Perfil/Perfil'
 
   // Constantes para estados
-  const ESTADOS_ACTIVOS = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"] as const
+  const ESTADOS_ACTIVOS = ["pendiente", "pagado", "enviado"] as const
   type EstadoActivo = typeof ESTADOS_ACTIVOS[number]
-  type EstadoPedido = EstadoActivo | 'completado' | 'cancelado'
+  type EstadoPedido = 'entregado' | 'cancelado' | EstadoActivo
 
   export interface ItemPedido {
     producto: string
@@ -57,6 +57,7 @@
         const { data } = await axios.get<{ pedidos: Pedido[] }>(
           `/api/obtener-pedidos?usuarioUid=${uid}`
         )
+        console.log('Pedidos obtenidos:', data.pedidos)
         setPedidos(data.pedidos)
       } catch (err) {
         console.error('Error fetching orders:', err)
