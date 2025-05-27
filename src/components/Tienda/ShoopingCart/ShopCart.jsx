@@ -1,4 +1,5 @@
 'use client';
+import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import producto from '../../../../public/images/sinFoto.webp';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import Swal from 'sweetalert2';
 import Image from 'next/image';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
 import Loading from '../../Loading/Loading';
+import { FormularioEnvio } from '../../Perfil/FormularioEnvio';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -23,46 +25,169 @@ useEffect(() => {
   }
 }, []);
   
-  const handleComprar = async () => {
-    if (cart.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'El carrito está vacío',
-        text: 'Agrega productos al carrito antes de continuar.',
-      });
-      return;
-    }if(user === null){
-      Swal.fire({
-        icon: 'warning',
-        title: 'Inicia sesión para continuar',
-        text: 'Debes iniciar sesión para realizar la compra.',
-      });
-      return;
+const handleComprar = async () => {
+  if (cart.length === 0) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'El carrito está vacío',
+      text: 'Agrega productos al carrito antes de continuar.',
+    });
+    return;
+  }
+
+  if (!user) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Inicia sesión para continuar',
+      text: 'Debes iniciar sesión para realizar la compra.',
+    });
+    return;
+  }
+
+  try {
+    setLoading(true);
+    
+    // 1. Obtener información completa del usuario desde la API
+    const userResponse = await fetch(`/api/usuarios/${user.uid}`, {
+      method: 'GET',
+      credentials: 'include', // Importante para enviar las cookies
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!userResponse.ok) {
+      throw new Error('Error al obtener datos del usuario');
     }
-    try {
-      setLoading(true);
-      const response = await fetch("/api/crear-preferencia", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, uid: user.uid }),
+
+    const userData = await userResponse.json();
+    
+    // 2. Verificar campos obligatorios con los datos completos
+    const requiredFields = {
+      personales: ['nombreCompleto', 'telefono', 'dniOCuit'],
+      direccion: ['pais', 'provincia', 'ciudad', 'calle', 'numero', 'codigoPostal']
+    };
+
+    const missingPersonalFields = requiredFields.personales.filter(
+      field => !userData[field] || userData[field]?.trim() === ''
+    );
+
+    const missingAddressFields = requiredFields.direccion.filter(
+      field => !userData.direccion?.[field] || userData.direccion[field]?.trim() === ''
+    );
+
+    const allMissingFields = [...missingPersonalFields, ...missingAddressFields];
+    const totalRequiredFields = [...requiredFields.personales, ...requiredFields.direccion].length;
+    const completedFields = totalRequiredFields - allMissingFields.length;
+    const progress = Math.round((completedFields / totalRequiredFields) * 100);
+
+    // 3. Mostrar modal si faltan datos
+    if (allMissingFields.length > 0) {
+      const { value: action } = await Swal.fire({
+        title: 'Datos incompletos',
+        html: `
+          <div>
+            <p>Para continuar con la compra, necesitamos que completes tu información de envío:</p>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-4 mt-4">
+              <div class="bg-blue-600 h-4 rounded-full" style="width: ${progress}%"></div>
+            </div>
+            <p class="text-sm text-gray-600">${completedFields} de ${totalRequiredFields} campos completados (${progress}%)</p>
+            ${allMissingFields.length > 0 ? `<p class="text-xs text-red-500 mt-2">Faltan: ${allMissingFields.join(', ')}</p>` : ''}
+          </div>
+        `,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Completar ahora',
+        cancelButtonText: 'Más tarde',
+        reverseButtons: true
       });
 
-      const data = await response.json();
-
-      if (data.init_point) {
-        setLoading(false);
-        setCart([]);
-        window.location.href = data.init_point;
-      } else {
-        console.error("No se pudo obtener el init_point");
+      if (action) {
+        // Mostrar formulario de edición
+        const { value: formValues } = await Swal.fire({
+          title: 'Completa tus datos',
+          html: `<div id="formulario-envio-container"></div>`,
+          showConfirmButton: false,
+          showCancelButton: false,
+          width: '800px',
+          willOpen: () => {
+            const container = document.getElementById('formulario-envio-container');
+            ReactDOM.render(
+              <FormularioEnvio
+                user={userData}
+                missingFields={allMissingFields}
+                onCancel={() => Swal.close()}
+                onSubmit={async (data) => {
+                  try {
+                    const response = await fetch(`/api/usuarios/${user.uid}`, {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(data),
+                      credentials: 'include'
+                    });
+                    
+                    if (!response.ok) throw new Error('Error al actualizar los datos');
+                    
+                    const updatedUser = await response.json();
+                    setUser(updatedUser); // Actualizar estado local si es necesario
+                    Swal.close();
+                    
+                    // Volver a intentar la compra con los nuevos datos
+                    handleComprar();
+                  } catch (error) {
+                    Swal.fire('Error', 'No se pudieron guardar los datos. Por favor intenta nuevamente.', 'error');
+                  }
+                }}
+              />,
+              container
+            );
+          },
+          willClose: () => {
+            const container = document.getElementById('formulario-envio-container');
+            if (container) {
+              ReactDOM.unmountComponentAtNode(container);
+            }
+          }
+        });
       }
-    } catch (error) {
-      console.error("Error en el checkout:", error);
+      return;
     }
-  };
+
+    // 4. Si todos los datos están completos, proceder con la compra
+    const compraResponse = await fetch("/api/crear-preferencia", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        cart, 
+        uid: user.uid,
+        shippingInfo: { // Enviar información de envío completa
+          ...userData.direccion,
+          nombreCompleto: userData.nombreCompleto,
+          telefono: userData.telefono
+        }
+      }),
+    });
+
+    const compraData = await compraResponse.json();
+
+    if (compraData.init_point) {
+      setCart([]);
+      window.location.href = compraData.init_point;
+    } else {
+      console.error("No se pudo obtener el init_point");
+      Swal.fire('Error', 'No se pudo procesar el pago', 'error');
+    }
+
+  } catch (error) {
+    console.error("Error en el proceso de compra:", error);
+    Swal.fire('Error', 'Ocurrió un error al procesar tu compra', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
 
 
-  console.log('cart:',cart)
+  //console.log('cart:',cart)
 
   const handleDelete = (producto) => {
     setCart((currItems) =>
