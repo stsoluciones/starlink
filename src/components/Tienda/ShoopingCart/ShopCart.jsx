@@ -1,15 +1,17 @@
 'use client';
-import ReactDOM from 'react-dom';
 import React, { useState, useRef, useEffect, useContext } from 'react';
-import producto from '../../../../public/images/sinFoto.webp';
+import Image from 'next/image';
 import Link from 'next/link';
+import Swal from 'sweetalert2';
+import Loading from '../../Loading/Loading';
+import userBank from '../../constants/userBank';
+import producto from '../../../../public/images/sinFoto.webp';
 import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
-import Swal from 'sweetalert2';
-import Image from 'next/image';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
-import Loading from '../../Loading/Loading';
-import { FormularioEnvio } from '../../Perfil/FormularioEnvio';
+import  completarDatosUser  from '../../../Utils/completarDatosUser';
+import  handleCompraMercadoPago  from '../../../Utils/handleCompraMercadoPago';
+import  handleGuardarPedido  from '../../../Utils/handleGuardarPedido';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -25,6 +27,23 @@ useEffect(() => {
   }
 }, []);
   
+
+  const transferInfo = `
+            <h2 class="text-lg font-bold mb-2">Información de Transferencia</h2>
+            <p>Por favor, realiza la transferencia a la siguiente cuenta:</p>
+            <p><strong>Banco: </strong>${userBank.banco}</p>
+            <p><strong>Cuenta: </strong>${userBank.cuenta}</p>
+            <p><strong>Alias: </strong>${userBank.alias}</p>
+            <p><strong>CBU: </strong>${userBank.cbu}</p>
+            <p><strong>Titular: </strong>${userBank.titular}</p>
+            <p><strong>Monto Total: </strong>${cart.reduce((acc, item) => acc + item.precio * item.quantity, 0).toLocaleString('es-AR', {
+              style: 'currency',
+              currency: 'ARS',
+            })}</p>
+            <p class="mt-4">Una vez realizada la transferencia, por favor envíanos el comprobante a nuestro correo electrónico.</p>
+          `;
+
+
 const handleComprar = async () => {
   if (cart.length === 0) {
     Swal.fire({
@@ -47,140 +66,66 @@ const handleComprar = async () => {
   try {
     setLoading(true);
     
-    // 1. Obtener información completa del usuario desde la API
-    const userResponse = await fetch(`/api/usuarios/${user.uid}`, {
-      method: 'GET',
-      credentials: 'include', // Importante para enviar las cookies
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!userResponse.ok) {
-      throw new Error('Error al obtener datos del usuario');
-    }
-
-    const userData = await userResponse.json();
+    // Primero completar los datos del usuario SIEMPRE
+    const userCompleto = await completarDatosUser(user, setUser);
     
-    // 2. Verificar campos obligatorios con los datos completos
-    const requiredFields = {
-      personales: ['nombreCompleto', 'telefono', 'dniOCuit'],
-      direccion: ['pais', 'provincia', 'ciudad', 'calle', 'numero', 'codigoPostal']
-    };
-
-    const missingPersonalFields = requiredFields.personales.filter(
-      field => !userData[field] || userData[field]?.trim() === ''
-    );
-
-    const missingAddressFields = requiredFields.direccion.filter(
-      field => !userData.direccion?.[field] || userData.direccion[field]?.trim() === ''
-    );
-
-    const allMissingFields = [...missingPersonalFields, ...missingAddressFields];
-    const totalRequiredFields = [...requiredFields.personales, ...requiredFields.direccion].length;
-    const completedFields = totalRequiredFields - allMissingFields.length;
-    const progress = Math.round((completedFields / totalRequiredFields) * 100);
-
-    // 3. Mostrar modal si faltan datos
-    if (allMissingFields.length > 0) {
-      const { value: action } = await Swal.fire({
-        title: 'Datos incompletos',
-        html: `
-          <div>
-            <p>Para continuar con la compra, necesitamos que completes tu información de envío:</p>
-            <div class="w-full bg-gray-200 rounded-full h-4 mb-4 mt-4">
-              <div class="bg-blue-600 h-4 rounded-full" style="width: ${progress}%"></div>
-            </div>
-            <p class="text-sm text-gray-600">${completedFields} de ${totalRequiredFields} campos completados (${progress}%)</p>
-            ${allMissingFields.length > 0 ? `<p class="text-xs text-red-500 mt-2">Faltan: ${allMissingFields.join(', ')}</p>` : ''}
-          </div>
-        `,
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonText: 'Completar ahora',
-        cancelButtonText: 'Más tarde',
-        reverseButtons: true
-      });
-
-      if (action) {
-        // Mostrar formulario de edición
-        const { value: formValues } = await Swal.fire({
-          title: 'Completa tus datos',
-          html: `<div id="formulario-envio-container"></div>`,
-          showConfirmButton: false,
-          showCancelButton: false,
-          width: '800px',
-          willOpen: () => {
-            const container = document.getElementById('formulario-envio-container');
-            ReactDOM.render(
-              <FormularioEnvio
-                user={userData}
-                missingFields={allMissingFields}
-                onCancel={() => Swal.close()}
-                onSubmit={async (data) => {
-                  try {
-                    const response = await fetch(`/api/usuarios/${user.uid}`, {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(data),
-                      credentials: 'include'
-                    });
-                    
-                    if (!response.ok) throw new Error('Error al actualizar los datos');
-                    
-                    const updatedUser = await response.json();
-                    setUser(updatedUser); // Actualizar estado local si es necesario
-                    Swal.close();
-                    
-                    // Volver a intentar la compra con los nuevos datos
-                    handleComprar();
-                  } catch (error) {
-                    Swal.fire('Error', 'No se pudieron guardar los datos. Por favor intenta nuevamente.', 'error');
-                  }
-                }}
-              />,
-              container
-            );
-          },
-          willClose: () => {
-            const container = document.getElementById('formulario-envio-container');
-            if (container) {
-              ReactDOM.unmountComponentAtNode(container);
-            }
-          }
-        });
-      }
-      return;
+    // Verificar que todos los campos obligatorios estén completos
+    if (!userCompleto.nombreCompleto || !userCompleto.telefono || !userCompleto.direccion) {
+      throw new Error('Debes completar todos tus datos personales para continuar');
     }
 
-    // 4. Si todos los datos están completos, proceder con la compra
-    const compraResponse = await fetch("/api/crear-preferencia", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        cart, 
-        uid: user.uid,
-        shippingInfo: { // Enviar información de envío completa
-          ...userData.direccion,
-          nombreCompleto: userData.nombreCompleto,
-          telefono: userData.telefono
-        }
-      }),
+    // Preguntar por método de pago
+    const result = await Swal.fire({
+      title: '¿Cómo deseas pagar?',
+      icon: 'question',
+      showCancelButton: true,
+      allowOutsideClick: false,
+      confirmButtonText: 'MercadoPago',
+      cancelButtonText: 'Transferencia',
+      reverseButtons: true,
     });
 
-    const compraData = await compraResponse.json();
-
-    if (compraData.init_point) {
+    if (result.isConfirmed) {
+      // Procesar pago con MercadoPago
+      const compraResponse = await handleCompraMercadoPago(userCompleto, cart);
+      if (!compraResponse.ok) {
+        throw new Error("Falló la creación de la orden con MercadoPago");
+      }
+      
+      const compraData = await compraResponse.json();
+      if (compraData.init_point) {
+        setCart([]);
+        window.location.href = compraData.init_point;
+      } else {
+        throw new Error("No se pudo obtener el init_point");
+      }
+    } else if (result.isDismissed) {
+      // Procesar transferencia bancaria
+      const guardarPedidoData = await handleGuardarPedido(userCompleto, cart);
+      
+      if (!guardarPedidoData.success) {
+        console.error("Detalles del error:", guardarPedidoData.error);
+        throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
+      }
+      
+      // Mostrar información de transferencia
+      await Swal.fire({
+        title: 'Transferencia Bancaria',
+        html: transferInfo,
+        icon: 'info',
+        confirmButtonText: 'Aceptar',
+      });
+      
+      // Limpiar carrito después de éxito
       setCart([]);
-      window.location.href = compraData.init_point;
-    } else {
-      console.error("No se pudo obtener el init_point");
-      Swal.fire('Error', 'No se pudo procesar el pago', 'error');
     }
-
   } catch (error) {
     console.error("Error en el proceso de compra:", error);
-    Swal.fire('Error', 'Ocurrió un error al procesar tu compra', 'error');
+    Swal.fire({
+      icon: 'error',
+      title: 'Error en la compra',
+      text: error.message || 'Ocurrió un error al procesar tu compra',
+    });
   } finally {
     setLoading(false);
   }
@@ -293,8 +238,9 @@ const handleComprar = async () => {
                 </span>
               </div>
               <div className="flex justify-between items-center mt-4"></div>
-              <button onClick={handleComprar} className="inline-flex items-center justify-center px-3 py-2 text-sm font-medium text-center text-white bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active w-full rounded-lg"
-                aria-label="contactar por todo el carrito">{loading?<Loading/>:'COMPRAR'}</button>
+              <button onClick={handleComprar} disabled={loading} className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg w-full" title="Finalizar compra" aria-label="Finalizar compra">
+                {loading ? <Loading /> : 'Finalizar Compra'}
+              </button>
             </div>
           </div>
         </div>

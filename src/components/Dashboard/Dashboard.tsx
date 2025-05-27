@@ -57,7 +57,7 @@
         const { data } = await axios.get<{ pedidos: Pedido[] }>(
           `/api/obtener-pedidos?usuarioUid=${uid}`
         )
-        //console.log('Pedidos obtenidos:', data.pedidos)
+        console.log('Pedidos obtenidos:', data.pedidos)
         setPedidos(data.pedidos)
       } catch (err) {
         console.error('Error fetching orders:', err)

@@ -5,19 +5,17 @@ import { URL } from "url";
 export async function GET(req) {
   await connectDB();
   try {
-
-    // Extraer parámetros desde la URL
     const { searchParams } = new URL(req.url);
-    const estado = searchParams.get("estado");
+    const estado = searchParams.get("estado");        // valor enviado en query
     const usuarioUid = searchParams.get("usuarioUid");
-    const desde = searchParams.get("desde"); // fecha ISO
-    const hasta = searchParams.get("hasta"); // fecha ISO
+    const desde = searchParams.get("desde");
+    const hasta = searchParams.get("hasta");
     const limit = parseInt(searchParams.get("limit")) || 20;
     const page = parseInt(searchParams.get("page")) || 1;
 
     const filtros = {};
 
-    if (estado) filtros.estado = estado;
+    if (estado) filtros.estado = estado;               // <-- cambio aquí
     if (usuarioUid) filtros.usuarioUid = usuarioUid;
     if (desde || hasta) {
       filtros.fechaPedido = {};
@@ -53,3 +51,4 @@ export async function GET(req) {
     });
   }
 }
+

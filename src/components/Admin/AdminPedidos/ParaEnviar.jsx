@@ -5,10 +5,9 @@ import cargarPedidos from "../../../Utils/cargarPedidos";
 import Loading from "../../Loading/Loading";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import actualizarEstado from "../../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
+import actualizarEstado from "../../../Utils/actualizarEstado";
 import Swal from "sweetalert2";
 
-// Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
 const ParaEnviar = () => {
@@ -16,7 +15,7 @@ const ParaEnviar = () => {
   const [pedidosProcesando, setPedidosProcesando] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
   const [todosSeleccionados, setTodosSeleccionados] = useState(false);
-  const [actualizandoId, setActualizandoId] = useState(null); // No parece usarse para feedback visual directo en este componente, pero se pasa.
+  const [actualizandoId, setActualizandoId] = useState(null);
 
   useEffect(() => {
     const obtenerPedidos = async () => {
@@ -55,6 +54,31 @@ const ParaEnviar = () => {
     setTodosSeleccionados(!todosSeleccionados);
   };
 
+  const handleGenerarAndreani = async (pedidosIds) => {
+    try {
+      const response = await fetch('/api/etiquetasAndreani', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pedidos: pedidosIds
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al generar etiquetas');
+      }
+
+      const data = await response.json();
+      return data.success;
+    } catch (error) {
+      console.error('Error:', error);
+      Swal.fire('Error', 'No se pudieron generar las etiquetas', 'error');
+      return false;
+    }
+  };
+
   const generarEtiquetas = async () => {
     const pedidosAActualizar = pedidosProcesando.filter((p) =>
       seleccionados.includes(p._id)
@@ -65,7 +89,6 @@ const ParaEnviar = () => {
       return;
     }
 
-    // Validar IDs antes de proceder
     const pedidosInvalidos = pedidosAActualizar.filter(p => !objectIdRegex.test(p._id));
     if (pedidosInvalidos.length > 0) {
       console.error("Pedidos con IDs malformados:", pedidosInvalidos.map(p => p._id));
@@ -91,6 +114,26 @@ const ParaEnviar = () => {
       });
 
       if (!result.isConfirmed) return;
+      
+      const etiquetasGeneradas = await handleGenerarAndreani(seleccionados);
+      
+      if (!etiquetasGeneradas) {
+        Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
+        return;
+      }
+
+      etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
+        const blob = new Blob([Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Etiqueta-${pedidoId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(url);
+        link.remove();
+      });
+
 
       Swal.fire({
         title: 'Procesando...',
@@ -101,45 +144,33 @@ const ParaEnviar = () => {
         }
       });
 
-      const resultadosPromises = pedidosAActualizar.map(pedido =>
-        actualizarEstado(
-          pedido._id,
-          "enviado",
-          setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
-          setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
-          true // Importante: Omitir la confirmación individual de actualizarEstado
+      const resultados = await Promise.all(
+        pedidosAActualizar.map(pedido =>
+          actualizarEstado(
+            pedido._id,
+            "enviado",
+            setActualizandoId,
+            setPedidosProcesando,
+            true
+          )
         )
       );
 
-      const resultados = await Promise.all(resultadosPromises);
-
       const actualizadosConExito = resultados.filter(r => r && r.success).length;
-      const actualizadosConError = pedidosAActualizar.length - actualizadosConExito;
-
-      // Actualizar la lista de pedidosProcesando después de todas las operaciones
-      // Esto es importante porque setPedidosProcesando dentro de actualizarEstado
-      // opera sobre el estado `prev` que podría no estar sincronizado en un bucle rápido.
-      // Es mejor hacerlo una vez al final basado en los resultados.
+      
       if (actualizadosConExito > 0) {
-         setPedidosProcesando(prevPedidos =>
-            prevPedidos.filter(p => !resultados.find(r => r && r.success && r.pedido && r.pedido._id === p._id && r.pedido.estado === "enviado"))
+        setPedidosProcesando(prevPedidos =>
+          prevPedidos.filter(p =>
+            !resultados.some(r => r && r.success && r.pedido && r.pedido._id === p._id)
+          )
         );
       }
 
-
-      if (actualizadosConError > 0) {
-        Swal.fire({
-          title: 'Operación Parcialmente Exitosa',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
-          icon: 'warning'
-        });
-      } else {
-        Swal.fire({
-          title: '¡Éxito!',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
-          icon: 'success'
-        });
-      }
+      Swal.fire({
+        title: '¡Éxito!',
+        text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
+        icon: 'success'
+      });
 
       setSeleccionados([]);
       setTodosSeleccionados(false);
@@ -160,13 +191,13 @@ const ParaEnviar = () => {
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (
-        <p className="text-gray-600">No hay pedidos en estado &quot;procesando&quot;.</p>
+        <p className="text-gray-600">No hay pedidos en estado "procesando".</p>
       ) : (
         <>
           <div className="mb-2 flex items-center gap-2 text-left">
             <input
               type="checkbox"
-              id="seleccionarTodos" // Añadir ID para asociar con label
+              id="seleccionarTodos"
               checked={todosSeleccionados}
               onChange={manejarSeleccionGeneral}
             />
@@ -175,18 +206,18 @@ const ParaEnviar = () => {
 
           <ul className="text-left space-y-2 mb-4">
             {pedidosProcesando.map((pedido, index) => (
-              <li key={pedido._id || index} className="flex items-center gap-2 p-1 text-sm md:text-base md:p-2 border rounded hover:bg-gray-100"> {/* Usar pedido._id para key si es único */}
+              <li key={pedido._id || index} className="flex items-center gap-2 p-1 text-sm md:text-base md:p-2 border rounded hover:bg-gray-100">
                 <input
                   type="checkbox"
-                  id={`pedido-${pedido._id || index}`} // ID único para el input
+                  id={`pedido-${pedido._id || index}`}
                   checked={seleccionados.includes(pedido._id)}
                   onChange={() => manejarSeleccion(pedido._id)}
                 />
-                <label htmlFor={`pedido-${pedido._id || index}`} className="flex-grow cursor-pointer"> {/* Label para hacer clickeable toda la fila */}
+                <label htmlFor={`pedido-${pedido._id || index}`} className="flex-grow cursor-pointer">
                   <strong className="uppercase">{pedido.estado}{" "}</strong>
                   <span>ID: {pedido._id}</span> - {" "}
                   <span>
-                    {format(new Date(pedido.fechaPedido), "dd-MM-yyyy HH:mm", { // Añadir hora
+                    {format(new Date(pedido.createdAt), "dd-MM-yyyy HH:mm", {
                       locale: es,
                     })}
                   </span> - {" "}
@@ -199,7 +230,7 @@ const ParaEnviar = () => {
 
           <button
             onClick={generarEtiquetas}
-            disabled={seleccionados.length === 0 || loading} // Deshabilitar si está cargando
+            disabled={seleccionados.length === 0 || loading}
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300"
           >
             Generar etiquetas y Marcar como Enviados ({seleccionados.length})

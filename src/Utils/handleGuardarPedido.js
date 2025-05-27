@@ -1,0 +1,81 @@
+const handleGuardarPedido = async (user, cart) => {
+  // Validaciones iniciales
+  if (!user?.uid) {
+    return { success: false, error: 'Usuario no autenticado' };
+  }
+
+  if (!Array.isArray(cart) || cart.length === 0) {
+    return { success: false, error: 'El carrito está vacío' };
+  }
+
+  // Validar campos obligatorios del usuario
+  const camposRequeridos = ['nombreCompleto', 'telefono', 'direccion', 'correo'];
+  const camposFaltantes = camposRequeridos.filter(campo => !user[campo]);
+
+  if (camposFaltantes.length > 0) {
+    return { 
+      success: false, 
+      error: `Faltan datos obligatorios: ${camposFaltantes.join(', ')}` 
+    };
+  }
+
+  // Validar estructura del carrito
+  const carritoValido = cart.every(item => 
+    item.cod_producto && 
+    item.quantity > 0 && 
+    item.precio > 0 &&
+    item.nombre
+  );
+
+  if (!carritoValido) {
+    return { success: false, error: 'El carrito contiene items inválidos' };
+  }
+
+  try {
+    const response = await fetch('/api/guardar-pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        cart: cart.map(item => ({
+          cod_producto: item.cod_producto,
+          nombre: item.nombre,
+          precio: item.precio,
+          quantity: item.quantity,
+          // otros campos necesarios
+        })),
+        user: {
+          uid: user.uid,
+          correo: user.correo,
+          nombreCompleto: user.nombreCompleto,
+          telefono: user.telefono,
+          direccion: user.direccion,
+        },
+        paymentMethod: 'transferencia',
+        estado: 'pendiente',
+        total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0),
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { 
+        success: false, 
+        error: errorData.message || 'Error al guardar el pedido',
+        estado: response.estado 
+      };
+    }
+
+    const result = await response.json();
+    return { success: true, orderId: result.orderId };
+
+  } catch (error) {
+    console.error('Error en handleGuardarPedido:', error);
+    return { 
+      success: false, 
+      error: error.message || 'Error de conexión',
+      details: error 
+    };
+  }
+};
+export default handleGuardarPedido;

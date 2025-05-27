@@ -10,16 +10,20 @@ const orderItemSchema = new mongoose.Schema({
   precioUnitario: { type: Number, required: true }
 });
 
+
 const orderSchema = new mongoose.Schema({
-  usuarioUid: {
-    type: String,
-    required: true
-  },
+  usuarioUid: { type: String, required: true, index: true },
   usuarioInfo: {
     nombreCompleto: String,
-    correo: String
+    correo: String,
+    telefono: String
   },
-  paymentId: { type: String, required: true },
+  paymentId: String,
+  paymentMethod: {
+    type: String,
+    enum: ['mercadopago', 'transferencia', 'efectivo'],
+    required: true
+  },
   items: [orderItemSchema],
   direccionEnvio: {
     pais: String,
@@ -36,11 +40,19 @@ const orderSchema = new mongoose.Schema({
     enum: ['pendiente', 'pagado', 'procesando', 'enviado', 'entregado', 'cancelado'],
     default: 'pendiente'
   },
-  total: { type: Number, required: true },
-  fechaPedido: { type: Date, default: Date.now }
+  total: { type: Number, required: true, min: 0 },
+  collectionId: String,
+  collectionStatus: String,
+  paymentType: String,
+  merchantOrderId: String,
+  preferenceId: String,
+  siteId: String,
+  processingMode: String,
+  merchantAccountId: String,
+  payerEmail: String,
+  metadata: mongoose.Schema.Types.Mixed
+}, {
+  timestamps: true
 });
 
-
-const order = mongoose.models.Order || mongoose.model('Order', orderSchema);
-
-export default order
+export default mongoose.models.Order || mongoose.model('Order', orderSchema);
