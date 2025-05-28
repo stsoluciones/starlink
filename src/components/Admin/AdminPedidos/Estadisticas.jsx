@@ -1,160 +1,97 @@
-// componentes/Admin/AdminPedidos/Estadisticas.jsx
 import { useEffect, useState } from "react";
 import Loading from "../../Loading/Loading";
+import StatsSummary from "./estadistica/StatsSummary";
+import StatsProducts from "./estadistica/StatsProducts";
+import StatsTrends from "./estadistica/StatsTrends";
+import StatsCustomers from "./estadistica/StatsCustomers";
 
 const Estadisticas = () => {
-  const [estadisticas, setEstadisticas] = useState({
-    ventasTotales: 0,
-    pedidosPorEstado: {},
-    productosMasVendidos: [],
-    totalPedidos: 0,
-    tendenciaMensual: [],
-    totalClientes: 0,
-    clientesConPedidos: 0,
-    ticketPromedio: 0,
-    carritosAbandonados: 0,
-    metodosPago: {},
-    tiempoPromedioEntrega: 0,
-    loading: true
-  });
-  const [rango, setRango] = useState("semana");
+  const [selectedTimeRange, setSelectedTimeRange] = useState("semana");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [summary, setSummary] = useState(null);
+  const [products, setProducts] = useState(null);
+  const [trends, setTrends] = useState(null);
+  const [customers, setCustomers] = useState(null);
 
   useEffect(() => {
-    const cargarEstadisticas = async () => {
+    const fetchData = async () => {
       try {
-        setEstadisticas(prev => ({ ...prev, loading: true }));
+        setLoading(true);
+        setError(null);
+        
+        const [summaryRes, productsRes, trendsRes, customersRes] = await Promise.all([
+          fetch(`/api/estadisticas/resumen?rango=${selectedTimeRange}`),
+          fetch(`/api/estadisticas/productos?rango=${selectedTimeRange}&limite=5`),
+          fetch('/api/estadisticas/tendencias?meses=12'),
+          fetch('/api/estadisticas/clientes')
+        ]); 
 
-        const response = await fetch(`/api/Estadisticas?rango=${rango}`);
-        if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-        const data = await response.json();
+        
+        if (!summaryRes.ok || !productsRes.ok || !trendsRes.ok || !customersRes.ok) {
+          throw new Error('Error al cargar datos estadísticos');
+        }
 
-        setEstadisticas({
-          ventasTotales: data.ventasTotales || 0,
-          pedidosPorEstado: data.pedidosPorEstado || {},
-          productosMasVendidos: data.productosMasVendidos || [],
-          totalPedidos: data.totalPedidos || 0,
-          tendenciaMensual: data.tendenciaMensual || [],
-          totalClientes: data.totalClientes || 0,
-          clientesConPedidos: data.clientesConPedidos || 0,
-          ticketPromedio: data.ticketPromedio || 0,
-          carritosAbandonados: data.carritosAbandonados || 0,
-          metodosPago: data.metodosPago || {},
-          tiempoPromedioEntrega: data.tiempoPromedioEntrega || 0,
-          loading: false
-        });
-      } catch (error) {
-        console.error("Error cargando estadísticas:", error);
-        setEstadisticas(prev => ({ ...prev, loading: false }));
+        const [summaryData, productsData, trendsData, customersData] = await Promise.all([
+          summaryRes.json(),
+          productsRes.json(),
+          trendsRes.json(),
+          customersRes.json()
+        ]);
+
+        setSummary(summaryData);
+        setProducts(productsData);
+        setTrends(trendsData);
+        setCustomers(customersData);
+        console.log('summaryData:', summaryData); 
+        console.log('productsData:', productsData);
+        console.log('trendsData:', trendsData);
+        console.log('customersData:', customersData);
+      } catch (err) {
+        console.error("Error loading statistics:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    cargarEstadisticas();
-  }, [rango]);
+    fetchData();
+  }, [selectedTimeRange]);
 
-  if (estadisticas.loading) {
+  if (loading) {
     return <div className="p-4"><Loading /></div>;
   }
 
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-600 bg-red-100 border border-red-400 rounded-lg">
+        Error al cargar las estadísticas: {error}
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gray-50 p-4 md:p-8 rounded-lg">
+    <div className="bg-gray-50 p-4 md:p-8 rounded-lg space-y-8">
       <h2 className="text-xl font-semibold mb-6 text-center">Estadísticas del Sistema</h2>
+      
       <div className="mb-6 text-center">
-        <label htmlFor="rango" className="mr-2 font-medium text-gray-700">Filtrar por:</label>
+        <label htmlFor="timeRange" className="mr-2 font-medium text-gray-700">Filtrar por:</label>
         <select
-          id="rango"
+          id="timeRange"
           className="border rounded p-2"
-          value={rango}
-          onChange={(e) => setRango(e.target.value)}
+          value={selectedTimeRange}
+          onChange={(e) => setSelectedTimeRange(e.target.value)}
         >
           <option value="mes_anterior">Mes anterior</option>
-          <option value="mes">Último mes</option>
-          <option value="semana">Última semana</option>
+          <option value="mes">Mes actual</option>
+          <option value="semana">Últimos 7 días</option>
         </select>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 justify-center text-center">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium text-gray-500">Clientes Registrados</h3>
-          <p className="text-2xl font-bold">{estadisticas.totalClientes}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium text-gray-500">Clientes Activos</h3>
-          <p className="text-2xl font-bold">{estadisticas.clientesConPedidos}</p>
-          <p className="text-sm text-gray-500 mt-1">
-            {((estadisticas.clientesConPedidos / (estadisticas.totalClientes || 1)) * 100).toFixed(1)}% conversión
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium text-gray-500">Ventas Totales</h3>
-          <p className="text-2xl font-bold">${estadisticas.ventasTotales.toLocaleString()}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium text-gray-500">Ticket Promedio</h3>
-          <p className="text-2xl font-bold">${estadisticas.ticketPromedio.toFixed(2)}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium mb-3">
-            Distribución de Pedidos (
-            {Object.values(estadisticas.pedidosPorEstado).reduce((total, cantidad) => total + cantidad, 0)} en total
-            )
-          </h3>
-          <div className="space-y-2">
-            {Object.entries(estadisticas.pedidosPorEstado).map(([estado, cantidad]) => (
-              <div key={estado} className="flex items-center">
-                <span className="w-24 capitalize">{estado}:</span>
-                <div className="flex-1 bg-gray-200 rounded-full h-4">
-                  <div
-                    className="bg-blue-500 h-4 rounded-full"
-                    style={{
-                      width: `${(cantidad / Math.max(1, Object.values(estadisticas.pedidosPorEstado).reduce((a, b) => a + b, 0))) * 100}%`
-                    }}
-                  ></div>
-                </div>
-                <span className="ml-2 w-8 text-right">{cantidad}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium mb-3">Métodos de Pago</h3>
-          <div className="space-y-2">
-            {Object.entries(estadisticas.metodosPago).map(([metodo, cantidad]) => (
-              <div key={metodo} className="flex items-center">
-                <span className="w-24 capitalize">{metodo}:</span>
-                <div className="flex-1 bg-gray-200 rounded-full h-4">
-                  <div
-                    className="bg-green-500 h-4 rounded-full"
-                    style={{
-                      width: `${(cantidad / Math.max(1, Object.values(estadisticas.metodosPago).reduce((a, b) => a + b, 0))) * 100}%`
-                    }}
-                  ></div>
-                </div>
-                <span className="ml-2 w-8 text-right">{cantidad}</span>
-              </div>
-            ))}
-            {Object.keys(estadisticas.metodosPago).length === 0 && (
-              <p className="text-gray-500 text-sm">No hay datos de métodos de pago disponibles</p>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium mb-3">Carritos Abandonados</h3>
-          <p className="text-3xl font-bold text-red-500">{estadisticas.carritosAbandonados}</p>
-          <p className="text-sm text-gray-500 mt-2">Últimos 30 días</p>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="font-medium mb-3">Tasa de Conversión</h3>
-          <p className="text-3xl font-bold text-green-500">
-            {((estadisticas.totalPedidos / Math.max(1, estadisticas.totalClientes)) * 100).toFixed(1)}%
-          </p>
-        </div>
-      </div>
+      {summary && <StatsSummary data={summary} />}
+      {customers && <StatsCustomers data={customers} />}
+      {products && <StatsProducts data={products} timeRange={selectedTimeRange} />}
+      {trends && <StatsTrends data={trends} />}
     </div>
   );
 };

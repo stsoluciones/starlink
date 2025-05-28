@@ -13,6 +13,7 @@ const orderItemSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   usuarioUid: { type: String, required: true, index: true },
+  fechaPedido: { type: Date, default: Date.now },
   usuarioInfo: {
     nombreCompleto: String,
     correo: String,
@@ -20,10 +21,10 @@ const orderSchema = new mongoose.Schema({
   },
   paymentId: String,
   paymentMethod: {
-    type: String,
-    enum: ['mercadopago', 'transferencia', 'efectivo'],
-    required: true
-  },
+      type: String,
+      enum: ['mercadopago', 'transferencia', 'efectivo'],
+      required: true
+    },
   items: [orderItemSchema],
   direccionEnvio: {
     pais: String,
