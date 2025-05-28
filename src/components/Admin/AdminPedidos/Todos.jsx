@@ -1,7 +1,7 @@
 import React from 'react'
 import Loading from '../../Loading/Loading';
 
-const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, handleStados }) => {
+const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina }) => {
   return (
             <section>
           {/* Filtros */}
@@ -30,7 +30,14 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                 </tr>
               </thead>
               <tbody>
-                {pedidosPaginados.map((pedido) => (
+                {pedidosPaginados.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center text-gray-600 py-4">
+                      No hay pedidos disponibles.
+                    </td>
+                  </tr>
+                ) : (
+                pedidosPaginados.map((pedido) => (
                   <tr key={pedido._id} className="border-t">
                     <td className="hidden md:flex px-4 py-2">{pedido._id}</td>
                     <td className="px-4 py-2">{new Date(pedido.fechaPedido).toLocaleDateString()}</td>
@@ -51,7 +58,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                       )}
                     </td>
                   </tr>
-                ))}
+                )))}
               </tbody>
             </table>
           </div>

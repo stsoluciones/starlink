@@ -11,7 +11,7 @@ import Swal from "sweetalert2";
 // Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 
-const EnTransito= () => {
+const Pagados= () => {
   const [loading, setLoading] = useState(false);
   const [pedidosProcesando, setPedidosProcesando] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
@@ -22,7 +22,7 @@ const EnTransito= () => {
     const obtenerPedidos = async () => {
       await cargarPedidos((todosLosPedidos) => {
         const filtrados = todosLosPedidos.filter(
-          (pedido) => pedido.estado === 'enviado'
+          (pedido) => pedido.estado === 'pagado'
         );
         setPedidosProcesando(filtrados);
       }, setLoading);
@@ -104,7 +104,7 @@ const EnTransito= () => {
       const resultadosPromises = pedidosAActualizar.map(pedido =>
         actualizarEstado(
           pedido._id,
-          "entregado",
+          "procesando",
           setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
           setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
           true // Importante: Omitir la confirmación individual de actualizarEstado
@@ -122,7 +122,7 @@ const EnTransito= () => {
       // Es mejor hacerlo una vez al final basado en los resultados.
       if (actualizadosConExito > 0) {
          setPedidosProcesando(prevPedidos =>
-            prevPedidos.filter(p => !resultados.find(r => r && r.success && r.pedido && r.pedido._id === p._id && r.pedido.estado === "enviado"))
+            prevPedidos.filter(p => !resultados.find(r => r && r.success && r.pedido && r.pedido._id === p._id && r.pedido.estado === "pagado"))
         );
       }
 
@@ -130,13 +130,13 @@ const EnTransito= () => {
       if (actualizadosConError > 0) {
         Swal.fire({
           title: 'Operación Parcialmente Exitosa',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "entregado". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "procesando". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
           icon: 'warning'
         });
       } else {
         Swal.fire({
           title: '¡Éxito!',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "entregado".`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "procesando".`,
           icon: 'success'
         });
       }
@@ -153,14 +153,15 @@ const EnTransito= () => {
       });
     }
   };
-
+  //console.log('Pedidos procesando:', pedidosProcesando);
+  
   return (
     <section className="bg-gray-50 p-8 rounded-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">Pedidos En Transito</h2>
+      <h2 className="text-xl font-semibold mb-4">Pedidos Pagos</h2>
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (
-        <p className="text-gray-600">No hay pedidos en estado &quot;Entregado&quot;.</p>
+        <p className="text-gray-600">No hay pedidos en estado &quot;Pagado&quot;.</p>
       ) : (
         <>
           <div className="mb-2 flex items-center gap-2 text-left">
@@ -188,11 +189,11 @@ const EnTransito= () => {
                   <span>{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</span>
                   {pedido.usuarioInfo?.correo && (<span> - {pedido.usuarioInfo.correo}</span>)}
                 </label>
-                  <span>
-                      {pedido.fechaPedido && !isNaN(new Date(pedido.fechaPedido).getTime())
-                        ? format(new Date(pedido.fechaPedido), "dd-MM-yyyy", { locale: es })
-                        : ""}
-                  </span>
+                <span>
+                    {pedido.fechaPedido && !isNaN(new Date(pedido.fechaPedido).getTime())
+                      ? format(new Date(pedido.fechaPedido), "dd-MM-yyyy", { locale: es })
+                      : ""}
+                </span>
               </li>
             ))}
           </ul>
@@ -209,4 +210,4 @@ const EnTransito= () => {
   );
 };
 
-export default EnTransito;
+export default Pagados;

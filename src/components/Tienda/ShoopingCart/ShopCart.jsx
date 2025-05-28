@@ -10,8 +10,8 @@ import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
 import  completarDatosUser  from '../../../Utils/completarDatosUser';
-import  handleCompraMercadoPago  from '../../../Utils/handleCompraMercadoPago';
 import  handleGuardarPedido  from '../../../Utils/handleGuardarPedido';
+import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -87,7 +87,10 @@ const handleComprar = async () => {
 
     if (result.isConfirmed) {
       // Procesar pago con MercadoPago
-      const compraResponse = await handleCompraMercadoPago(userCompleto, cart);
+      console.log('cart:', cart);
+      console.log('userCompleto:', userCompleto);
+      
+      const compraResponse = await handleComprarMercadoPago(cart, userCompleto);
       if (!compraResponse.ok) {
         throw new Error("Falló la creación de la orden con MercadoPago");
       }

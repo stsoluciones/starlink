@@ -217,14 +217,14 @@ const ParaEnviar = () => {
                 <label htmlFor={`pedido-${pedido._id || index}`} className="flex-grow cursor-pointer">
                   <strong className="uppercase">{pedido.estado}{" "}</strong>
                   <span>ID: {pedido._id}</span> - {" "}
-                  <span>
-                    {format(new Date(pedido.createdAt), "dd-MM-yyyy HH:mm", {
-                      locale: es,
-                    })}
-                  </span> - {" "}
                   <span>{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</span>
                   {pedido.usuarioInfo?.correo && (<span> - {pedido.usuarioInfo.correo}</span>)}
                 </label>
+                <span>
+                    {pedido.fechaPedido && !isNaN(new Date(pedido.fechaPedido).getTime())
+                      ? format(new Date(pedido.fechaPedido), "dd-MM-yyyy", { locale: es })
+                      : ""}
+                </span>
               </li>
             ))}
           </ul>
