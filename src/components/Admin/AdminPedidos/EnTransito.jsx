@@ -186,10 +186,10 @@ const EnTransito= () => {
                   <strong className="uppercase">{pedido.estado}{" "}</strong>
                   <span>ID: {pedido._id}</span> - {" "}
                   <span>
-                    {format(new Date(pedido.fechaPedido), "dd-MM-yyyy HH:mm", { // Añadir hora
-                      locale: es,
-                    })}
-                  </span> - {" "}
+                    {pedido.createdAt && !isNaN(new Date(pedido.createdAt).getTime())
+                      ? format(new Date(pedido.createdAt), "dd-MM-yyyy HH:mm", { locale: es })
+                      : "Fecha inválida"}
+                  </span>
                   <span>{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</span>
                   {pedido.usuarioInfo?.correo && (<span> - {pedido.usuarioInfo.correo}</span>)}
                 </label>

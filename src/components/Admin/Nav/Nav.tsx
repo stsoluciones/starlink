@@ -63,7 +63,7 @@ export default function Nav({ handleSelectSection }) {
   };
 
   return (
-    <section className="border-gray-200 bg-[url('/bg/bg-banner.webp')]">
+    <section className="border-gray-200 bg-[url('/bg/bg-banner.webp')] bg-cover bg-no-repeat">
       {/* Header */}
       <div className="max-w-screen-xl mx-auto p-4 flex flex-wrap items-center justify-between flex-row-reverse">
         <Link href="/" className="flex items-center space-x-3" title="Volver al home">

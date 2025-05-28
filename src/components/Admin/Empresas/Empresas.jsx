@@ -22,7 +22,7 @@ export default function EmpresaForm() {
   const [editingId, setEditingId] = useState(null);
   const [busqueda, setBusqueda] = useState('');
   const [paginaActual, setPaginaActual] = useState(1);
-  const empresasPorPagina = 5;
+  const empresasPorPagina = 25;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -77,7 +77,7 @@ export default function EmpresaForm() {
   );
 
   return (
-    <div className="max-w-4xl mx-auto py-10">
+    <div className="max-w-7xl mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">Administrar Empresa</h1>
 
       {/* Buscador */}
@@ -140,29 +140,30 @@ export default function EmpresaForm() {
       </form>
 
 
-      {/* Lista paginada */}
-      <div className="grid gap-4">
-        {empresasPaginadas.map((empresa) => (
-          <Card key={empresa._id} className="p-4 w-full md:w-1/2 lg:w-1/3 bg-slate-200"> 
-            <CardContent className="space-y-2">
-              <p className="text-lg font-semibold">{empresa.nombre}</p>
-              <p>{empresa.direccion}</p>
-              <p>{empresa.mail}</p>
-              <p>{empresa.telefono}</p>
-              <p>{empresa.cuil}</p>
-              <p>{empresa.tipo}</p>
-              <div className="flex gap-2 mt-2">
-                <Buttons size="sm" onClick={() => handleEdit(empresa)}>
-                  Editar
-                </Buttons>
-                <Buttons size="sm" variant="destructive" onClick={() => handleDelete(empresa._id)}>
-                  Eliminar
-                </Buttons>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+    {/* Lista paginada */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {empresasPaginadas.map((empresa) => (
+        <Card key={empresa._id} className="p-2 bg-slate-200">
+          <CardContent className="space-y-2">
+            <p className="text-lg font-semibold">{empresa.nombre}</p>
+            <p>{empresa.direccion}</p>
+            <p>{empresa.mail}</p>
+            <p>{empresa.telefono}</p>
+            <p>{empresa.cuil}</p>
+            <p>{empresa.tipo}</p>
+            <div className="flex gap-2 mt-2">
+              <Buttons size="sm" onClick={() => handleEdit(empresa)}>
+                Editar
+              </Buttons>
+              <Buttons size="sm" variant="destructive" onClick={() => handleDelete(empresa._id)}>
+                Eliminar
+              </Buttons>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
 
       {/* Paginador */}
       {totalPaginas > 1 && (
@@ -172,7 +173,7 @@ export default function EmpresaForm() {
             page={paginaActual}
             onChange={(_, page) => setPaginaActual(page)}
             color="primary"
-          />
+          />  
         </div>
       )}
     </div>

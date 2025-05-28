@@ -115,29 +115,30 @@ const ParaEnviar = () => {
 
       if (!result.isConfirmed) return;
       
-      const etiquetasGeneradas = await handleGenerarAndreani(seleccionados);
+      // const etiquetasGeneradas = await handleGenerarAndreani(seleccionados);
       
-      if (!etiquetasGeneradas) {
-        Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
-        return;
-      }
+      // if (!etiquetasGeneradas) {
+      //   Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
+      //   return;
+      // }
 
-      etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
-        const blob = new Blob([Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Etiqueta-${pedidoId}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        URL.revokeObjectURL(url);
-        link.remove();
-      });
+      // etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
+      //   const blob = new Blob([Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))], { type: 'application/pdf' });
+      //   const url = URL.createObjectURL(blob);
+      //   const link = document.createElement('a');
+      //   link.href = url;
+      //   link.download = `Etiqueta-${pedidoId}.pdf`;
+      //   document.body.appendChild(link);
+      //   link.click();
+      //   URL.revokeObjectURL(url);
+      //   link.remove();
+      // });
 
 
       Swal.fire({
         title: 'Procesando...',
-        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
+        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).
+        <br/>Aca se genera y se imprime las etiquetas de andreani.`,
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
