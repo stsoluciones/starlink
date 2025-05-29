@@ -97,6 +97,7 @@ const handleComprar = async () => {
       
       const compraData = await compraResponse.json();
       if (compraData.init_point) {
+        await handleGuardarPedido(userCompleto, cart);
         setCart([]);
         window.location.href = compraData.init_point;
       } else {

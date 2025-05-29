@@ -1,54 +1,72 @@
-import Order from "../../../models/Order";
+import { NextResponse } from "next/server";
 import { connectDB } from "../../../lib/mongodb";
-import { URL } from "url";
+import Order from "../../../models/Order";
+import verifyMercadoPagoPayment from "../../../lib/verifyMercadoPagoPayment";
 
 export async function GET(req) {
-  await connectDB();
   try {
+    await connectDB();
+
     const { searchParams } = new URL(req.url);
-    const estado = searchParams.get("estado");        // valor enviado en query
     const usuarioUid = searchParams.get("usuarioUid");
-    const desde = searchParams.get("desde");
-    const hasta = searchParams.get("hasta");
-    const limit = parseInt(searchParams.get("limit")) || 20;
-    const page = parseInt(searchParams.get("page")) || 1;
+    const empresa = searchParams.get("empresa");
+    const estado = searchParams.get("estado");
+    const page = parseInt(searchParams.get("page") || "1", 10);
+    const limit = parseInt(searchParams.get("limit") || "100", 10);
+    const verificarPagos = searchParams.get("verificarPagos") === "true";
 
     const filtros = {};
 
-    if (estado) filtros.estado = estado;               // <-- cambio aquí
     if (usuarioUid) filtros.usuarioUid = usuarioUid;
-    if (desde || hasta) {
-      filtros.fechaPedido = {};
-      if (desde) filtros.fechaPedido.$gte = new Date(desde);
-      if (hasta) filtros.fechaPedido.$lte = new Date(hasta);
-    }
+    if (empresa) filtros.empresa = empresa;
+    if (estado) filtros.estado = estado;
 
     const pedidos = await Order.find(filtros)
       .sort({ fechaPedido: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
-      .lean()
-      .exec();
+      .lean();
 
     const total = await Order.countDocuments(filtros);
 
-    return new Response(
-      JSON.stringify({
-        pedidos,
-        total,
-        totalPages: Math.ceil(total / limit),
-        currentPage: page,
-      }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
+    if (verificarPagos) {
+      for (const pedido of pedidos) {
+        if (pedido.paymentId) {
+          try {
+            const pago = await verifyMercadoPagoPayment(pedido.paymentId);
+
+            const estadoPago = pago.status;
+            const metodoPago = pago.payment_method_id;
+
+            pedido.estadoPago = estadoPago;
+            pedido.metodoPago = metodoPago;
+
+            // Guardar actualización en la base de datos si es diferente
+            await Order.updateOne(
+              { _id: pedido._id },
+              {
+                $set: {
+                  estadoPago,
+                  metodoPago,
+                },
+              }
+            );
+          } catch (error) {
+            console.error("Error verificando pago:", error.message);
+            pedido.estadoPago = "error";
+          }
+        } else {
+          pedido.estadoPago = "sin paymentId";
+        }
       }
-    );
+    }
+
+    return NextResponse.json({ pedidos, total });
   } catch (error) {
     console.error("Error al obtener pedidos:", error);
-    return new Response(JSON.stringify({ error: "Error al obtener pedidos" }), {
-      status: 500,
-    });
+    return NextResponse.json(
+      { message: "Error al obtener pedidos" },
+      { status: 500 }
+    );
   }
 }
-
