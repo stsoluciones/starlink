@@ -35,6 +35,8 @@ export async function POST() {
           }
 
           const mpData = await verifyMercadoPagoPayment(pedido.paymentId);
+          console.log('Mercado Pagoverificar:', mpData);
+          
           const nuevoEstadoMP = mpData.status;
 
           if (nuevoEstadoMP === "approved" || nuevoEstadoMP === "cancelled") {

@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 import { connectDB } from "../../../../lib/mongodb";
 import Order from "../../../../models/Order";
 import Product from "../../../../models/product";
-import User from "../../..../models/User";
-import { verifyMercadoPagoPayment } from "../../../../lib/verifyMercadoPagoPayment";
+import User from "../../../../models/User";
+import verifyMercadoPagoPayment from "../../../../lib/verifyMercadoPagoPayment";
 
 export async function POST(req) {
   await connectDB();
@@ -49,6 +49,8 @@ export async function POST(req) {
 
       // Obtener datos reales desde MP
       const verificacion = await verifyMercadoPagoPayment(paymentId);
+      console.log('Mercado Pago guardar:', verificacion);
+      
       paymentData = verificacion.paymentData;
       payment = verificacion.payment;
       totalOrden = payment.transaction_amount;
@@ -77,9 +79,10 @@ export async function POST(req) {
           producto: producto?._id ?? new mongoose.Types.ObjectId(),
           cod_producto: item.cod_producto,
           nombre: producto?.nombre || "Producto desconocido",
+          titulo_de_producto:producto?.titulo_de_producto || "",
           cantidad: item.quantity,
           precioUnitario: item.precio,
-          foto: producto?.imagen || "",
+          foto: producto?.foto_1_1 || "",
         };
       })
     );

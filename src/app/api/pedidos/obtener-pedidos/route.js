@@ -38,41 +38,44 @@ export async function GET(req) {
     };
 
 
-    if (verificarPagos) {
-      for (const pedido of pedidos) {
-        if (pedido.paymentId) {
-          try {
-            const pago = await verifyMercadoPagoPayment(pedido.paymentId);
+if (verificarPagos) {
+  for (const pedido of pedidos) {
+    console.log('⏳ Verificando pedido:', pedido._id, 'paymentId:', pedido.paymentId);
 
-            const estadoPago = pago.status;
-            const metodoPago = pago.payment_method_id;
+    if (pedido.paymentId) {
+      try {
+        const pago = await verifyMercadoPagoPayment(pedido.paymentId);
+        console.log('✅ Respuesta de MercadoPago:', pago);
 
-            pedido.estadoPago = estadoPago;
-            pedido.metodoPago = metodoPago;
+        const estadoPago = pago.status;
+        const metodoPago = pago.payment_method_id;
 
-            // Guardar actualización en la base de datos si es diferente
-            const nuevoEstado = mapStatusToEstado[estadoPago] || pedido.estado;
+        const nuevoEstado = mapStatusToEstado[estadoPago] || pedido.estado;
 
-            await Order.updateOne(
-              { _id: pedido._id },
-              {
-                $set: {
-                  estadoPago,
-                  metodoPago,
-                  estado: nuevoEstado,
-                  ultimaVerificacionPago: new Date(),
-                },
-              }
-            );
-          } catch (error) {
-            console.error("Error verificando pago:", error.message);
-            pedido.estadoPago = "error";
+        console.log('📦 Estado MercadoPago:', estadoPago, '| Nuevo estado:', nuevoEstado);
+
+        await Order.updateOne(
+          { _id: pedido._id },
+          {
+            $set: {
+              estadoPago,
+              metodoPago,
+              estado: nuevoEstado,
+              ultimaVerificacionPago: new Date(),
+            },
           }
-        } else {
-          pedido.estadoPago = "sin paymentId";
-        }
+        );
+      } catch (error) {
+        console.error("❌ Error verificando pago:", error.message);
+        pedido.estadoPago = "error";
       }
+    } else {
+      console.warn("⚠️ Pedido sin paymentId:", pedido._id);
+      pedido.estadoPago = "sin paymentId";
     }
+  }
+}
+
 
     return NextResponse.json({ pedidos, total });
   } catch (error) {
