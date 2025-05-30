@@ -80,7 +80,7 @@ const Pagados= () => {
     try {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
-        text: `Vas a actualizar ${pedidosAActualizar.length} pedido(s) a "entregados".`,
+        text: `Vas a actualizar ${pedidosAActualizar.length} pedido(s) a "procesando".`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -202,7 +202,7 @@ const Pagados= () => {
             onClick={handleEntregados}
             disabled={seleccionados.length === 0 || loading} // Deshabilitar si está cargando
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300"
-          > Marcar como Entregados ({seleccionados.length})
+          > Marcar como PROCESANDO ({seleccionados.length})
           </button>
         </>
       )}

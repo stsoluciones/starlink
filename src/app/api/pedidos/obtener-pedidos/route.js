@@ -1,7 +1,8 @@
+//app/api/pedidos/obtener-pedidos/route.js
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../lib/mongodb";
-import Order from "../../../models/Order";
-import verifyMercadoPagoPayment from "../../../lib/verifyMercadoPagoPayment";
+import { connectDB } from "../../../../lib/mongodb";
+import Order from "../../../../models/Order";
+import verifyMercadoPagoPayment from "../../../../lib/verifyMercadoPagoPayment";
 
 export async function GET(req) {
   try {
@@ -28,6 +29,14 @@ export async function GET(req) {
       .lean();
 
     const total = await Order.countDocuments(filtros);
+    const mapStatusToEstado = {
+      approved: 'pagado',
+      in_process: 'pendiente',
+      rejected: 'cancelado',
+      refunded: 'cancelado',
+      // otros estados que maneje MP
+    };
+
 
     if (verificarPagos) {
       for (const pedido of pedidos) {
@@ -42,12 +51,16 @@ export async function GET(req) {
             pedido.metodoPago = metodoPago;
 
             // Guardar actualización en la base de datos si es diferente
+            const nuevoEstado = mapStatusToEstado[estadoPago] || pedido.estado;
+
             await Order.updateOne(
               { _id: pedido._id },
               {
                 $set: {
                   estadoPago,
                   metodoPago,
+                  estado: nuevoEstado,
+                  ultimaVerificacionPago: new Date(),
                 },
               }
             );

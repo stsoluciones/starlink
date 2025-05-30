@@ -1,14 +1,10 @@
+//app/api/pedidos/guardar-pedido/route.js
 import mongoose from "mongoose";
-import { connectDB } from "../../../lib/mongodb";
-import Order from "../../../models/Order";
-import Product from "../../../models/product";
-import User from "../../../models/User";
-import { verifyMercadoPagoPayment } from "../../../lib/verifyMercadoPagoPayment";
-import { MercadoPagoConfig } from "mercadopago"; // Asegúrate de tener esta importación si es necesaria
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN,
-});
+import { connectDB } from "../../../../lib/mongodb";
+import Order from "../../../../models/Order";
+import Product from "../../../../models/product";
+import User from "../../..../models/User";
+import { verifyMercadoPagoPayment } from "../../../../lib/verifyMercadoPagoPayment";
 
 export async function POST(req) {
   await connectDB();

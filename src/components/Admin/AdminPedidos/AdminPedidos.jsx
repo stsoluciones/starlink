@@ -5,6 +5,7 @@ import ParaEnviar from "./ParaEnviar";
 import EnTransito from "./EnTransito";
 import Pagados from "./Pagados";
 import Estadisticas from "./Estadisticas";
+import Entregado from "./Entregado";
 import Todos from "./Todos";
 import cargarPedidos from "../../../Utils/cargarPedidos";
 import actualizarEstado from "../../../Utils/actualizarEstado";
@@ -18,7 +19,7 @@ export default function AdminPedidos() {
   const [paginaActual, setPaginaActual] = useState(1);
   const [tabActivo, setTabActivo] = useState("pedidos"); // Estado para controlar la pestaña activa
   const [error, setError] = useState(null);
-  const pedidosPorPagina = 5;
+  const pedidosPorPagina = 25;
   const estados = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"];
 
   // Tabs disponibles
@@ -27,6 +28,7 @@ export default function AdminPedidos() {
     PAGADOS: "PAGADOS",
     ESTADISTICAS: "ESTADISTICAS",
     TRANSITO: "TRANSITO",
+    ENTREGADO: "ENTREGADO",
     ENVIAR: "ENVIAR"
   };
 
@@ -82,6 +84,7 @@ const handleStados = (id, nuevoEstado) => {
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.PAGADOS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.PAGADOS)}>PAGADOS</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENVIAR ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENVIAR)}>ENVIAR</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.TRANSITO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.TRANSITO)}>EN TRANSITO</button>
+        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENTREGADO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENTREGADO)}>ENTREGADO</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ESTADISTICAS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ESTADISTICAS)}>ESTADISTICAS</button>
       </div>
 
@@ -100,7 +103,9 @@ const handleStados = (id, nuevoEstado) => {
       {tabActivo === TABS.TRANSITO && (
         <EnTransito />
       )}
-
+      {tabActivo === TABS.ENTREGADO && (
+        <Entregado />
+      )}
       {tabActivo === TABS.ESTADISTICAS && (
         <Estadisticas />
       )}

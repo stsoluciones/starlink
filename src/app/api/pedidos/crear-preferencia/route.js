@@ -1,5 +1,6 @@
+//app/api/pedidos/crear-preferencia/route.js
 import { MercadoPagoConfig, Preference } from 'mercadopago';
-import userData from '../../../components/constants/userData';
+import userData from '../../../../components/constants/userData';
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,

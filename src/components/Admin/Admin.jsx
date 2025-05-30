@@ -104,13 +104,6 @@ export default function Admin() {
   }, [isModalClose, isModalOpen]);
 
 
-  const loadingElement = document.createElement('div');
-  const root = ReactDOM.createRoot(loadingElement);
-  const container = document.createElement('div');
-  root.render(<Loading />);
-  container.innerHTML = `<h2><strong>AGUARDE</strong></h2><br/><p> se está eliminando el producto</p>`;
-  container.appendChild(loadingElement);
-
   const handleEliminarArchivos = async (producto) => {
     try {
       const result = await Swal.fire({

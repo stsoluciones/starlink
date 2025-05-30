@@ -27,7 +27,7 @@ const actualizarEstado = async (
 
     setActualizandoId(id);
 
-    const res = await fetch(`/api/actualizar-pedido/${id}`, {
+    const res = await fetch(`/api/pedidos/actualizar-pedido/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nuevoEstado }),

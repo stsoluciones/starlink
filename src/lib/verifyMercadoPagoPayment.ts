@@ -1,3 +1,4 @@
+//src/lib/verifyMercadoPagoPayment.ts
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
 const client = new MercadoPagoConfig({

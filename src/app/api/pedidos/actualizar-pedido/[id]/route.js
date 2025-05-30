@@ -1,7 +1,7 @@
-// app/api/actualizar-pedido/[id]/route.js
+// app/api/pedidos/actualizar-pedido/[id]/route.js
 
-import { connectDB } from "../../../../lib/mongodb"; // Asumiendo rutas correctas
-import Order from "../../../../models/Order"; // Asumiendo rutas correctas
+import { connectDB } from "../../../../../lib/mongodb"; // Asumiendo rutas correctas
+import Order from "../../../../../models/Order"; // Asumiendo rutas correctas
 
 // Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;

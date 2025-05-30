@@ -1,3 +1,4 @@
+//app/api/usuarios/route.ts
 import { NextResponse } from 'next/server';
 import { connectDB } from '../../../lib/mongodb';
 import Usuario from '../../../models/User';

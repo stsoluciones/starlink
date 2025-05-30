@@ -9,7 +9,7 @@
   import PerfilPage from '../Perfil/Perfil'
 
   // Constantes para estados
-  const ESTADOS_ACTIVOS = ["pendiente", "pagado", "enviado"] as const
+  const ESTADOS_ACTIVOS = ["pendiente", "pagado","procesando", "enviado"] as const
   type EstadoActivo = typeof ESTADOS_ACTIVOS[number]
   type EstadoPedido = 'entregado' | 'cancelado' | EstadoActivo
 
@@ -55,7 +55,7 @@
       try {
         setLoading(true)
         const { data } = await axios.get<{ pedidos: Pedido[] }>(
-          `/api/obtener-pedidos?usuarioUid=${uid}`
+          `/api/pedidos/obtener-pedidos?usuarioUid=${uid}`
         )
         console.log('Pedidos obtenidos:', data.pedidos)
         setPedidos(data.pedidos)

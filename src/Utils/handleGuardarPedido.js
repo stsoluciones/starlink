@@ -32,7 +32,7 @@ const handleGuardarPedido = async (user, cart) => {
   }
 
   try {
-    const response = await fetch('/api/guardar-pedido', {
+    const response = await fetch('/api/pedidos/guardar-pedido', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

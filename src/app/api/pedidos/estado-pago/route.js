@@ -1,4 +1,4 @@
-//app/api/estado-pago/route.js
+//app/api/pedidos/estado-pago/route.js
 import { NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 
