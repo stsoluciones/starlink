@@ -42,8 +42,6 @@ export async function POST(req) {
       }
     });
 
-    //console.log("Respuesta de MercadoPago:", response);
-
     return new Response(
       JSON.stringify({ init_point: response.init_point }),
       {
