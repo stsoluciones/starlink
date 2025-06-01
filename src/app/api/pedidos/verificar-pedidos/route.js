@@ -1,4 +1,4 @@
-// app/api/pedidos/verificar-pago/route.js
+// app/api/pedidos/verificar-pedidos/route.js
 import { NextResponse } from 'next/server';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
 import Order from '../../../../models/Order';

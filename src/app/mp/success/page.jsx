@@ -19,7 +19,7 @@ export default function SuccessPage() {
           throw new Error('No se encontró el ID de pago en la URL');
         }
 
-        const { data } = await axios.post('/api/pedidos/verificar-pago', {
+        const { data } = await axios.post('/api/pedidos/verificar-pendientes', {
           paymentId: payment_id,
           preferenceId: preference_id
         }, {
@@ -37,7 +37,7 @@ export default function SuccessPage() {
             text: 'Tu pago ha sido procesado correctamente.',
             confirmButtonText: 'Ver mis pedidos'
           });
-          router.push('/mis-pedidos');
+          router.push('/Dashboard');
         } else {
           await Swal.fire({
             icon: 'info',
