@@ -1,6 +1,6 @@
 //app/Utils/handleGuardarPedidoMercado.js
 
-const handleGuardarPedidoMercado = async (user, cart,compraData) => {
+const handleGuardarPedidoMercado = async (user, cart, compraData) => {
   // Validaciones iniciales
   if (!user?.uid) {
     return { success: false, error: 'Usuario no autenticado' };
@@ -32,10 +32,11 @@ const handleGuardarPedidoMercado = async (user, cart,compraData) => {
   if (!carritoValido) {
     return { success: false, error: 'El carrito contiene items inválidos' };
   }
-console.log('compraData:', compraData.init_point);
+console.log('compraData:', compraData);
 
-  const parsedUrl = new URL(compraData.init_point);
-  const prefId = parsedUrl.searchParams.get("pref_id");
+  
+  const prefId = compraData?.pref_id || compraData?.preference_id;
+  const externalReference = compraData?.external_reference || compraData?.external_reference_id;
 
   try {
     console.log('Iniciando guardado de pedido con MercadoPago');    
@@ -58,6 +59,7 @@ console.log('compraData:', compraData.init_point);
           telefono: user.telefono,
           direccion: user.direccion,
         },
+        external_reference: externalReference,
         pref_id: prefId,
         paymentId: prefId,
         paymentMethod: 'mercadopago',

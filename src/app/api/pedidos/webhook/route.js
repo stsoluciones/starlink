@@ -1,6 +1,6 @@
 // app/api/pedidos/webhook/route.js
 import { connectDB } from '../../../../lib/mongodb';
-import Order from '../../../../models/Order';
+import Order from '../../../../models/Order'; // Asegúrate que este modelo incluye 'external_reference'
 
 function mapEstadoMP(status) {
   switch (status) {
@@ -15,7 +15,7 @@ function mapEstadoMP(status) {
     case 'charged_back':
       return 'cancelado';
     default:
-      return 'pendiente';
+      return 'pendiente'; // O un estado como 'desconocido_mp'
   }
 }
 
@@ -23,55 +23,70 @@ export async function POST(req) {
   try {
     const body = await req.json();
     console.log('📥 Webhook recibido:', body);
-    
+
     const topic = body.type;
     const paymentId = body.data?.id;
 
     if (topic !== 'payment' || !paymentId) {
-      return new Response(JSON.stringify({ error: 'Not a payment notification' }), { status: 400 });
+      console.log('Notificación no es de tipo "payment" o falta data.id.');
+      // Devolver 200 para que MP no reintente notificaciones irrelevantes
+      return new Response(JSON.stringify({ success: true, message: 'Notificación no procesada (no es de tipo payment o falta data.id)' }), { status: 200 });
     }
 
     // Consultar a MP para obtener detalles del pago
-    const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+    const mpResponse = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       headers: {
         Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
       },
     });
 
-    const payment = await res.json();
-
-    console.log("🔍 Datos del pago:", payment);
-
-    // Validar pago aprobado
-    const estadoMapped = mapEstadoMP(payment.status);
-    if (!payment || !payment.metadata) {
-      console.warn('❗️Metadata faltante en el pago');
-      return new Response(JSON.stringify({ error: 'Metadata faltante en pago' }), { status: 400 });
+    if (!mpResponse.ok) {
+      const errorData = await mpResponse.text();
+      console.error(`❌ Error al obtener detalles del pago ${paymentId} de MP: ${mpResponse.status}`, errorData);
+      return new Response(JSON.stringify({ error: 'Error al consultar API de MP' }), { status: mpResponse.status });
     }
 
-    // Conectar a DB
+    const payment = await mpResponse.json();
+    console.log("🔍 Datos del pago desde MP:", payment);
+
+    const externalRefFromPayment = payment.external_reference;
+    const mpPaymentStatus = payment.status;
+    const mappedInternalStatus = mapEstadoMP(mpPaymentStatus);
+
+    if (!externalRefFromPayment) {
+      console.warn('⚠️ External Reference no encontrada en los datos del pago de MP. Payment ID:', paymentId, 'Datos del pago:', payment);
+      // Es un problema si confías en external_reference. Decide cómo manejarlo.
+      // Devolver 200 para que MP no reintente si el dato realmente falta en MP.
+      return new Response(JSON.stringify({ success: true, message: 'External Reference faltante en datos de MP, notificación acusada.' }), { status: 200 });
+    }
+
     await connectDB();
 
-    const prefId = payment.metadata.pref_id || payment.preference_id;
-    const order = await Order.findOne({ pref_id: prefId });
+    // Buscar la orden usando external_reference
+    const order = await Order.findOne({ external_reference: externalRefFromPayment });
 
     if (!order) {
-      console.warn('⚠️ Orden no encontrada para pref_id:', prefId);
-      return new Response(JSON.stringify({ error: 'Orden no encontrada' }), { status: 404 });
+      console.warn('⚠️ Orden no encontrada en DB para external_reference:', externalRefFromPayment, '. Payment ID de MP:', paymentId);
+      // Devolver 200 para acusar recibo a MP, el problema es de sincronización de datos o un pedido no guardado.
+      return new Response(JSON.stringify({ success: true, message: 'Orden no encontrada para la external_reference, notificación acusada.' }), { status: 200 });
     }
 
+    console.log(`🔄 Actualizando orden ${order._id} (ExtRef: ${externalRefFromPayment}) con estado de MP "${mpPaymentStatus}" a estado interno "${mappedInternalStatus}"`);
+
     // Actualizar pedido
-    order.estado = estadoMapped;
-    order.paymentId = payment.id;
+    order.estado = mappedInternalStatus;
+    order.paymentId = payment.id; // El ID del pago actual
+    order.pref_id = payment.preference_id; // Guardar también el preference_id si está disponible y es útil
     order.collectionId = payment.collection_id || payment.id;
-    order.collectionStatus = payment.status;
+    order.collectionStatus = payment.status; // El estado crudo de MP
     order.paymentType = payment.payment_type_id;
-    order.preferenceId = prefId;
+    // order.external_reference ya debería estar seteado, pero puedes re-asegurarlo si quieres
+    // order.external_reference = externalRefFromPayment;
     order.siteId = payment.site_id;
     order.processingMode = payment.processing_mode;
     order.merchantAccountId = payment.merchant_account_id;
     order.payerEmail = payment.payer?.email;
-    order.metadata = payment.metadata;
+    order.metadata = payment.metadata; // Metadata que enviaste originalmente
     order.paymentDetails = {
       status: payment.status,
       status_detail: payment.status_detail,
@@ -81,16 +96,20 @@ export async function POST(req) {
       transaction_amount: payment.transaction_amount,
       date_approved: payment.date_approved,
       date_created: payment.date_created,
-      last_updated: payment.last_modified,
+      last_updated: payment.last_modified || payment.date_last_updated,
     };
 
     await order.save();
 
-    console.log("✅ Pedido actualizado a estado:", estadoMapped);
+    console.log(`✅ Pedido ${order._id} actualizado a estado: ${mappedInternalStatus}. Payment ID: ${payment.id}`);
+
+    // Aquí podrías disparar otras acciones (ej: enviar email de confirmación si 'pagado')
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
+
   } catch (error) {
-    console.error('❌ Error en webhook:', error);
-    return new Response('Error en webhook', { status: 500 });
+    console.error('❌ Error fatal en webhook:', error);
+    // Devolver 500 indica a MP que algo salió mal y podría reintentar.
+    return new Response(JSON.stringify({ error: 'Error interno en webhook', details: error.message }), { status: 500 });
   }
 }

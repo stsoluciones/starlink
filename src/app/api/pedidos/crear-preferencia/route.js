@@ -26,12 +26,13 @@ export async function POST(req) {
     //console.log("Items para preferencia:", items);
 
     const preference = new Preference(client);
-    
+    const external_reference = `order_${uid}_${new Date().getTime()}`; // Generar referencia externa única
     const response = await preference.create({
       body: {
         items,
         metadata: { uid, cart },
         notification_url: `${userData.urlHttps}/api/pedidos/webhook`,
+        external_reference: external_reference,
         back_urls: {
           // success: `http://localhost:3000/mp/success`,
           // failure: `http://localhost:3000/mp/failure`,
@@ -43,7 +44,7 @@ export async function POST(req) {
     });
 
     return new Response(
-      JSON.stringify({ init_point: response.init_point }),
+      JSON.stringify({ init_point: response.init_point, external_reference: response.external_reference }),
       {
         headers: { "Content-Type": "application/json" },
         status: 200,

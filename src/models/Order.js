@@ -21,6 +21,12 @@ const orderSchema = new mongoose.Schema({
     telefono: String
   },
   pref_id: String,
+  external_reference: { // Campo para la referencia externa de MP
+    type: String,
+    unique: true,     // Debe ser único para evitar duplicados
+    sparse: true,     // Permite múltiples documentos con valor null/undefined si no todos los pedidos son con MP
+    index: true,      // Bueno para búsquedas rápidas
+  },
   paymentId: String,
   paymentMethod: {
     type: String,
