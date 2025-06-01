@@ -1,70 +1,86 @@
-// app/mp/success/page.js
-useEffect(() => {
-  const verifyPayment = async () => {
-    try {
-      const urlParams = new URLSearchParams(window.location.search);
-      const payment_id = urlParams.get('payment_id');
-      
-      if (!payment_id) {
-        throw new Error('Missing payment_id in URL');
-      }
+// app/api/pedidos/verificar-pendientes/route.js
+import { NextResponse } from "next/server";
+import { MercadoPagoConfig, Payment } from "mercadopago";
+import Order from "../../../../models/Order";
+import { connectDB } from "../../../../lib/mongodb";
 
-      // First verify endpoint exists
-      const endpointCheck = await fetch('/api/pedidos/verificar-pendientes', {
-        method: 'OPTIONS'
-      });
-      
-      if (!endpointCheck.ok) {
-        throw new Error(`Endpoint returned ${endpointCheck.status}`);
-      }
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+});
 
-      // Then make the actual request
-      const { data } = await axios.post(
-        '/api/pedidos/verificar-pendientes', 
-        { paymentId: payment_id },
-        {
-          timeout: 10000,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+// Add this for debugging
+export async function OPTIONS() {
+  return NextResponse.json({ status: 'OK' });
+}
+
+export async function POST(req) {
+  try {
+    console.log("POST verificar-pendientes called");
+    await connectDB();
+    
+    const body = await req.json();
+    console.log("Request body:", body);
+    
+    if (!body.paymentId) {
+      console.error("Missing paymentId");
+      return NextResponse.json(
+        { error: "Se requiere paymentId" },
+        { status: 400 }
       );
-
-      if (!data.success) {
-        throw new Error(data.error || 'Verification failed');
-      }
-
-      // Handle successful payment
-      if (data.order.estado === 'pagado') {
-        await Swal.fire({
-          icon: 'success',
-          title: '¡Pago exitoso!',
-          text: 'Tu pago ha sido procesado correctamente.',
-          confirmButtonText: 'Ver mis pedidos'
-        });
-        router.push('/Dashboard');
-      } else {
-        await Swal.fire({
-          icon: 'info',
-          title: 'Pago pendiente',
-          text: 'Tu pago está siendo procesado. Te notificaremos cuando se complete.',
-          confirmButtonText: 'Entendido'
-        });
-        router.push('/');
-      }
-    } catch (error) {
-      console.error('Payment verification error:', error);
-      await Swal.fire({
-        icon: 'error',
-        title: 'Error de verificación',
-        html: `No se pudo confirmar tu pago:<br>
-               <small>${error.response?.data?.error || error.message}</small>`,
-        confirmButtonText: 'Reintentar'
-      }).then((result) => {
-        result.isConfirmed ? window.location.reload() : router.push('/');
-      });
     }
-  };
-  
-  verifyPayment();
-}, [router]);
+
+    const payment = new Payment(client);
+    console.log("Fetching payment details for:", body.paymentId);
+    const paymentDetails = await payment.get({ id: body.paymentId });
+
+    const order = await Order.findOne({
+      $or: [
+        { paymentId: body.paymentId },
+        { preferenceId: body.preferenceId },
+        { merchantOrderId: paymentDetails.order?.id }
+      ]
+    });
+
+    if (!order) {
+      console.error("Order not found for payment:", body.paymentId);
+      return NextResponse.json(
+        { error: "Orden no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    console.log("Updating order status to:", paymentDetails.status);
+    const updatedOrder = await Order.findByIdAndUpdate(
+      order._id,
+      {
+        estado: paymentDetails.status === "approved" ? "pagado" : "pendiente",
+        collectionStatus: paymentDetails.status,
+        paymentDetails: {
+          status: paymentDetails.status,
+          status_detail: paymentDetails.status_detail,
+          payment_method_id: paymentDetails.payment_method_id,
+          payment_type_id: paymentDetails.payment_type_id,
+          installments: paymentDetails.installments,
+          transaction_amount: paymentDetails.transaction_amount,
+          date_approved: paymentDetails.date_approved,
+          date_created: paymentDetails.date_created,
+          last_updated: paymentDetails.date_last_updated
+        }
+      },
+      { new: true }
+    );
+
+    return NextResponse.json({
+      success: true,
+      order: updatedOrder,
+      paymentStatus: paymentDetails.status
+    });
+
+  } catch (error) {
+    console.error("Error in POST verificar-pendientes:", error);
+    return NextResponse.json(
+      { error: error.message || "Error al verificar pago" },
+      { status: 500 }
+    );
+  }
+}
