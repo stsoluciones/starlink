@@ -1,85 +1,78 @@
 // app/api/pedidos/webhook/route.js
-import { NextResponse } from "next/server";
-import { MercadoPagoConfig, Payment } from "mercadopago";
-import Order from "../../../../models/Order";
-import { connectDB } from "../../../../lib/mongodb";
+import { MercadoPagoConfig } from 'mercadopago';
+import Order from '../../../../models/Order';
+import { connectDB } from '../../../../lib/mongodb';
 
-const client = new MercadoPagoConfig({
+
+const mp = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
 });
 
 export async function POST(req) {
   try {
-    await connectDB();
-    const origin = req.headers.get('origin');
-    if (origin && !origin.includes('localhost') && !origin.includes('devtunnels.ms')) {
-      return new Response('Not allowed', { status: 403 });
-    }
+    const body = await req.json();
+    console.log('Webhook body:', body);
     
-    const data = await req.json();
-    console.log("Datos recibidos del webhook:", data);
+    const topic = body.type;
+    const paymentId = body.data?.id;
 
-    // Verificar si es una notificación de pago
-    if (data.type === "payment") {
-      const paymentId = data.data.id;
-      
-      // Obtener los detalles del pago desde MercadoPago
-      const payment = new Payment(client);
-      const paymentDetails = await payment.get({ id: paymentId });
-      
-      console.log("Detalles del pago:", paymentDetails);
-
-      // Buscar la orden relacionada con este pago
-      const order = await Order.findOne({
-        $or: [
-          { paymentId: paymentId },
-          { preferenceId: paymentDetails.additional_info?.items?.[0]?.id },
-          { merchantOrderId: paymentDetails.order?.id }
-        ]
-      });
-
-      if (!order) {
-        console.error("Orden no encontrada para el pago:", paymentId);
-        return NextResponse.json({ success: false, message: "Orden no encontrada" }, { status: 404 });
-      }
-
-      // Actualizar el estado según el estado del pago
-      let newStatus = order.estado;
-      
-      if (paymentDetails.status === "approved") {
-        newStatus = "pagado";
-      } else if (paymentDetails.status === "pending") {
-        newStatus = "pendiente";
-      } else if (paymentDetails.status === "cancelled" || paymentDetails.status === "rejected") {
-        newStatus = "cancelado";
-      }
-
-      // Actualizar la orden en la base de datos
-      const updatedOrder = await Order.findByIdAndUpdate(
-        order._id,
-        {
-          estado: newStatus,
-          collectionId: paymentId,
-          collectionStatus: paymentDetails.status,
-          paymentType: paymentDetails.payment_type_id,
-          merchantOrderId: paymentDetails.order?.id,
-          payerEmail: paymentDetails.payer?.email,
-          metadata: paymentDetails
-        },
-        { new: true }
-      );
-
-      console.log("Orden actualizada:", updatedOrder);
-      
-      return NextResponse.json({ success: true, order: updatedOrder });
+    if (topic !== 'payment' || !paymentId) {
+      return NextResponse.json({ error: 'Not a payment notification' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: false, message: "Tipo de notificación no manejado" });
+    // Traer datos del pago desde MP
+    const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+      },
+    });
+
+    const payment = await res.json();
+
+    if (payment.status !== 'approved') {
+      return NextResponse.json({ message: 'Payment not approved yet' });
+    }
+
+    // Conectar a la DB
+    await connectDB();
+
+    // Buscar la orden por pref_id o paymentId
+    const order = await Order.findOne({ pref_id: payment?.metadata?.pref_id });
+
+    if (!order) {
+      console.warn('Orden no encontrada para pref_id:', payment?.metadata?.pref_id);
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    }
+
+    // Actualizar los datos del pedido
+    order.estado = 'pagado';
+    order.paymentId = payment.id;
+    order.collectionId = payment.collection_id || payment.id;
+    order.collectionStatus = payment.status;
+    order.paymentType = payment.payment_type_id;
+    order.preferenceId = payment.metadata?.pref_id || payment.preference_id;
+    order.siteId = payment.site_id;
+    order.processingMode = payment.processing_mode;
+    order.merchantAccountId = payment.merchant_account_id;
+    order.payerEmail = payment.payer?.email;
+    order.metadata = payment.metadata;
+    order.paymentDetails = {
+      status: payment.status,
+      status_detail: payment.status_detail,
+      payment_method_id: payment.payment_method_id,
+      payment_type_id: payment.payment_type_id,
+      installments: payment.installments,
+      transaction_amount: payment.transaction_amount,
+      date_approved: payment.date_approved,
+      date_created: payment.date_created,
+      last_updated: payment.last_modified,
+    };
+
+    await order.save();
+
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error en el webhook:", error);
-    return NextResponse.json(
-      { success: false, message: "Error al procesar el webhook" },
-      { status: 500 }
-    );
+    console.error('Error en webhook:', error);
+    return new Response('Error en webhook', { status: 500 });
   }
 }
