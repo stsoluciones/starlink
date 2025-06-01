@@ -1,7 +1,5 @@
 // src/utils/cargarPedidos.js
 
-let ultimaVerificacion = 0;
-
 const cargarPedidos = async (setPedidos, setLoading) => {
   try {
     setLoading(true);
@@ -23,13 +21,6 @@ const cargarPedidos = async (setPedidos, setLoading) => {
     );
     setPedidos(ordenados);
 
-    const ahora = Date.now();
-    if (ahora - ultimaVerificacion > 5 * 60 * 1000) { // 5 minutos
-      ultimaVerificacion = ahora;
-      fetch("/api/pedidos/verificar-pedidos", { method: "POST" }).catch((e) =>
-        console.error("Error en verificar-pedidos:", e)
-      );
-    }
 
   } catch (err) {
     console.error("Error al obtener pedidos:", err);
