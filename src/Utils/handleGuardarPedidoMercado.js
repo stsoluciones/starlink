@@ -1,4 +1,6 @@
-const handleGuardarPedido = async (user, cart) => {
+//app/Utils/handleGuardarPedidoMercado.js
+
+const handleGuardarPedidoMercado = async (user, cart,compraData) => {
   // Validaciones iniciales
   if (!user?.uid) {
     return { success: false, error: 'Usuario no autenticado' };
@@ -30,8 +32,13 @@ const handleGuardarPedido = async (user, cart) => {
   if (!carritoValido) {
     return { success: false, error: 'El carrito contiene items inválidos' };
   }
+console.log('compraData:', compraData.init_point);
+
+  const parsedUrl = new URL(compraData.init_point);
+  const prefId = parsedUrl.searchParams.get("pref_id");
 
   try {
+    console.log('Iniciando guardado de pedido con MercadoPago');    
     const response = await fetch('/api/pedidos/guardar-pedido', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -51,7 +58,9 @@ const handleGuardarPedido = async (user, cart) => {
           telefono: user.telefono,
           direccion: user.direccion,
         },
-        paymentMethod: 'transferencia',
+        pref_id: prefId,
+        paymentId: prefId,
+        paymentMethod: 'mercadopago',
         estado: 'pendiente',
         total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0),
       }),
@@ -70,7 +79,7 @@ const handleGuardarPedido = async (user, cart) => {
     return { success: true, orderId: result.orderId };
 
   } catch (error) {
-    console.error('Error en handleGuardarPedido:', error);
+    console.error('Error en handleGuardarPedidoMercado:', error);
     return { 
       success: false, 
       error: error.message || 'Error de conexión',
@@ -78,4 +87,4 @@ const handleGuardarPedido = async (user, cart) => {
     };
   }
 };
-export default handleGuardarPedido;
+export default handleGuardarPedidoMercado;

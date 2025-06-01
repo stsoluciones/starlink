@@ -8,6 +8,9 @@ const nextConfig = {
     unoptimized: true,
   },
   compress: true,
+  api: {
+    bodyParser: false, // MercadoPago envía `x-www-form-urlencoded`
+  },
 };
 
 export default withBundleAnalyzer({ enabled: process.env.ANALYZE === 'true' })(nextConfig);

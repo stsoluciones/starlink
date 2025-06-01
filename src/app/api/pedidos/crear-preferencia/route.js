@@ -2,6 +2,7 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import userData from '../../../../components/constants/userData';
 
+
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
   options: { timeout: 5000 } // opcional
@@ -11,7 +12,7 @@ export async function POST(req) {
   try {
     //console.log("Iniciando creación de preferencia");
     const { cart, uid } = await req.json();
-    //console.log("cart:", cart);
+    console.log("cart:", cart);
     //console.log("uid:", uid);
 
     const items = cart.map(item => ({
@@ -30,13 +31,12 @@ export async function POST(req) {
       body: {
         items,
         metadata: { uid, cart },
+        notification_url: `${userData.urlHttps}/api/pedidos/webhook`,
         back_urls: {
           // success: `http://localhost:3000/mp/success`,
           // failure: `http://localhost:3000/mp/failure`,
-          // pending: `http://localhost:3000/mp/pending`,
           success: `${userData.urlHttps}/mp/success`,
           failure: `${userData.urlHttps}/mp/failure`,
-          pending: `${userData.urlHttps}/mp/pending`,
         },
         auto_return: "approved",
       }

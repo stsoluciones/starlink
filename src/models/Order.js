@@ -1,4 +1,3 @@
-
 //src/models/Order.js
 import mongoose from 'mongoose';
 
@@ -8,10 +7,10 @@ const orderItemSchema = new mongoose.Schema({
     ref: 'Product',
     required: true
   },
+  nombreProducto: { type: String },
   cantidad: { type: Number, required: true },
   precioUnitario: { type: Number, required: true }
 });
-
 
 const orderSchema = new mongoose.Schema({
   usuarioUid: { type: String, required: true, index: true },
@@ -21,12 +20,13 @@ const orderSchema = new mongoose.Schema({
     correo: String,
     telefono: String
   },
+  pref_id: String,
   paymentId: String,
   paymentMethod: {
-      type: String,
-      enum: ['mercadopago', 'transferencia', 'efectivo'],
-      required: true
-    },
+    type: String,
+    enum: ['mercadopago', 'transferencia', 'efectivo'],
+    required: true
+  },
   items: [orderItemSchema],
   direccionEnvio: {
     pais: String,
@@ -53,7 +53,18 @@ const orderSchema = new mongoose.Schema({
   processingMode: String,
   merchantAccountId: String,
   payerEmail: String,
-  metadata: mongoose.Schema.Types.Mixed
+  metadata: mongoose.Schema.Types.Mixed,
+  paymentDetails: {
+    status: String,
+    status_detail: String,
+    payment_method_id: String,
+    payment_type_id: String,
+    installments: Number,
+    transaction_amount: Number,
+    date_approved: Date,
+    date_created: Date,
+    last_updated: Date
+  }
 }, {
   timestamps: true
 });

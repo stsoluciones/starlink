@@ -68,7 +68,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
 
   // 2. Mapear el estado del backend al estado que usará la línea de tiempo
   const estadoParaTimeline = mapEstadoToTimeline(pedido.estado);
-  console.log('pedido:', pedido);
+  //console.log('pedido:', pedido);
   // 3. Usar el estado original del backend (o su fallback) para el color y el texto del tag.
   // Asegúrate de que ESTADO_COLORS tiene una entrada para 'desconocido' o cualquier estado que pueda resultar.
   const estadoColorClass = ESTADO_COLORS[estadoBackend as EstadoPedido] || ESTADO_COLORS.desconocido;

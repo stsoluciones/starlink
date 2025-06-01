@@ -8,8 +8,8 @@ const userData = {
     email:'infostarlinksoluciones@gmail.com',
     textoPredefinido:'Hola, me gustaria consultar sobre, ',
     cuil:'23xxxxxxxxxx3',
-    urlWWW:'www.starlinksoluciones.com.ar',
-    urlHttps:'https://starlinksoluciones.com.ar',
+    urlWWW:'www.starlink-beta.vercel.app/',
+    urlHttps:'https://starlink-beta.vercel.app/',
     
 };
 

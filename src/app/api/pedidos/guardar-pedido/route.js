@@ -1,65 +1,38 @@
-//app/api/pedidos/guardar-pedido/route.js
 import mongoose from "mongoose";
 import { connectDB } from "../../../../lib/mongodb";
 import Order from "../../../../models/Order";
 import Product from "../../../../models/product";
 import User from "../../../../models/User";
-import verifyMercadoPagoPayment from "../../../../lib/verifyMercadoPagoPayment";
 
 export async function POST(req) {
   await connectDB();
 
   try {
     const body = await req.json();
+    console.log("body back:", body);
     const paymentMethod = body.paymentMethod || "mercadopago";
-
     const cart = body.cart;
+    const pref_id = body.pref_id
     const uid = body.user?.uid;
     let totalOrden = body.total;
-
+    
     if (!uid || !Array.isArray(cart) || cart.length === 0) {
       return new Response(
         JSON.stringify({ message: "Faltan datos esenciales (UID o carrito)" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
+    
     let paymentId;
-    let paymentData = null;
     let payment = null;
-
-    if (paymentMethod === "mercadopago") {
-      paymentId = body.data?.id || body.payment_id;
-
-      if (!paymentId) {
-        return new Response(
-          JSON.stringify({ message: "Falta paymentId para Mercado Pago" }),
-          { status: 400, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      // Verificar si ya existe una orden con este paymentId
-      const ordenExistente = await Order.findOne({ paymentId: paymentId.toString() });
-      if (ordenExistente) {
-        return new Response(
-          JSON.stringify({ message: "Pago de Mercado Pago ya procesado", orderId: ordenExistente._id }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
-        );
-      }
-
-      // Obtener datos reales desde MP
-      const verificacion = await verifyMercadoPagoPayment(paymentId);
-      console.log('Mercado Pago guardar:', verificacion);
-      
-      paymentData = verificacion.paymentData;
-      payment = verificacion.payment;
-      totalOrden = payment.transaction_amount;
-    }
+    
 
     if (paymentMethod === "transferencia") {
       if (!totalOrden) {
         return new Response(
-          JSON.stringify({ message: "Falta el total de la orden para la transferencia" }),
+          JSON.stringify({
+            message: "Falta el total de la orden para la transferencia",
+          }),
           { status: 400, headers: { "Content-Type": "application/json" } }
         );
       }
@@ -74,12 +47,14 @@ export async function POST(req) {
 
     const items = await Promise.all(
       cart.map(async (item) => {
-        const producto = await Product.findOne({ cod_producto: item.cod_producto });
+        const producto = await Product.findOne({
+          cod_producto: item.cod_producto,
+        });
         return {
           producto: producto?._id ?? new mongoose.Types.ObjectId(),
           cod_producto: item.cod_producto,
           nombre: producto?.nombre || "Producto desconocido",
-          titulo_de_producto:producto?.titulo_de_producto || "",
+          titulo_de_producto: producto?.titulo_de_producto || "",
           cantidad: item.quantity,
           precioUnitario: item.precio,
           foto: producto?.foto_1_1 || "",
@@ -100,6 +75,7 @@ export async function POST(req) {
           body.emailUsuario ||
           "",
       },
+      pref_id:pref_id,
       paymentMethod,
       items,
       direccionEnvio: usuario?.direccion || body.direccionEnvio || "",
