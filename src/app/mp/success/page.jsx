@@ -15,16 +15,21 @@ export default function SuccessPage() {
         const payment_id = urlParams.get('payment_id');
         const preference_id = urlParams.get('preference_id');
         
-        if (!payment_id || !preference_id) {
-          throw new Error('Faltan parámetros de pago');
+        if (!payment_id) {
+          throw new Error('No se encontró el ID de pago en la URL');
         }
-        
-        // Verificar el pago con tu backend
+
         const { data } = await axios.post('/api/pedidos/verificar-pago', {
           paymentId: payment_id,
           preferenceId: preference_id
+        }, {
+          timeout: 10000 // 10 segundos de timeout
         });
-        
+
+        if (!data.success) {
+          throw new Error(data.error || 'Error al verificar el pago');
+        }
+
         if (data.order.estado === 'pagado') {
           await Swal.fire({
             icon: 'success',
@@ -32,20 +37,24 @@ export default function SuccessPage() {
             text: 'Tu pago ha sido procesado correctamente.',
             confirmButtonText: 'Ver mis pedidos'
           });
-          
           router.push('/mis-pedidos');
         } else {
-          throw new Error('El pago no ha sido aprobado aún');
+          await Swal.fire({
+            icon: 'info',
+            title: 'Pago pendiente',
+            text: 'Tu pago está siendo procesado. Te notificaremos cuando se complete.',
+            confirmButtonText: 'Entendido'
+          });
+          router.push('/');
         }
       } catch (error) {
         console.error('Error verificando pago:', error);
         await Swal.fire({
           icon: 'error',
           title: 'Error al verificar pago',
-          text: error.message || 'Ocurrió un error al verificar tu pago',
+          text: error.response?.data?.error || error.message || 'Ocurrió un error',
           confirmButtonText: 'Volver al inicio'
         });
-        
         router.push('/');
       }
     };

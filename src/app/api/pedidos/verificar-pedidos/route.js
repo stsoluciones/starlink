@@ -1,106 +1,81 @@
-// app/api/pedidos/verificar-pedidos/route.js
+// app/api/pedidos/verificar-pago/route.js
+import { NextResponse } from 'next/server';
+import { MercadoPagoConfig, Payment } from 'mercadopago';
+import Order from '../../../../models/Order';
+import { connectDB } from '../../../../lib/mongodb';
 
-import { NextResponse } from "next/server";
-import { connectDB } from "../../../../lib/mongodb";
-import Order from "../../../../models/Order";
-import verifyMercadoPagoPayment from "../../../../lib/verifyMercadoPagoPayment";
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
+});
 
-const MAX_ORDERS_TO_PROCESS = 100;
-
-export async function POST() {
+export async function POST(req) {
   try {
     await connectDB();
+    const { paymentId, preferenceId } = await req.json();
 
-    const pedidos = await Order.find({ estado: "pendiente", paymentMethod: "mercadopago" })
-      .limit(MAX_ORDERS_TO_PROCESS)
-      .select("_id paymentId estado")
-      .lean();
-
-    if (!pedidos.length) {
+    if (!paymentId) {
       return NextResponse.json(
-        { success: true, message: "No hay pedidos pendientes para verificar" },
-        { status: 200 }
+        { error: 'paymentId es requerido' },
+        { status: 400 }
       );
     }
 
-    const resultados = await Promise.allSettled(
-      pedidos.map(async (pedido) => {
-        try {
-          if (!pedido.paymentId) {
-            return {
-              pedidoId: pedido._id,
-              status: "skipped",
-              reason: "Sin paymentId",
-            };
-          }
+    // Verificar pago en MercadoPago
+    const payment = new Payment(client);
+    const paymentDetails = await payment.get({ id: paymentId });
 
-          const mpData = await verifyMercadoPagoPayment(pedido.paymentId);
-          console.log('Mercado Pagoverificar:', mpData);
-          
-          const nuevoEstadoMP = mpData.status;
+    // Buscar orden relacionada
+    const order = await Order.findOne({
+      $or: [
+        { paymentId },
+        { preferenceId },
+        { merchantOrderId: paymentDetails.order?.id }
+      ]
+    });
 
-          if (nuevoEstadoMP === "approved" || nuevoEstadoMP === "cancelled") {
-            const nuevoEstadoOrder = nuevoEstadoMP === "approved" ? "pagado" : "cancelado";
+    if (!order) {
+      return NextResponse.json(
+        { error: 'Orden no encontrada' },
+        { status: 404 }
+      );
+    }
 
-            await Order.findByIdAndUpdate(
-              pedido._id,
-              {
-                estado: nuevoEstadoOrder,
-                collectionId: mpData.collection_id || null,
-                collectionStatus: mpData.status || null,
-                paymentType: mpData.payment_type_id || null,
-                merchantOrderId: mpData.merchant_order_id || null,
-                preferenceId: mpData.preference_id || null,
-                siteId: mpData.site_id || null,
-                processingMode: mpData.processing_mode || null,
-                merchantAccountId: mpData.merchant_account_id || null,
-                payerEmail: mpData.payer?.email || null,
-              },
-              { new: true }
-            );
+    // Actualizar estado
+    let newStatus = order.estado;
+    if (paymentDetails.status === 'approved') newStatus = 'pagado';
+    else if (['pending', 'in_process'].includes(paymentDetails.status)) newStatus = 'pendiente';
+    else if (['cancelled', 'rejected'].includes(paymentDetails.status)) newStatus = 'cancelado';
 
-            return {
-              pedidoId: pedido._id,
-              paymentId: pedido.paymentId,
-              oldStatus: pedido.estado,
-              newStatus: nuevoEstadoOrder,
-              status: "updated",
-            };
-          }
-
-          return {
-            pedidoId: pedido._id,
-            status: "no_change",
-            currentStatus: pedido.estado,
-            mercadoPagoStatus: nuevoEstadoMP,
-          };
-        } catch (error) {
-          return {
-            pedidoId: pedido._id,
-            status: "error",
-            error: error.message,
-          };
+    const updatedOrder = await Order.findByIdAndUpdate(
+      order._id,
+      {
+        estado: newStatus,
+        collectionStatus: paymentDetails.status,
+        paymentDetails: {
+          status: paymentDetails.status,
+          status_detail: paymentDetails.status_detail,
+          payment_method_id: paymentDetails.payment_method_id,
+          payment_type_id: paymentDetails.payment_type_id,
+          installments: paymentDetails.installments,
+          transaction_amount: paymentDetails.transaction_amount,
+          date_approved: paymentDetails.date_approved,
+          date_created: paymentDetails.date_created,
+          last_updated: paymentDetails.date_last_updated
         }
-      })
-    );
-
-    const resultadosFinales = resultados.map((r) =>
-      r.status === "fulfilled" ? r.value : { status: "error", error: r.reason?.message }
+      },
+      { new: true }
     );
 
     return NextResponse.json({
       success: true,
-      processed: resultadosFinales.length,
-      resultados: resultadosFinales,
+      order: updatedOrder,
+      paymentStatus: paymentDetails.status
     });
+
   } catch (error) {
-    console.error("Error verificando pedidos:", error);
+    console.error('Error en verificar-pago:', error);
     return NextResponse.json(
-      {
-        success: false,
-        error: "Error interno del servidor",
-        details: process.env.NODE_ENV === "development" ? error.message : undefined,
-      },
+      { error: error.message || 'Error al verificar pago' },
       { status: 500 }
     );
   }
