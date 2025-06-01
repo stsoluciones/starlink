@@ -15,25 +15,21 @@ const orderItemSchema = new mongoose.Schema({
 const orderSchema = new mongoose.Schema({
   usuarioUid: { type: String, required: true, index: true },
   fechaPedido: { type: Date, default: Date.now },
-  usuarioInfo: {
-    nombreCompleto: String,
-    correo: String,
-    telefono: String
-  },
+  usuarioInfo: { nombreCompleto: String, correo: String, telefono: String },
   pref_id: String,
-  external_reference: { // Campo para la referencia externa de MP
-    type: String,
-    unique: true,     // Debe ser único para evitar duplicados
-    sparse: true,     // Permite múltiples documentos con valor null/undefined si no todos los pedidos son con MP
-    index: true,      // Bueno para búsquedas rápidas
-  },
+  external_reference: { type: String, unique: true, sparse: true, index: true },
   paymentId: String,
-  paymentMethod: {
-    type: String,
-    enum: ['mercadopago', 'transferencia', 'efectivo'],
-    required: true
-  },
+  paymentMethod: { type: String, enum: ['mercadopago', 'transferencia', 'efectivo'], required: true },
   items: [orderItemSchema],
+  tipoFactura: {
+    tipo: { type: String, enum: ['A', 'B', 'C'], default: 'B' },
+    fecha: Date,
+    cuit: String,
+    razonSocial: String,
+    domicilio: String,
+    codigoPostal: String,
+    condicionIva: { type: String, enum: ['responsableInscripto', 'monotributista', 'exento', 'consumidorFinal'], default: 'consumidorFinal' }
+  },
   direccionEnvio: {
     pais: String,
     provincia: String,
@@ -44,11 +40,7 @@ const orderSchema = new mongoose.Schema({
     depto: String,
     codigoPostal: String
   },
-  estado: {
-    type: String,
-    enum: ['pendiente', 'pagado', 'procesando', 'enviado', 'entregado', 'cancelado'],
-    default: 'pendiente'
-  },
+  estado: { type: String, enum: ['pendiente', 'pagado', 'procesando', 'enviado', 'entregado', 'cancelado'], default: 'pendiente' },
   total: { type: Number, required: true, min: 0 },
   collectionId: String,
   collectionStatus: String,
@@ -70,9 +62,8 @@ const orderSchema = new mongoose.Schema({
     date_approved: Date,
     date_created: Date,
     last_updated: Date
-  }
-}, {
-  timestamps: true
-});
+  },
+  }, { timestamps: true}
+);
 
 export default mongoose.models.Order || mongoose.model('Order', orderSchema);

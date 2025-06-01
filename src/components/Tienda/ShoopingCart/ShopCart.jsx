@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useRef, useEffect, useContext } from 'react';
+import { createRoot } from 'react-dom/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
@@ -13,6 +14,8 @@ import  completarDatosUser  from '../../../Utils/completarDatosUser';
 import  handleGuardarPedido  from '../../../Utils/handleGuardarPedido';
 import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercado';
+import FormularioFactura from '../../Perfil/FormularioFactura';
+import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
 
 const ShopCart = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -90,6 +93,102 @@ const handleComprar = async () => {
       // Procesar pago con MercadoPago
       //console.log('cart:', cart);
       //console.log('userCompleto:', userCompleto);
+
+      const facturaPrompt = await Swal.fire({
+            title: '¿Es consumidor final?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No, necesito factura',
+            reverseButtons: true,
+          });
+
+      if (facturaPrompt.isConfirmed) {
+        userCompleto.factura = { tipo: 'B', condicionIva: 'consumidorFinal' };
+        } else {
+            // ✅ Preguntar tipo de factura
+            const tipoFactura = await Swal.fire({
+              title: 'Selecciona el tipo de factura',
+              input: 'select',
+              inputOptions: {
+                'A': 'Factura A',
+                'B': 'Factura B',
+                'C': 'Factura C',
+              },
+              inputPlaceholder: 'Selecciona un tipo',
+              showCancelButton: true,
+            });
+
+            if (!tipoFactura.isConfirmed) throw new Error('Debes seleccionar un tipo de factura');
+
+              // ✅ Verificar si tiene datos de factura
+          const tieneFactura =
+            userCompleto.factura?.tipo &&
+            userCompleto.factura?.razonSocial &&
+            userCompleto.factura?.cuit &&
+            userCompleto.factura?.condicionIva &&
+            userCompleto.factura?.domicilio &&
+            userCompleto.factura?.codigoPostal;
+
+          if (!tieneFactura) {
+            // Mostrar modal para completar factura
+            const datosFactura = await new Promise((resolve) => {
+              Swal.fire({
+                html: '<div id="form-factura"></div>',
+                showCancelButton: true,
+                showConfirmButton: false,
+                didOpen: () => {
+                  const root = document.getElementById('form-factura');
+                  const container = document.createElement('div');
+                  root.appendChild(container);
+
+                  const rootReact = createRoot(container);
+                  rootReact.render(
+                    <FormularioFactura
+                      tipo={tipoFactura.value}
+                      onSubmit={(data) => {
+                        resolve(data);
+                        Swal.close();
+                      }}
+                      onCancel={() => {
+                        resolve(null);
+                        Swal.close();
+                      }}
+                    />
+                  );
+                },
+              });
+            });
+
+            if (!datosFactura) throw new Error('Debes completar los datos de facturación');
+
+            userCompleto.factura = { ...datosFactura };
+          } else {
+            userCompleto.factura.tipo = tipoFactura.value;
+          }
+        }
+
+      // ✅ Dirección de envío
+      const direccionPrompt = await Swal.fire({
+        title: '¿Usar dirección de perfil para el envío?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí',
+        cancelButtonText: 'No, ingresar otra',
+        reverseButtons: true,
+      });
+
+      if (direccionPrompt.isDismissed) {
+        // Pedir nueva dirección (puedes crear un componente como FormularioDireccion)
+        const nuevaDireccion = await solicitarNuevaDireccion(); // debes implementar esta función
+        if (!nuevaDireccion) throw new Error('Debes ingresar una dirección de envío');
+          userCompleto.direccionEnvio = nuevaDireccion;
+        } else {
+          userCompleto.direccionEnvio = userCompleto.direccion;
+        }
+
+      // console.log('userCompleto:', userCompleto);
+      
       const compraResponse = await handleComprarMercadoPago(cart, userCompleto);
       if (!compraResponse.ok) {
         throw new Error("Falló la creación de la orden con MercadoPago");
@@ -98,7 +197,7 @@ const handleComprar = async () => {
       const compraData = await compraResponse.json();
       if (compraData.init_point) {
         //console.log('init_point:', compraData.init_point);
-        //console.log('userCompleto:', userCompleto);
+        console.log('userCompleto:', userCompleto);
         //console.log('cart:', cart);
         await handleGuardarPedidoMercado(userCompleto, cart, compraData);
         window.location.href = compraData.init_point;

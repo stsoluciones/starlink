@@ -7,6 +7,7 @@
   import Loading from '../Loading/Loading'
   import PedidoCard from './PedidoCard'
   import PerfilPage from '../Perfil/Perfil'
+  import FormularioFactura from '../Perfil/FormularioFactura'
 
   // Constantes para estados
   const ESTADOS_ACTIVOS = ["pendiente", "pagado","procesando", "enviado"] as const
@@ -34,7 +35,7 @@
     const [pedidos, setPedidos] = useState<Pedido[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
-    const [activeTab, setActiveTab] = useState<'pedidos' | 'perfil'>('pedidos')
+    const [activeTab, setActiveTab] = useState<'pedidos' | 'perfil' | 'facturacion'>('pedidos')
 
     // Obtener datos del usuario
     useEffect(() => {
@@ -118,37 +119,55 @@
             >
               Mi Perfil
             </button>
+            <button
+              onClick={() => setActiveTab('facturacion')}
+              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'facturacion'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Mi Datos de Facturacion
+            </button>
           </nav>
         </div>
 
         {/* Contenido de las pestañas */}
-        {activeTab === 'pedidos' ? (
-          <>
-            <section className="mb-10">
-              <SectionHeader 
-                title="🟢 Pedidos Activos" 
-                count={pedidosActivos.length}
-              />
-              <PedidosList 
-                pedidos={pedidosActivos} 
-                emptyMessage="No tienes pedidos activos."
-              />
-            </section>
+        {activeTab === 'pedidos' && (
+          <section>
+            <article className="mb-10">
+              <SectionHeader title="🟢 Pedidos Activos" count={pedidosActivos.length} />
+              <PedidosList pedidos={pedidosActivos} emptyMessage="No tienes pedidos activos." />
+            </article>
 
-            <section>
-              <SectionHeader 
-                title="📜 Historial de Compras" 
-                count={pedidosCompletados.length}
-              />
-              <PedidosList 
-                pedidos={pedidosCompletados} 
-                emptyMessage="No tienes compras anteriores."
-              />
-            </section>
-          </>
-        ) : (
+            <article>
+              <SectionHeader title="📜 Historial de Compras" count={pedidosCompletados.length} />
+              <PedidosList pedidos={pedidosCompletados} emptyMessage="No tienes compras anteriores." />
+            </article>
+          </section>
+        )}
+        {activeTab === 'perfil' && (
           <PerfilPage usuarioUid={usuarioUid} />
         )}
+        {activeTab === 'facturacion' && (
+          <FormularioFactura
+            tipo="B"
+            initialData={null}
+            onSubmit={async (datos:any) => {
+              try {
+                await axios.post('/api/facturacion/guardar-datos', {
+                  usuarioUid,
+                  ...datos
+                })
+                alert('Datos de facturación guardados correctamente.')
+              } catch (error) {
+                console.error('Error guardando datos de facturación:', error)
+                alert('Ocurrió un error al guardar los datos. Intenta de nuevo.')
+              }
+            }}
+            onCancel={() => setActiveTab('pedidos')}
+          />
+)}
       </div>
     )
   }
