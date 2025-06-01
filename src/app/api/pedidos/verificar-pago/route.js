@@ -1,9 +1,4 @@
 // app/api/pedidos/verificar-pago/route.js
-import { MercadoPagoConfig } from 'mercadopago';
-
-const client = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN,
-});
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);

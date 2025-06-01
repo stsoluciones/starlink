@@ -1,12 +1,7 @@
 // app/api/pedidos/webhook/route.js
-import { MercadoPagoConfig } from 'mercadopago';
 import Order from '../../../../models/Order';
 import { connectDB } from '../../../../lib/mongodb';
 
-
-const mp = new MercadoPagoConfig({
-  accessToken: process.env.MP_ACCESS_TOKEN,
-});
 
 export async function POST(req) {
   try {

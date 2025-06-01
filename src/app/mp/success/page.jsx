@@ -1,25 +1,22 @@
 "use client";
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect } from "react";
 
 export default function SuccessPage() {
-  const params = useSearchParams();
-
   useEffect(() => {
-    const paymentId = params.get("payment_id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentId = urlParams.get("payment_id");
 
     if (paymentId) {
       fetch(`/api/pedidos/verificar-pago?payment_id=${paymentId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           console.log("Pago verificado:", data);
-          // Mostrar mensaje, redirigir, etc.
         })
-        .catch(err => {
+        .catch((err) => {
           console.error("Error al verificar el pago:", err);
         });
     }
-  }, [params]);
+  }, []);
 
   return (
     <div>
