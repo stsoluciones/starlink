@@ -1,21 +1,37 @@
 // app/api/pedidos/webhook/route.js
-import Order from '../../../../models/Order';
 import { connectDB } from '../../../../lib/mongodb';
+import Order from '../../../../models/Order';
 
+function mapEstadoMP(status) {
+  switch (status) {
+    case 'approved':
+      return 'pagado';
+    case 'pending':
+    case 'in_process':
+      return 'pendiente';
+    case 'rejected':
+    case 'cancelled':
+    case 'refunded':
+    case 'charged_back':
+      return 'cancelado';
+    default:
+      return 'pendiente';
+  }
+}
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log('Webhook body:', body);
+    console.log('📥 Webhook recibido:', body);
     
     const topic = body.type;
     const paymentId = body.data?.id;
 
     if (topic !== 'payment' || !paymentId) {
-      return NextResponse.json({ error: 'Not a payment notification' }, { status: 400 });
+      return new Response(JSON.stringify({ error: 'Not a payment notification' }), { status: 400 });
     }
 
-    // Traer datos del pago desde MP
+    // Consultar a MP para obtener detalles del pago
     const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
       headers: {
         Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
@@ -24,28 +40,33 @@ export async function POST(req) {
 
     const payment = await res.json();
 
-    if (payment.status !== 'approved') {
-      return NextResponse.json({ message: 'Payment not approved yet' });
+    console.log("🔍 Datos del pago:", payment);
+
+    // Validar pago aprobado
+    const estadoMapped = mapEstadoMP(payment.status);
+    if (!payment || !payment.metadata) {
+      console.warn('❗️Metadata faltante en el pago');
+      return new Response(JSON.stringify({ error: 'Metadata faltante en pago' }), { status: 400 });
     }
 
-    // Conectar a la DB
+    // Conectar a DB
     await connectDB();
 
-    // Buscar la orden por pref_id o paymentId
-    const order = await Order.findOne({ pref_id: payment?.metadata?.pref_id });
+    const prefId = payment.metadata.pref_id || payment.preference_id;
+    const order = await Order.findOne({ pref_id: prefId });
 
     if (!order) {
-      console.warn('Orden no encontrada para pref_id:', payment?.metadata?.pref_id);
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+      console.warn('⚠️ Orden no encontrada para pref_id:', prefId);
+      return new Response(JSON.stringify({ error: 'Orden no encontrada' }), { status: 404 });
     }
 
-    // Actualizar los datos del pedido
-    order.estado = 'pagado';
+    // Actualizar pedido
+    order.estado = estadoMapped;
     order.paymentId = payment.id;
     order.collectionId = payment.collection_id || payment.id;
     order.collectionStatus = payment.status;
     order.paymentType = payment.payment_type_id;
-    order.preferenceId = payment.metadata?.pref_id || payment.preference_id;
+    order.preferenceId = prefId;
     order.siteId = payment.site_id;
     order.processingMode = payment.processing_mode;
     order.merchantAccountId = payment.merchant_account_id;
@@ -65,9 +86,11 @@ export async function POST(req) {
 
     await order.save();
 
-    return NextResponse.json({ success: true });
+    console.log("✅ Pedido actualizado a estado:", estadoMapped);
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
-    console.error('Error en webhook:', error);
+    console.error('❌ Error en webhook:', error);
     return new Response('Error en webhook', { status: 500 });
   }
 }
