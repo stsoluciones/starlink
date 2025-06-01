@@ -6,7 +6,7 @@ const client = new MercadoPagoConfig({
 });
 
 const verifyMercadoPagoPayment = async (paymentId) => {
-  console.log("verifyMercadoPagoPayment paymentId:", paymentId);
+  //console.log("verifyMercadoPagoPayment paymentId:", paymentId);
 
   if (!paymentId) {
     throw new Error("No se proporcionó paymentId");

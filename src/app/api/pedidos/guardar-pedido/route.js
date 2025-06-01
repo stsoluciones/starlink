@@ -9,11 +9,12 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    console.log("body back:", body);
+    //console.log("body back:", body);
     const paymentMethod = body.paymentMethod || "mercadopago";
     const cart = body.cart;
     const pref_id = body.pref_id
     const uid = body.user?.uid;
+    const external_reference = body.external_reference || "";
     let totalOrden = body.total;
     
     if (!uid || !Array.isArray(cart) || cart.length === 0) {
@@ -54,6 +55,7 @@ export async function POST(req) {
           producto: producto?._id ?? new mongoose.Types.ObjectId(),
           cod_producto: item.cod_producto,
           nombre: producto?.nombre || "Producto desconocido",
+          external_reference:external_reference,
           titulo_de_producto: producto?.titulo_de_producto || "",
           cantidad: item.quantity,
           precioUnitario: item.precio,
@@ -76,6 +78,7 @@ export async function POST(req) {
           "",
       },
       pref_id:pref_id,
+      external_reference: external_reference,
       paymentMethod,
       items,
       direccionEnvio: usuario?.direccion || body.direccionEnvio || "",

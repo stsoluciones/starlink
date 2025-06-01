@@ -22,13 +22,13 @@ function mapEstadoMP(status) {
 export async function POST(req) {
   try {
     const body = await req.json();
-    console.log('📥 Webhook recibido:', body);
+    //console.log('📥 Webhook recibido:', body);
 
     const topic = body.type;
     const paymentId = body.data?.id;
 
     if (topic !== 'payment' || !paymentId) {
-      console.log('Notificación no es de tipo "payment" o falta data.id.');
+      //console.log('Notificación no es de tipo "payment" o falta data.id.');
       // Devolver 200 para que MP no reintente notificaciones irrelevantes
       return new Response(JSON.stringify({ success: true, message: 'Notificación no procesada (no es de tipo payment o falta data.id)' }), { status: 200 });
     }
@@ -47,7 +47,7 @@ export async function POST(req) {
     }
 
     const payment = await mpResponse.json();
-    console.log("🔍 Datos del pago desde MP:", payment);
+    //console.log("🔍 Datos del pago desde MP:", payment);
 
     const externalRefFromPayment = payment.external_reference;
     const mpPaymentStatus = payment.status;
@@ -71,7 +71,7 @@ export async function POST(req) {
       return new Response(JSON.stringify({ success: true, message: 'Orden no encontrada para la external_reference, notificación acusada.' }), { status: 200 });
     }
 
-    console.log(`🔄 Actualizando orden ${order._id} (ExtRef: ${externalRefFromPayment}) con estado de MP "${mpPaymentStatus}" a estado interno "${mappedInternalStatus}"`);
+    //console.log(`🔄 Actualizando orden ${order._id} (ExtRef: ${externalRefFromPayment}) con estado de MP "${mpPaymentStatus}" a estado interno "${mappedInternalStatus}"`);
 
     // Actualizar pedido
     order.estado = mappedInternalStatus;
@@ -101,7 +101,7 @@ export async function POST(req) {
 
     await order.save();
 
-    console.log(`✅ Pedido ${order._id} actualizado a estado: ${mappedInternalStatus}. Payment ID: ${payment.id}`);
+    //console.log(`✅ Pedido ${order._id} actualizado a estado: ${mappedInternalStatus}. Payment ID: ${payment.id}`);
 
     // Aquí podrías disparar otras acciones (ej: enviar email de confirmación si 'pagado')
 

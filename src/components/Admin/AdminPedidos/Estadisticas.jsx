@@ -43,10 +43,10 @@ const Estadisticas = () => {
         setProducts(productsData);
         setTrends(trendsData);
         setCustomers(customersData);
-        console.log('summaryData:', summaryData); 
-        console.log('productsData:', productsData);
-        console.log('trendsData:', trendsData);
-        console.log('customersData:', customersData);
+        //console.log('summaryData:', summaryData); 
+        //console.log('productsData:', productsData);
+        //console.log('trendsData:', trendsData);
+        //console.log('customersData:', customersData);
       } catch (err) {
         console.error("Error loading statistics:", err);
         setError(err.message);

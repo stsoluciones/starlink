@@ -12,7 +12,7 @@ export async function POST(req) {
   try {
     //console.log("Iniciando creación de preferencia");
     const { cart, uid } = await req.json();
-    console.log("cart:", cart);
+    //console.log("cart:", cart);
     //console.log("uid:", uid);
 
     const items = cart.map(item => ({

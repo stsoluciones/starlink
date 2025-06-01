@@ -32,14 +32,15 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
   if (!carritoValido) {
     return { success: false, error: 'El carrito contiene items inválidos' };
   }
-console.log('compraData:', compraData);
+  //console.log('compraData:', compraData);
 
   
   const prefId = compraData?.pref_id || compraData?.preference_id;
   const externalReference = compraData?.external_reference || compraData?.external_reference_id;
-
+  //console.log('externalReference:', externalReference);
+  
   try {
-    console.log('Iniciando guardado de pedido con MercadoPago');    
+    //console.log('Iniciando guardado de pedido con MercadoPago');    
     const response = await fetch('/api/pedidos/guardar-pedido', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

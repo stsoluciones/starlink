@@ -33,7 +33,7 @@ export async function POST(req) {
     const payment = new Payment(client);
     const paymentDetails = await payment.get({ id: order.paymentId });
     
-    console.log("Detalles del pago:", paymentDetails);
+    //console.log("Detalles del pago:", paymentDetails);
 
     // Actualizar el estado según el estado del pago
     let newStatus = order.estado;
