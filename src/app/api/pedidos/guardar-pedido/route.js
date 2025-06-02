@@ -67,6 +67,7 @@ export async function POST(req) {
     const usuario = await User.findOne({ uid });
     const direccionEnvio = body.direccionEnvio;
     const tipoFactura = body.tipoFactura || null;
+    const metadata = { uid: uid, cart: cart}
     const nuevaOrdenData = {
       paymentId: paymentId,
       usuarioUid: uid,
@@ -78,6 +79,7 @@ export async function POST(req) {
           body.emailUsuario ||
           "",
       },
+      metadata: metadata,
       tipoFactura,
       direccionEnvio,
       pref_id:pref_id,

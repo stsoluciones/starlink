@@ -197,7 +197,7 @@ const handleComprar = async () => {
       if (compraData.init_point) {
         //console.log('init_point:', compraData.init_point);
         console.log('userCompleto:', userCompleto);
-        //console.log('cart:', cart);
+        console.log('cart:', cart);
         await handleGuardarPedidoMercado(userCompleto, cart, compraData);
         window.location.href = compraData.init_point;
         setCart([]);
@@ -220,46 +220,76 @@ const handleComprar = async () => {
         icon: 'info',
         confirmButtonText: 'Aceptar',
       });
-      await Swal.fire({
-        title:'Quiere subir el comprobante de la transferencia ahora?',
+      
+      const { isConfirmed } = await Swal.fire({
+        title: '¿Quieres subir el comprobante ahora?',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Sí, subir comprobante',
         cancelButtonText: 'No, lo haré después',
         reverseButtons: true,
-      })
-      //.then(async (result) => {
-        // if (result.isConfirmed) {
-        //   // Aquí puedes implementar la lógica para subir el comprobante
-        //   // Por ejemplo, abrir un modal o redirigir a una página de carga
-        //   Swal.fire({
-        //     title: 'Subir Comprobante',
-        //     html: '<input type="file" id="comprobante" accept="image/*" class="swal2-input">',
-        //     preConfirm: () => {
-        //       const fileInput = document.getElementById('comprobante');
-        //       if (!fileInput.files.length) {
-        //         Swal.showValidationMessage('Por favor, selecciona un archivo');
-        //         return false;
-        //       }
-        //       const file = fileInput.files[0];
+      });
 
-        //       // Aquí puedes implementar la lógica para subir el archivo al servidor
-        //       // Por ejemplo, usando fetch o axios
-        //       // return uploadComprobante(file); // Debes implementar esta función
-        //     },
-        //     confirmButtonText: 'Subir Comprobante',
-        //     showLoaderOnConfirm: true,
+      if (isConfirmed) {
+        const { value: formValues } = await Swal.fire({
+          title: 'Subir Comprobante',
+          html: `
+            <input type="text" id="nroComprobante" class="swal2-input" placeholder="Número de comprobante">
+            <input type="file" id="comprobante" accept="application/pdf,image/png,image/jpeg" class="swal2-file">
+          `,
+          focusConfirm: false,
+          showCancelButton: true,
+          confirmButtonText: 'Subir',
+          preConfirm: async () => {
+            const fileInput = document.getElementById('comprobante');
+            const nroInput = document.getElementById('nroComprobante');
 
-        //   });
-        // } else {
-        //   Swal.fire({
-        //     title: 'Comprobante no subido',
-        //     text: 'Puedes subir el comprobante más tarde desde tu perfil.',
-        //     icon: 'info',
-        //     confirmButtonText: 'Aceptar',
-        //   });
-        // }
-      //})
+            if (!fileInput?.files?.length || !nroInput?.value.trim()) {
+              Swal.showValidationMessage('Debes ingresar el número de comprobante y seleccionar un archivo.');
+              return;
+            }
+            console.log('guardarPedidoData:', guardarPedidoData);
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('numeroComprobante', nroInput.value.trim());
+            formData.append('pedidoId', guardarPedidoData.orderId);
+
+            try {
+              const res = await fetch('/api/pedidos/guardar-ticket', {
+                method: 'POST',
+                body: formData,
+              });
+
+              const data = await res.json();
+
+              if (!res.ok || !data.success) {
+                throw new Error(data?.error || 'Error desconocido');
+              }
+
+              return data;
+            } catch (err) {
+              Swal.showValidationMessage(`Error al subir el comprobante: ${err.message}`);
+              return;
+            }
+          },
+        });
+
+        if (formValues?.success) {
+          await Swal.fire({
+            title: 'Comprobante subido',
+            text: 'Tu comprobante fue enviado correctamente.',
+            icon: 'success',
+          });
+        }
+      } else {
+        await Swal.fire({
+          title: 'Comprobante no subido',
+          text: 'Puedes subirlo más tarde desde tu perfil.',
+          icon: 'info',
+          confirmButtonText: 'Aceptar',
+        });
+      }
       
       // Limpiar carrito después de éxito
       setCart([]);

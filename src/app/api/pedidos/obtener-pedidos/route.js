@@ -3,23 +3,9 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/mongodb";
 import Order from "../../../../models/Order";
+import mapEstadoMP from "../../../../Utils/mapEstadoMP"; 
 
-function mapEstadoMP(status) {
-  switch (status) {
-    case 'approved':
-      return 'pagado';
-    case 'pending':
-    case 'in_process':
-      return 'pendiente';
-    case 'rejected':
-    case 'cancelled':
-    case 'refunded':
-    case 'charged_back':
-      return 'cancelado';
-    default:
-      return 'pendiente'; // O un estado como 'desconocido_mp'
-  }
-}
+
 
 export async function GET(req) {
   try {

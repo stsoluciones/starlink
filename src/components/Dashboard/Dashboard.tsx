@@ -26,6 +26,7 @@ import Swal from 'sweetalert2'
       titulo_de_producto: string
     ]
     uid: string
+    ticketUrl: string
   }
 
   export interface Pedido {
@@ -36,6 +37,8 @@ import Swal from 'sweetalert2'
     items: ItemPedido[]
     usuarioUid: string
     metadata?:PedidoMetadata
+    paymentMethod: string
+    paymentId?: string
   }
 
   const Dashboard = () => {

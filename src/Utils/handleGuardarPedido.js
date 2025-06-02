@@ -55,6 +55,7 @@ const handleGuardarPedido = async (user, cart) => {
         tipoFactura: 'B',
         direccionEnvio: user.direccionEnvio || user.direccion,
         pref_id: '',
+        paymentId: `transf_intent_${new Date().getTime()}`,
         paymentMethod: 'transferencia',
         estado: 'pendiente',
         total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0),

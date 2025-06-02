@@ -1,5 +1,8 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { Pedido } from './Dashboard' // Asegúrate que la interfaz Pedido defina 'estado' correctamente (ej. estado?: string)
+import { toast } from 'react-toastify';
+import Loading from '../Loading/Loading';
+import Link from 'next/link';
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
 // Es buena práctica tener un tipo para las llaves de estado si son un conjunto conocido.
@@ -64,13 +67,12 @@ const mapEstadoToTimeline = (estadoBackend?: string): EstadoPedido => {
 
 const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   // 1. Obtener el estado de forma segura, con un fallback.
-  const estadoBackend = pedido.estado || "desconocido"; // Usa 'desconocido' si pedido.estado es undefined
-
-  // 2. Mapear el estado del backend al estado que usará la línea de tiempo
+  const estadoBackend = pedido.estado || "desconocido";
+  const [loading, setLoading] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [ticketFile, setTicketFile] = useState<File | null>(null);
+  const [nroComprobante, setNroComprobante] = useState('');
   const estadoParaTimeline = mapEstadoToTimeline(pedido.estado);
-  //console.log('pedido a:', pedido);
-  // 3. Usar el estado original del backend (o su fallback) para el color y el texto del tag.
-  // Asegúrate de que ESTADO_COLORS tiene una entrada para 'desconocido' o cualquier estado que pueda resultar.
   const estadoColorClass = ESTADO_COLORS[estadoParaTimeline] || ESTADO_COLORS.desconocido;
   const estadoDisplayText = estadoParaTimeline.toUpperCase();
 
@@ -80,19 +82,101 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   const currentStateIndex = ESTADOS_ORDENADOS_TIMELINE.includes(estadoParaTimeline)
     ? ESTADOS_ORDENADOS_TIMELINE.indexOf(estadoParaTimeline)
     : -1;
+  //console.log('pedido:', pedido);
+  //console.log('estadoBackend:', estadoBackend);
+
+  const handleUpload = async (pedido) => {
+    if (!ticketFile || !nroComprobante) {
+      alert('Debes seleccionar un archivo y escribir el número de comprobante.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', ticketFile);
+    formData.append('numeroComprobante', nroComprobante);
+    formData.append('pedidoId', pedido._id);
+
+    setLoading(true);
+    try {
+      const res = await fetch('/api/pedidos/guardar-ticket', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast.success('Comprobante enviado correctamente.');
+        setShowUploadModal(false);
+        setTicketFile(null);
+        setNroComprobante('');
+      } else {
+        toast.error('Error al subir el comprobante.');
+      }
+    } catch (error) {
+      console.error('Error al subir el ticket:', error);
+      toast.error('Error al subir el ticket.');
+    } finally {
+      setLoading(false);
+    }
+  };
+    // En JSX: botón para subir comprobante si corresponde
+  const puedeSubirTicket =
+    mapEstadoToTimeline(pedido.estado) === 'pendiente' &&
+    pedido.paymentMethod === 'transferencia';
 
   return (
     <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-bold text-lg">
-          Pedido #{pedido._id ? pedido._id.slice(-6).toUpperCase() : "N/A"}
-        </h3>
-        <span className={`px-3 py-1 rounded-full text-xs font-medium ${estadoColorClass}`}>
-          {/* Ya no hay riesgo de error aquí porque estadoDisplayText siempre será un string */}
-          {estadoDisplayText}
-        </span>
+      <div className="grid grid-cols-3 items-center text-center mb-2 gap-2">
+        <h3 className="text-sm md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
+        <div className="col-span-1">
+          {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
+            <button onClick={() => setShowUploadModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Adj. comprobante</button>) : pedido?.metadata?.ticketUrl ? (
+            <Link href={pedido.metadata.ticketUrl} target="_blank" className="text-blue-600 hover:underline text-xs md:text-sm"> Ver comprobante</Link>) : null}
+        </div>
+        <span className={`col-span-1 px-3 py-1 rounded-full text-xs md:text-sm font-medium ${estadoColorClass}`}>{estadoDisplayText}</span>
       </div>
-      
+
+      {/* Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold mb-4">Subir comprobante</h2>
+            <label className="block mb-2">
+              Número de comprobante:
+              <input
+                type="text"
+                value={nroComprobante}
+                onChange={(e) => setNroComprobante(e.target.value)}
+                className="mt-1 w-full border rounded p-2"
+              />
+            </label>
+            <label className="block mb-4">
+              Archivo (PDF, JPG, PNG):
+              <input
+                type="file"
+                accept="application/pdf,image/jpeg,image/png"
+                onChange={(e) => setTicketFile(e.target.files?.[0] || null)}
+                className="mt-1"
+              />
+            </label>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={()=>handleUpload(pedido)}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                {loading ? <Loading/> : 'Subir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Línea de tiempo de estados */}
       <div className="mb-4">
         <div className="flex items-center justify-between relative">
