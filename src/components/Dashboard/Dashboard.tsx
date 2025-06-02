@@ -8,6 +8,7 @@
   import PedidoCard from './PedidoCard'
   import PerfilPage from '../Perfil/Perfil'
   import FormularioFactura from '../Perfil/FormularioFactura'
+import Swal from 'sweetalert2'
 
   // Constantes para estados
   const ESTADOS_ACTIVOS = ["pendiente", "pagado","procesando", "enviado"] as const
@@ -20,13 +21,21 @@
     precioUnitario: number
   }
 
+  export interface PedidoMetadata {
+    cart:[
+      titulo_de_producto: string
+    ]
+    uid: string
+  }
+
   export interface Pedido {
     _id: string
-    estado: EstadoPedido
+    estado: string | undefined 
     fechaPedido: string
     total: number
     items: ItemPedido[]
     usuarioUid: string
+    metadata?:PedidoMetadata
   }
 
   const Dashboard = () => {
@@ -36,6 +45,8 @@
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<'pedidos' | 'perfil' | 'facturacion'>('pedidos')
+    const [datosFactura, setDatosFactura] = useState(null)
+
 
     // Obtener datos del usuario
     useEffect(() => {
@@ -67,6 +78,24 @@
         setLoading(false)
       }
     }, [])
+      useEffect(() => {
+        const fetchDatosFactura = async () => {
+          try {
+            const { data } = await axios.get('/api/facturacion/obtener-datos', {
+              params: { usuarioUid }
+            })
+            if (data?.factura) {
+              setDatosFactura(data.factura)
+            }
+          } catch (error) {
+            console.error('Error al cargar datos de facturación:', error)
+          }
+        }
+    
+        if (usuarioUid) {
+          fetchDatosFactura()
+        }
+      }, [usuarioUid])
 
     useEffect(() => {
       if (usuarioUid) {
@@ -80,8 +109,8 @@
       }
 
       return [
-        pedidos.filter(p => isEstadoActivo(p.estado)),
-        pedidos.filter(p => !isEstadoActivo(p.estado))
+        pedidos.filter(p => p.estado !== undefined && isEstadoActivo(p.estado as EstadoPedido)),
+        pedidos.filter(p => p.estado !== undefined && !isEstadoActivo(p.estado as EstadoPedido))
       ]
     }, [pedidos])
 
@@ -152,14 +181,23 @@
         {activeTab === 'facturacion' && (
           <FormularioFactura
             tipo="B"
-            initialData={null}
-            onSubmit={async (datos:any) => {
+            usuarioUid={usuarioUid}
+            initialData={datosFactura}
+            onSubmit={async (datos: any) => {
               try {
-                await axios.post('/api/facturacion/guardar-datos', {
+                await axios.put('/api/facturacion/guardar-datos', {
                   usuarioUid,
                   ...datos
+                }, {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
                 })
-                alert('Datos de facturación guardados correctamente.')
+                Swal.fire({
+                  text: 'Datos de facturación guardados correctamente.',
+                  icon: 'success',
+                  confirmButtonText: 'Aceptar'
+                })
               } catch (error) {
                 console.error('Error guardando datos de facturación:', error)
                 alert('Ocurrió un error al guardar los datos. Intenta de nuevo.')
@@ -167,7 +205,7 @@
             }}
             onCancel={() => setActiveTab('pedidos')}
           />
-)}
+        )}
       </div>
     )
   }

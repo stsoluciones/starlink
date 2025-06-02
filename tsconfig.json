@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/app/api/guardar-pedido/route.js", "src/Hooks/localStorage.js", "src/lib/verifyMercadoPagoPayment.js"  ],
+, "src/app/api/guardar-pedido/route.js", "src/Hooks/localStorage.js", "src/lib/verifyMercadoPagoPayment.js", "src/app/api/facturacion/guardar-datos/route.ts"  ],
   "exclude": [
     "node_modules"
   ]

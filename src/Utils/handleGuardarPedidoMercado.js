@@ -57,9 +57,19 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           uid: user.uid,
           correo: user.correo,
           nombreCompleto: user.nombreCompleto,
-          telefono: user.telefono,
+          telefono: user.telefono, // Asegúrate de que esté
           direccion: user.direccion,
         },
+        direccionEnvio: user.direccionEnvio,
+        tipoFactura: user.factura ? {
+          tipo: user.factura.tipo,
+          razonSocial: user.factura.razonSocial,
+          cuit: user.factura.cuit,
+          domicilio: user.factura.domicilio,
+          codigoPostal: user.factura.codigoPostal,
+          condicionIva: user.factura.condicionIva,
+          fecha: new Date()
+        } : undefined,
         external_reference: externalReference,
         pref_id: prefId,
         paymentId: prefId,

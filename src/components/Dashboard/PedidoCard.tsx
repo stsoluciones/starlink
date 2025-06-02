@@ -68,11 +68,12 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
 
   // 2. Mapear el estado del backend al estado que usará la línea de tiempo
   const estadoParaTimeline = mapEstadoToTimeline(pedido.estado);
-  //console.log('pedido:', pedido);
+  //console.log('pedido a:', pedido);
   // 3. Usar el estado original del backend (o su fallback) para el color y el texto del tag.
   // Asegúrate de que ESTADO_COLORS tiene una entrada para 'desconocido' o cualquier estado que pueda resultar.
-  const estadoColorClass = ESTADO_COLORS[estadoBackend as EstadoPedido] || ESTADO_COLORS.desconocido;
-  const estadoDisplayText = estadoBackend.toUpperCase();
+  const estadoColorClass = ESTADO_COLORS[estadoParaTimeline] || ESTADO_COLORS.desconocido;
+  const estadoDisplayText = estadoParaTimeline.toUpperCase();
+
 
   const isCanceled = estadoParaTimeline === 'cancelado';
 
@@ -81,7 +82,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
     : -1;
 
   return (
-    <div className={`border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
+    <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
       <div className="flex justify-between items-start mb-2">
         <h3 className="font-bold text-lg">
           Pedido #{pedido._id ? pedido._id.slice(-6).toUpperCase() : "N/A"}
@@ -158,15 +159,16 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </summary>
-        <div className="mt-2 pl-2 border-l-2 border-gray-200 ">
-          <h4 className="font-medium mb-1">Productos:</h4>
+        <div className="mt-2 p-1 md:p-4 border-gray-200 ">
+          <h4 className="font-normal md:font-medium mb-1">Productos:</h4>
           <ul className="space-y-1">
-            {(pedido.items || []).map((item, i) => ( // Comprobar si items existe
-              <li key={i} className="flex justify-between">
+            {(pedido?.metadata?.cart || []).map((item, i) => ( // Comprobar si items existe
+              <li key={i} className="flex text-sm md:text-base md:justify-between items-center md:items-start md:text-start text-gray-700 gap-1 md:gap-4">
                 {/* Asegúrate que item.producto y item.precioUnitario existen */}
-                <span>{item.producto || "Producto desconocido"}</span>
+                <span>{item.titulo_de_producto || "Producto desconocido"}</span>
+                <span className='hidden md:flex'>{item.cod_producto}</span>
                 <span className="text-gray-600">
-                  {item.cantidad || 0} × ${(item.precioUnitario || 0).toFixed(2)}
+                  {item.quantity || 0} × ${(parseFloat(item.precio) || 0).toFixed(2)}
                 </span>
               </li>
             ))}

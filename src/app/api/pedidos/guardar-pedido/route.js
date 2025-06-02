@@ -9,7 +9,7 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    //console.log("body back:", body);
+    console.log("body back:", body);
     const paymentMethod = body.paymentMethod || "mercadopago";
     const cart = body.cart;
     const pref_id = body.pref_id
@@ -65,7 +65,8 @@ export async function POST(req) {
     );
 
     const usuario = await User.findOne({ uid });
-
+    const direccionEnvio = body.direccionEnvio;
+    const tipoFactura = body.tipoFactura || null;
     const nuevaOrdenData = {
       paymentId: paymentId,
       usuarioUid: uid,
@@ -77,14 +78,15 @@ export async function POST(req) {
           body.emailUsuario ||
           "",
       },
+      tipoFactura,
+      direccionEnvio,
       pref_id:pref_id,
       external_reference: external_reference,
       paymentMethod,
       items,
-      direccionEnvio: usuario?.direccion || body.direccionEnvio || "",
       total: totalOrden,
     };
-
+    console.log("Nueva orden a guardar:", nuevaOrdenData);
     if (paymentMethod === "mercadopago" && payment) {
       Object.assign(nuevaOrdenData, {
         collectionId: payment.id.toString(),

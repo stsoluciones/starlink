@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -16,7 +18,7 @@ const schemaFactura = yup.object().shape({
   condicionIva: yup.string().required('Selecciona una condición frente al IVA'),
 })
 
-export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, initialData }) {
+export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usuarioUid, initialData }) {
   const {
     register,
     handleSubmit,
@@ -34,15 +36,21 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, init
     }
   })
 
-  // Precargar datos si existen
   useEffect(() => {
     if (initialData) {
-      reset({ ...initialData, tipo: initialData.tipo || tipo })
+      reset({
+        tipo: tipo || 'B',
+        razonSocial: initialData.razonSocial || '',
+        cuit: initialData.cuit || '',
+        domicilio: initialData.domicilio || '',
+        codigoPostal: initialData.codigoPostal || '',
+        condicionIva: initialData.condicionIva || '',
+      })
     }
-  }, [initialData, tipo, reset])
+  }, [initialData, reset, tipo])
 
-  const enviar = (data) => {
-    onSubmit(data)
+  const enviar = (datos) => {
+    onSubmit(datos)
   }
 
   return (
@@ -51,25 +59,25 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, init
       <form onSubmit={handleSubmit(enviar)} className="space-y-4">
         <div>
           <label className="block text-sm">Razón Social</label>
-          <input {...register('razonSocial')} className="w-full border rounded p-2" />
+          <input placeholder="Ej: Mi empresa S.A." {...register('razonSocial')} className="w-full border rounded p-2" />
           {errors.razonSocial && <p className="text-red-500 text-sm">{errors.razonSocial.message}</p>}
         </div>
 
         <div>
           <label className="block text-sm">CUIT</label>
-          <input {...register('cuit')} className="w-full border rounded p-2" />
+          <input placeholder="Ej: 20304050607" {...register('cuit')} className="w-full border rounded p-2" />
           {errors.cuit && <p className="text-red-500 text-sm">{errors.cuit.message}</p>}
         </div>
 
         <div>
           <label className="block text-sm">Domicilio Fiscal</label>
-          <input {...register('domicilio')} className="w-full border rounded p-2" />
+          <input placeholder="Ej: Av. Siempreviva 742" {...register('domicilio')} className="w-full border rounded p-2" />
           {errors.domicilio && <p className="text-red-500 text-sm">{errors.domicilio.message}</p>}
         </div>
 
         <div>
           <label className="block text-sm">Código Postal</label>
-          <input {...register('codigoPostal')} className="w-full border rounded p-2" />
+          <input placeholder="Ej: 1407" {...register('codigoPostal')} className="w-full border rounded p-2" />
           {errors.codigoPostal && <p className="text-red-500 text-sm">{errors.codigoPostal.message}</p>}
         </div>
 
