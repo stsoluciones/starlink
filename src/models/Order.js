@@ -17,7 +17,7 @@ const orderSchema = new mongoose.Schema({
   fechaPedido: { type: Date, default: Date.now },
   usuarioInfo: { nombreCompleto: String, correo: String, telefono: String },
   pref_id: String,
-  external_reference: { type: String, unique: true, sparse: true, index: true },
+  external_reference: { type: String, sparse: true, index: true },
   paymentId: String,
   paymentMethod: { type: String, enum: ['mercadopago', 'transferencia', 'efectivo'], required: true },
   items: [orderItemSchema],

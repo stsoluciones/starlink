@@ -36,7 +36,6 @@ useEffect(() => {
             <h2 class="text-lg font-bold mb-2">Información de Transferencia</h2>
             <p>Por favor, realiza la transferencia a la siguiente cuenta:</p>
             <p><strong>Banco: </strong>${userBank.banco}</p>
-            <p><strong>Cuenta: </strong>${userBank.cuenta}</p>
             <p><strong>Alias: </strong>${userBank.alias}</p>
             <p><strong>CBU: </strong>${userBank.cbu}</p>
             <p><strong>Titular: </strong>${userBank.titular}</p>
@@ -221,6 +220,46 @@ const handleComprar = async () => {
         icon: 'info',
         confirmButtonText: 'Aceptar',
       });
+      await Swal.fire({
+        title:'Quiere subir el comprobante de la transferencia ahora?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, subir comprobante',
+        cancelButtonText: 'No, lo haré después',
+        reverseButtons: true,
+      })
+      //.then(async (result) => {
+        // if (result.isConfirmed) {
+        //   // Aquí puedes implementar la lógica para subir el comprobante
+        //   // Por ejemplo, abrir un modal o redirigir a una página de carga
+        //   Swal.fire({
+        //     title: 'Subir Comprobante',
+        //     html: '<input type="file" id="comprobante" accept="image/*" class="swal2-input">',
+        //     preConfirm: () => {
+        //       const fileInput = document.getElementById('comprobante');
+        //       if (!fileInput.files.length) {
+        //         Swal.showValidationMessage('Por favor, selecciona un archivo');
+        //         return false;
+        //       }
+        //       const file = fileInput.files[0];
+
+        //       // Aquí puedes implementar la lógica para subir el archivo al servidor
+        //       // Por ejemplo, usando fetch o axios
+        //       // return uploadComprobante(file); // Debes implementar esta función
+        //     },
+        //     confirmButtonText: 'Subir Comprobante',
+        //     showLoaderOnConfirm: true,
+
+        //   });
+        // } else {
+        //   Swal.fire({
+        //     title: 'Comprobante no subido',
+        //     text: 'Puedes subir el comprobante más tarde desde tu perfil.',
+        //     icon: 'info',
+        //     confirmButtonText: 'Aceptar',
+        //   });
+        // }
+      //})
       
       // Limpiar carrito después de éxito
       setCart([]);
