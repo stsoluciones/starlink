@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import actualizarEstado from "../../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
 import Swal from "sweetalert2";
+import Link from "next/link";
 
 // Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -186,13 +187,13 @@ const EnTransito= () => {
                   <strong className="uppercase">{pedido.estado}{" "}</strong>
                   <span>ID: {pedido._id}</span> - {" "}
                   <span>{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</span>
-                  {pedido.usuarioInfo?.correo && (<span> - {pedido.usuarioInfo.correo}</span>)}
                 </label>
                   <span>
                       {pedido.fechaPedido && !isNaN(new Date(pedido.fechaPedido).getTime())
                         ? format(new Date(pedido.fechaPedido), "dd-MM-yyyy", { locale: es })
                         : ""}
                   </span>
+                  {pedido?.etiquetaEnvio && (<Link href={pedido.etiquetaEnvio} target="_blank"> - Reimprimir </Link>)}
               </li>
             ))}
           </ul>

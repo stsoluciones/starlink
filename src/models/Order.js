@@ -53,6 +53,7 @@ const orderSchema = new mongoose.Schema({
   merchantAccountId: {type: String},
   payerEmail: {type: String},
   metadata: mongoose.Schema.Types.Mixed,
+  etiquetaEnvio: { type: String, default: '' },
   paymentDetails: {
     status: {type: String},
     status_detail: {type: String},

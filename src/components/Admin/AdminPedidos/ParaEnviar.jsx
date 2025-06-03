@@ -113,37 +113,75 @@ const ParaEnviar = () => {
         reverseButtons: true
       });
 
-      if (!result.isConfirmed) return;
-      
-      // const etiquetasGeneradas = await handleGenerarAndreani(seleccionados);
-      
-      // if (!etiquetasGeneradas) {
-      //   Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
-      //   return;
-      // }
+      if (!result.isConfirmed) {
+        Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
+        return;
+      }
 
-      // etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
-      //   const blob = new Blob([Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))], { type: 'application/pdf' });
-      //   const url = URL.createObjectURL(blob);
-      //   const link = document.createElement('a');
-      //   link.href = url;
-      //   link.download = `Etiqueta-${pedidoId}.pdf`;
-      //   document.body.appendChild(link);
-      //   link.click();
-      //   URL.revokeObjectURL(url);
-      //   link.remove();
-      // });
-
-
+      // Mostrar cargando mientras se generan etiquetas
       Swal.fire({
         title: 'Procesando...',
-        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).
-        <br/>Aca se genera y se imprime las etiquetas de andreani.`,
+        html: `Generando etiquetas para ${pedidosAActualizar.length} pedido(s).`,
         allowOutsideClick: false,
         didOpen: () => {
           Swal.showLoading();
         }
       });
+
+      // Generar etiquetas (descomenta y adapta según tu lógica)
+      const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar);
+
+      // Cerrar el "Procesando"
+      Swal.close();
+
+      // Mostrar mensaje de éxito y preguntar por impresión
+      const imprimir = await Swal.fire({
+        title: `Se generaron ${etiquetasGeneradas.length} etiqueta(s).`,
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Imprimir Etiquetas',
+        cancelButtonText: 'No Imprimir',
+        reverseButtons: true
+      });
+
+      if (imprimir.isConfirmed) {
+        etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
+          const blob = new Blob(
+            [Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))],
+            { type: 'application/pdf' }
+          );
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `Etiqueta-${pedidoId}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          URL.revokeObjectURL(url);
+          link.remove();
+        });
+
+        Swal.fire('Imprimiendo etiquetas...', 'Se guardaron las etiquetas en los pedidos.', 'info');
+      } else {
+        Swal.fire('Etiquetas no impresas', 'Las etiquetas fueron generadas pero no se imprimieron.', 'info');
+      }
+
+      // Finalmente actualizar el estado de los pedidos
+      Swal.fire({
+        title: 'Actualizando pedidos...',
+        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Lógica para actualizar estado aquí
+      await actualizarPedidosComoEnviados(pedidosAActualizar);
+
+      // Finalizar
+      Swal.close();
+      Swal.fire('¡Pedidos actualizados!', 'Todos los pedidos fueron marcados como enviados.', 'success');
+
 
       const resultados = await Promise.all(
         pedidosAActualizar.map(pedido =>

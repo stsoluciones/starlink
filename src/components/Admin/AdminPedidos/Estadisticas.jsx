@@ -90,8 +90,8 @@ const Estadisticas = () => {
 
       {summary && <StatsSummary data={summary} />}
       {customers && <StatsCustomers data={customers} />}
-      {products && <StatsProducts data={products} timeRange={selectedTimeRange} />}
-      {trends && <StatsTrends data={trends} />}
+      {/* {products && <StatsProducts data={products} timeRange={selectedTimeRange} />}
+      {trends && <StatsTrends data={trends} />} */}
     </div>
   );
 };

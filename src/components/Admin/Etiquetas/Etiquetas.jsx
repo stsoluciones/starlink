@@ -22,6 +22,7 @@ function Etiquetas({ data }) {
           <p><strong>Para:</strong> {data.para}</p>
           <p><strong>Dirección:</strong> {data.direccion}</p>
           <p><strong>Tel:</strong> {data.telefono}</p>
+          <p><strong>Cuil:</strong> {data.cuil}</p>
         </div>
 
         {/* Columna derecha */}
@@ -41,6 +42,9 @@ function Etiquetas({ data }) {
         <p><strong>Bultos <small>total</small>:</strong> {data.totalBulto}</p>
         <p><strong>Bulto N°:</strong>{data.bultoN}</p>
       </div>
+      <div className="grid grid-cols-1 gap-2 mt-2 px-2 text-base">
+        <p><strong>Observaciones: </strong>{data.observaciones}</p>
+      </div>
     </div>
   );
 }
@@ -53,9 +57,12 @@ export default function EtiquetaFormPDF() {
         para: '',
         direccion:'',
         telefono:'',
+        cuil: '',
+        tipo: '',
         totalBulto: '',
         despacharPor: '',
         bultoN: '',
+        observaciones:'',
     });
     const { empresas } = useEmpresas()
     const [empresa, setEmpresa] = useState({
@@ -96,6 +103,8 @@ export default function EtiquetaFormPDF() {
         totalBulto: '',
         despacharPor: '',
         bultoN: '',
+        cuil:'',
+        observaciones:'',
     });
     setEmpresa({
       nombre: '',
@@ -119,12 +128,16 @@ export default function EtiquetaFormPDF() {
                         telefono: empresaSeleccionada.telefono,
                         cuil: empresaSeleccionada.cuil,
                         tipo: empresaSeleccionada.tipo,
+                        observaciones: empresaSeleccionada.observaciones,
                     });
                     setFormData((prev) => ({
                         ...prev,
                         para: empresaSeleccionada.nombre,
                         direccion: empresaSeleccionada.direccion,
                         telefono: empresaSeleccionada.telefono,
+                        cuil: empresaSeleccionada.cuil,
+                        tipo: empresaSeleccionada.tipo,
+                        observaciones: empresaSeleccionada.observaciones,
                     }))
                 }} />
                 <Buttons onClick={handleClean} className='bg-primary text-white uppercase'>Limpiar etiqueta</Buttons>
