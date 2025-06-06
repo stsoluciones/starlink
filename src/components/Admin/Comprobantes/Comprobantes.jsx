@@ -132,16 +132,17 @@ const Comprobantes = () => {
           )
         
           if (!empresaYaExiste) {
-            //console.log('first', JSON.stringify(empresa))
+            console.log('first', empresa);
             const res = await fetch('/api/empresa', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(empresa)
-            })
-        
+              body: JSON.stringify(empresa),
+            });
             if (!res.ok) {
-              Swal.fire('Error', 'No se pudo guardar la empresa', 'error')
-              return
+              Swal.fire('Error', 'No se pudo guardar la empresa', 'error');
+              return;
+            } else {
+              Swal.fire('Se Guardo la empresa con Éxito', res.message, 'success'); // ✅ ahora sí lo verás
             }
           }
         }

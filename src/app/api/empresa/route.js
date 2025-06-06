@@ -8,7 +8,7 @@ export async function GET() {
 }
 
 export async function POST(req) {
-  //console.log('back:',req.body)
+
   try {
     await connectDB();
     const data = await req.json();
@@ -16,6 +16,7 @@ export async function POST(req) {
     return new Response(JSON.stringify(nuevaEmpresa), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
+      message:'Se guardo la empresa'
     });
   } catch (error) {
     console.error(error);
