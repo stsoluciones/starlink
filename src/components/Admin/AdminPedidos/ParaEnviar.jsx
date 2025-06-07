@@ -226,7 +226,7 @@ const ParaEnviar = () => {
 
   return (
     <section className="bg-gray-50 p-0 md:p-8 rounded-lg text-center">
-      <h2 className="text-xl font-semibold mb-4">PROCESADOS para ENVIAR</h2>
+      <h2 className="text-xl font-semibold mb-4">PAGOS para ENVIAR</h2>
       {loading ? (
         <Loading />
       ) : pedidosProcesando.length === 0 ? (

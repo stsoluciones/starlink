@@ -11,7 +11,7 @@ export async function POST(req) {
 
     const pedidosSeleccionados = await Order.find({
       _id: { $in: pedidos },
-      estado: 'procesando',
+      estado: 'pagado',
     }).lean();
 
     if (pedidosSeleccionados.length === 0) {

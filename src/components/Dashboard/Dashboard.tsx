@@ -11,7 +11,7 @@
 import Swal from 'sweetalert2'
 
   // Constantes para estados
-  const ESTADOS_ACTIVOS = ["pendiente", "pagado","procesando", "enviado"] as const
+  const ESTADOS_ACTIVOS = ["pendiente", "pagado", "enviado"] as const
   type EstadoActivo = typeof ESTADOS_ACTIVOS[number]
   type EstadoPedido = 'entregado' | 'cancelado' | EstadoActivo
 

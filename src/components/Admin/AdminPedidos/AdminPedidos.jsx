@@ -20,7 +20,7 @@ export default function AdminPedidos() {
   const [tabActivo, setTabActivo] = useState("pedidos"); // Estado para controlar la pestaña activa
   const [error, setError] = useState(null);
   const pedidosPorPagina = 25;
-  const estados = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"];
+  const estados = ["pendiente", "pagado", "enviado", "entregado", "cancelado"];
 
   // Tabs disponibles
   const TABS = {

@@ -20,7 +20,7 @@ export async function PUT(req, { params }) {
     });
   }
 
-  const estadosValidos = ["pendiente", "pagado", "procesando", "enviado", "entregado", "cancelado"];
+  const estadosValidos = ["pendiente", "pagado", "enviado", "entregado", "cancelado"];
   if (!nuevoEstado || !estadosValidos.includes(nuevoEstado)) {
     return new Response(JSON.stringify({ success: false, error: "Estado no válido proporcionado" }), {
       status: 400,

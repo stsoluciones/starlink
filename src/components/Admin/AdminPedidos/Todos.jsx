@@ -1,8 +1,20 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Loading from '../../Loading/Loading';
-import Link from 'next/link';
 
 const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina }) => {
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const [mostrarFacturaModal, setMostrarFacturaModal] = useState(false);
+
+  const abrirModalFactura = (pedido) => {
+    setPedidoSeleccionado(pedido);
+    setMostrarFacturaModal(true);
+  };
+
+  const cerrarModalFactura = () => {
+    setMostrarFacturaModal(false);
+    setPedidoSeleccionado(null);
+  };
+
   if (!pedidosPaginados) return <div className="p-4"><Loading /></div>;
   if (pedidosPaginados.length === 0) { 
     return (
@@ -28,17 +40,6 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
           {/* Tabla de pedidos */}
           <div className="overflow-x-auto">
             <table className="min-w-full border border-gray-300 text-sm">
-              <thead className="bg-gray-100 text-left">
-                <tr>
-                  <th className="hidden md:flex px-4 py-2 whitespace-nowrap">ID</th>
-                  <th className="px-4 py-2 whitespace-nowrap">Fecha</th>
-                  <th className="px-4 py-2 whitespace-nowrap">Cliente</th>
-                  <th className="hidden md:flex px-4 py-2 whitespace-nowrap">Correo</th>
-                  <th className="px-4 py-2 whitespace-nowrap">Transfer</th>
-                  <th className="md:flex-col px-4 py-2 whitespace-nowrap">Total</th>
-                  <th className="hidden md:flex px-4 py-2 whitespace-nowrap">Cambiar Estado</th>
-                </tr>
-              </thead>
               <tbody>
                 {pedidosPaginados.length === 0 ? (
                   <tr>
@@ -48,26 +49,96 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                   </tr>
                 ) : (
                 pedidosPaginados.map((pedido) => (
+                  console.log('pedido:',pedido),
                   <tr key={pedido._id} className="border-t">
-                    <td className="hidden md:flex px-4 py-2">{pedido._id}</td>
-                    <td className="px-4 py-2">{new Date(pedido.fechaPedido).toLocaleDateString()}</td>
-                    <td className="px-4 py-2">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</td>
-                    <td className="hidden md:flex px-4 py-2">{pedido.usuarioInfo?.correo || "-"}</td>
-                    <td className="px-4 py-2 font-semibold">{pedido?.metadata?.ticketUrl ?<Link href={pedido?.metadata?.ticketUrl} target='_blank'>Ver</Link>:null}</td>
-                    <td className="md:flex-col px-4 py-2">{new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", }).format(pedido.total)}</td>
-                    <td className="hidden md:flex px-4 py-2">
-                      <select disabled={actualizandoId === pedido._id} className="border rounded px-2 py-1 w-full sm:w-auto" value={pedido.estado} onChange={(e) => handleStados(pedido._id, e.target.value)}>
-                        {estados.map((estado) => (
-                          <option key={estado} value={estado}>{estado}</option>
-                        ))}
-                      </select>
-                      {actualizandoId === pedido._id && (
-                        <>
-                          <span className="ml-2 text-xs text-gray-500">Guardando</span><Loading />
-                        </>
-                      )}
+                    <td colSpan={8} className="p-4">
+                      <div className="border rounded-lg shadow-sm p-4 space-y-4">
+
+                        {/* Encabezado: Estado, Fecha y Botón de etiqueta */}
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                          <div>
+                            <p className="text-xs text-gray-500 my-2">{new Date(pedido.fechaPedido).toLocaleString('es-AR')}</p>
+                            {pedido.estado !== 'pendiente' && pedido.estado !== 'cancelado' && (
+                              <button onClick={() => handleGenerarAndreani(pedido.direccionEnvio)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-2 my-2 rounded-md" >
+                                {pedido.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}
+                              </button>
+                            )}
+                            {/* Botón imprimir etiqueta */}
+                            {pedido.metadata?.ticketUrl && pedido.paymentMethod === 'transferencia' && (
+                              <a href={pedido.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded`}> ver ticket</a> )}
+                          </div>
+
+                          {/* Selector de estado */}
+                          <div className="flex flex-col md:flex-row md:items-center gap-2">
+                            <select
+                              disabled={actualizandoId === pedido._id}
+                              className="border rounded px-2 py-1 w-full md:w-auto"
+                              value={pedido.estado}
+                              onChange={(e) => handleStados(pedido._id, e.target.value)}
+                            >
+                              {estados.map((estado) => (
+                                <option key={estado} value={estado}>{estado}</option>
+                              ))}
+                            </select>
+                            {actualizandoId === pedido._id && (
+                              <span className="ml-2 text-xs text-gray-500 inline-flex items-center">
+                                Guardando <Loading />
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Lista de productos */}
+                        <div className="flex flex-wrap gap-4">
+                          {pedido.metadata?.cart?.map((item, index) => (
+                            <div key={index} className="flex items-center border rounded p-2 w-full md:w-auto md:min-w-[250px]">
+                              <img
+                                src={item.foto_1_1}
+                                alt={item.nombre}
+                                className="w-16 h-16 object-contain mr-4"
+                              />
+                              <div>
+                                <p className="text-sm font-semibold">{item.titulo_de_producto}</p>
+                                <p className="text-xs text-gray-600">
+                                  Cantidad: <span className="text-blue-600 font-bold">{item.quantity}</span>
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Datos del comprador */}
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t mt-4">
+                          <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
+                          <a href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Iniciar conversación</a>
+                          <button onClick={() => abrirModalFactura(pedido)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded ml-2">
+                            Ver datos de Factura
+                          </button>
+                          {mostrarFacturaModal && pedidoSeleccionado && (
+                              <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center z-50">
+                                <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
+                                  <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>
+                                  <ul className="text-sm space-y-2">
+                                    <li><strong>Tipo:</strong> {pedidoSeleccionado.tipoFactura?.tipo}</li>
+                                    <li><strong>Razón Social:</strong> {pedidoSeleccionado.tipoFactura?.razonSocial}</li>
+                                    <li><strong>CUIT:</strong> {pedidoSeleccionado.tipoFactura?.cuit}</li>
+                                    <li><strong>Condición IVA:</strong> {pedidoSeleccionado.tipoFactura?.condicionIva}</li>
+                                    <li><strong>Domicilio:</strong> {pedidoSeleccionado.tipoFactura?.domicilio}</li>
+                                    <li><strong>Código Postal:</strong> {pedidoSeleccionado.tipoFactura?.codigoPostal}</li>
+                                    <li><strong>Fecha:</strong> {new Date(pedidoSeleccionado.tipoFactura?.fecha).toLocaleDateString('es-AR')}</li>
+                                  </ul>
+                                  <button onClick={cerrarModalFactura} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded" >
+                                    Cerrar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                        </div>
+
+                      </div>
                     </td>
                   </tr>
+
                 )))}
               </tbody>
             </table>

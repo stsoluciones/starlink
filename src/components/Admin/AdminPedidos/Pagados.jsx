@@ -80,7 +80,7 @@ const Pagados= () => {
     try {
       const result = await Swal.fire({
         title: '¿Estás seguro?',
-        text: `Vas a actualizar ${pedidosAActualizar.length} pedido(s) a "procesando".`,
+        text: `Vas a actualizar ${pedidosAActualizar.length} pedido(s) a "enviado".`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -104,7 +104,7 @@ const Pagados= () => {
       const resultadosPromises = pedidosAActualizar.map(pedido =>
         actualizarEstado(
           pedido._id,
-          "procesando",
+          "enviado",
           setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
           setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
           true // Importante: Omitir la confirmación individual de actualizarEstado
@@ -130,13 +130,13 @@ const Pagados= () => {
       if (actualizadosConError > 0) {
         Swal.fire({
           title: 'Operación Parcialmente Exitosa',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "procesando". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado". ${actualizadosConError} pedido(s) no pudieron ser actualizados. Revisa la consola o los mensajes de error individuales.`,
           icon: 'warning'
         });
       } else {
         Swal.fire({
           title: '¡Éxito!',
-          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "procesando".`,
+          text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
           icon: 'success'
         });
       }
@@ -202,7 +202,7 @@ const Pagados= () => {
             onClick={handleEntregados}
             disabled={seleccionados.length === 0 || loading} // Deshabilitar si está cargando
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-300"
-          > Marcar como PROCESANDO ({seleccionados.length})
+          > Marcar como ENVIADO ({seleccionados.length})
           </button>
         </>
       )}
