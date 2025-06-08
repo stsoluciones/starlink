@@ -1,7 +1,6 @@
 // componentes/Admin/AdminPedidos/AdminPedidos.jsx
 import { useEffect, useState } from "react";
 import Loading from "../../Loading/Loading";
-import ParaEnviar from "./ParaEnviar";
 import EnTransito from "./EnTransito";
 import Pagados from "./Pagados";
 import Estadisticas from "./Estadisticas";
@@ -82,7 +81,6 @@ const handleStados = (id, nuevoEstado) => {
       <div className="flex flex-col md:flex-row  border-b mb-6">
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.PEDIDOS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.PEDIDOS)}>TODOS</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.PAGADOS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.PAGADOS)}>PAGADOS</button>
-        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENVIAR ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENVIAR)}>ENVIAR</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.TRANSITO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.TRANSITO)}>EN TRANSITO</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENTREGADO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENTREGADO)}>ENTREGADO</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ESTADISTICAS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ESTADISTICAS)}>ESTADISTICAS</button>
@@ -92,14 +90,9 @@ const handleStados = (id, nuevoEstado) => {
       {tabActivo === TABS.PEDIDOS && (
         <Todos search={search} filtroEstado={filtroEstado} setSearch={setSearch} setFiltroEstado={setFiltroEstado} cambiarPagina={cambiarPagina} estados={estados} pedidosPaginados={pedidosPaginados} actualizandoId={actualizandoId} paginaActual={paginaActual} totalPaginas={totalPaginas} handleStados={handleStados} />
       )}
-      {tabActivo === TABS.ENVIAR && (
-        <ParaEnviar />
-      )}
-
       {tabActivo === TABS.PAGADOS && (
         <Pagados />
       )}
-
       {tabActivo === TABS.TRANSITO && (
         <EnTransito />
       )}

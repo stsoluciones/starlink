@@ -1,10 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { FaBackward, FaForward } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 import Loading from '../../Loading/Loading';
+import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
+import actualizarEstado from '../../../Utils/actualizarEstado';
 
-const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina }) => {
+
+const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId,setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina }) => {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   const [mostrarFacturaModal, setMostrarFacturaModal] = useState(false);
-
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [todosSeleccionados, setTodosSeleccionados] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const objectIdRegex = /^[a-f\d]{24}$/i;
+  
   const abrirModalFactura = (pedido) => {
     setPedidoSeleccionado(pedido);
     setMostrarFacturaModal(true);
@@ -15,6 +24,30 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
     setPedidoSeleccionado(null);
   };
 
+  useEffect(() => {
+    const pedidosPagados = pedidosPaginados.filter(p => p.estado === 'pagado').map(p => p._id);
+    const todosPagadosSeleccionados =
+      pedidosPagados.length > 0 &&
+      pedidosPagados.every(id => seleccionados.includes(id));
+    setTodosSeleccionados(todosPagadosSeleccionados);
+  }, [seleccionados, pedidosPaginados]);
+
+
+  const manejarSeleccionGeneral = () => {
+    const pedidosPagados = pedidosPaginados
+      .filter(p => p.estado === 'pagado')
+      .map(p => p._id);
+
+    if (todosSeleccionados) {
+      // Deseleccionar solo los pagados de esta página
+      setSeleccionados(seleccionados.filter(id => !pedidosPagados.includes(id)));
+    } else {
+      // Agregar los pagados de esta página a los seleccionados
+      setSeleccionados([...new Set([...seleccionados, ...pedidosPagados])]);
+    }
+  };
+
+
   if (!pedidosPaginados) return <div className="p-4"><Loading /></div>;
   if (pedidosPaginados.length === 0) { 
     return (
@@ -24,6 +57,149 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
       </div>
     );
   }
+
+const generarEtiquetas = async (pedidoUnico = null) => {
+  const pedidosAActualizar = pedidoUnico
+    ? [pedidoUnico]
+    : pedidosPaginados.filter(pedido => seleccionados.includes(pedido._id));
+
+    if (pedidosAActualizar.length === 0) {
+      Swal.fire("Atención", "No hay pedidos seleccionados para generar etiquetas.", "info");
+      return;
+    }
+
+    const pedidosInvalidos = pedidosAActualizar.filter(p => !objectIdRegex.test(p._id));
+    if (pedidosInvalidos.length > 0) {
+      console.error("Pedidos con IDs malformados:", pedidosInvalidos.map(p => p._id));
+      Swal.fire({
+        title: 'Error de Datos',
+        html: `Se encontraron ${pedidosInvalidos.length} pedido(s) con formato de ID incorrecto. Por favor, revisa la consola para más detalles y corrige los datos en la base de datos.<br/>IDs problemáticos: ${pedidosInvalidos.map(p => p._id).join(', ')}`,
+        icon: 'error'
+      });
+      return;
+    }
+
+    try {
+      const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: `Vas a generar etiquetas y actualizar ${pedidosAActualizar.length} pedido(s) a "enviado".`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, generar y actualizar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+      });
+
+      if (!result.isConfirmed) {
+        Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
+        return;
+      }
+
+      // Mostrar cargando mientras se generan etiquetas
+      Swal.fire({
+        title: 'Procesando...',
+        html: `Generando etiquetas para ${pedidosAActualizar.length} pedido(s).`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Generar etiquetas (descomenta y adapta según tu lógica)
+      const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar.map(p => p._id));
+
+      // Cerrar el "Procesando"
+      Swal.close();
+
+      // Mostrar mensaje de éxito y preguntar por impresión
+      const imprimir = await Swal.fire({
+        title: `Se generaron ${etiquetasGeneradas.length} etiqueta(s).`,
+        icon: 'success',
+        showCancelButton: true,
+        confirmButtonText: 'Imprimir Etiquetas',
+        cancelButtonText: 'No Imprimir',
+        reverseButtons: true
+      });
+
+      if (imprimir.isConfirmed) {
+        etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
+          const blob = new Blob(
+            [Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))],
+            { type: 'application/pdf' }
+          );
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `Etiqueta-${pedidoId}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          URL.revokeObjectURL(url);
+          link.remove();
+        });
+
+        Swal.fire('Imprimiendo etiquetas...', 'Se guardaron las etiquetas en los pedidos.', 'info');
+      } else {
+        Swal.fire('Etiquetas no impresas', 'Las etiquetas fueron generadas pero no se imprimieron.', 'info');
+      }
+
+      // Finalmente actualizar el estado de los pedidos
+      Swal.fire({
+        title: 'Actualizando pedidos...',
+        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+      // Finalizar
+      Swal.close();
+      Swal.fire('¡Pedidos actualizados!', 'Todos los pedidos fueron marcados como enviados.', 'success');
+
+
+      const resultados = await Promise.all(
+        pedidosAActualizar.map(pedido =>
+          actualizarEstado(
+            pedido._id,
+            "enviado",
+            setActualizandoId,
+            setPedidosProcesando,
+            true
+          )
+        )
+      );
+
+      const actualizadosConExito = resultados.filter(r => r && r.success).length;
+      
+      if (actualizadosConExito > 0) {
+        setPedidosProcesando(prevPedidos =>
+          prevPedidos.filter(p =>
+            !resultados.some(r => r && r.success && r.pedido && r.pedido._id === p._id)
+          )
+        );
+      }
+
+      Swal.fire({
+        title: '¡Éxito!',
+        text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
+        icon: 'success'
+      });
+
+      setSeleccionados([]);
+      setTodosSeleccionados(false);
+
+    } catch (error) {
+      console.error("Error al generar etiquetas y actualizar pedidos:", error);
+      Swal.fire({
+        title: 'Error General',
+        text: error.message || "Ocurrió un error inesperado durante el proceso.",
+        icon: 'error'
+      });
+    }
+  };
+
   return (
           <section>
           {/* Filtros */}
@@ -35,6 +211,11 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                 <option key={estado} value={estado}>{estado}</option>
               ))}
             </select>
+            <div className="flex gap-2 align-middle items-center">
+              <input type="checkbox" id="seleccionarTodos" checked={todosSeleccionados} onChange={manejarSeleccionGeneral}/>
+              <label htmlFor="seleccionarTodos" className="font-medium cursor-pointer">Imprimir todas las etiquetas</label>
+            </div>
+            <button onClick={generarEtiquetas} disabled={seleccionados.length === 0 || loading } className="bg-blue-600 text-white text-sm p-2 my-2 rounded hover:bg-blue-700 disabled:bg-gray-300">Generar y Enviar ({seleccionados.length})</button>
           </div>
 
           {/* Tabla de pedidos */}
@@ -49,23 +230,19 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                   </tr>
                 ) : (
                 pedidosPaginados.map((pedido) => (
-                  console.log('pedido:',pedido),
                   <tr key={pedido._id} className="border-t">
                     <td colSpan={8} className="p-4">
                       <div className="border rounded-lg shadow-sm p-4 space-y-4">
 
                         {/* Encabezado: Estado, Fecha y Botón de etiqueta */}
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <div>
-                            <p className="text-xs text-gray-500 my-2">{new Date(pedido.fechaPedido).toLocaleString('es-AR')}</p>
+                          <p className="text-xs text-gray-500 p-2 my-2">{new Date(pedido.fechaPedido).toLocaleString('es-AR')}</p>
+                          <div className=' flex gap-2 align-middle'>
                             {pedido.estado !== 'pendiente' && pedido.estado !== 'cancelado' && (
-                              <button onClick={() => handleGenerarAndreani(pedido.direccionEnvio)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-2 my-2 rounded-md" >
-                                {pedido.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}
-                              </button>
-                            )}
+                              <button onClick={() => generarEtiquetas(pedido)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-2 my-2 rounded-md" >{pedido.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
                             {/* Botón imprimir etiqueta */}
                             {pedido.metadata?.ticketUrl && pedido.paymentMethod === 'transferencia' && (
-                              <a href={pedido.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded`}> ver ticket</a> )}
+                              <a href={pedido.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm p-2 my-2 rounded`}> ver ticket</a> )}
                           </div>
 
                           {/* Selector de estado */}
@@ -93,7 +270,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                           {pedido.metadata?.cart?.map((item, index) => (
                             <div key={index} className="flex items-center border rounded p-2 w-full md:w-auto md:min-w-[250px]">
                               <img
-                                src={item.foto_1_1}
+                                src={item.foto_1_1 || '/images/sinFoto.webp'}
                                 alt={item.nombre}
                                 className="w-16 h-16 object-contain mr-4"
                               />
@@ -115,7 +292,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                             Ver datos de Factura
                           </button>
                           {mostrarFacturaModal && pedidoSeleccionado && (
-                              <div className="fixed inset-0 bg-black bg-opacity-20 flex justify-center items-center z-50">
+                              <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>
                                   <ul className="text-sm space-y-2">
@@ -127,9 +304,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
                                     <li><strong>Código Postal:</strong> {pedidoSeleccionado.tipoFactura?.codigoPostal}</li>
                                     <li><strong>Fecha:</strong> {new Date(pedidoSeleccionado.tipoFactura?.fecha).toLocaleDateString('es-AR')}</li>
                                   </ul>
-                                  <button onClick={cerrarModalFactura} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded" >
-                                    Cerrar
-                                  </button>
+                                  <button onClick={cerrarModalFactura} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded" >Cerrar</button>
                                 </div>
                               </div>
                             )}
@@ -147,11 +322,11 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
           {/* Paginación */}
           <div className="mt-4 flex flex-col sm:flex-row items-center gap-2">
             <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} className="px-3 py-1 border rounded disabled:opacity-50">
-              Anterior
+              <FaBackward/>
             </button>
-            <span>Página {paginaActual} de {totalPaginas}</span>
+            <span>{paginaActual} de {totalPaginas}</span>
             <button onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === totalPaginas} className="px-3 py-1 border rounded disabled:opacity-50">
-              Siguiente
+              <FaForward />
             </button>
           </div>
         </section>
