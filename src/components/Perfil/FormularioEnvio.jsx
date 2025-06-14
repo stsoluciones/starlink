@@ -29,17 +29,7 @@ const envioSchema = yup.object().shape({
   })
 });
 
-export const FormularioEnvio = ({ 
-  user, 
-  onCancel, 
-  onSubmit: externalOnSubmit,
-  missingFields 
-}) => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, missingFields }) => { const { register, handleSubmit, formState: { errors }, } = useForm({
     resolver: yupResolver(envioSchema),
     defaultValues: {
       nombreCompleto: user?.nombreCompleto || '',
@@ -162,7 +152,24 @@ export const FormularioEnvio = ({
                   )}
                 </div>
               )}
-              
+              {missingFields.includes('casaOTorre') && (
+                <div>
+                  <label>Casa O Torre</label>
+                  <Input {...register('direccion.casaOTorre')} />
+                  {errors.direccion?.casaOTorre && (
+                    <p className="text-red-500 text-sm">{errors.direccion.casaOTorre.message}</p>
+                  )}
+                </div>
+              )}
+              {missingFields.includes('depto') && (
+                <div>
+                  <label>Depto</label>
+                  <Input {...register('direccion.depto')} />
+                  {errors.direccion?.depto && (
+                    <p className="text-red-500 text-sm">{errors.direccion.depto.message}</p>
+                  )}
+                </div>
+              )}
               {missingFields.includes('codigoPostal') && (
                 <div>
                   <label>Código Postal *</label>

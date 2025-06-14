@@ -16,11 +16,7 @@ const schemaDireccion = yup.object().shape({
 });
 
 export default function FormularioDireccion({ onSubmit, onCancel }) {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schemaDireccion),
     defaultValues: {
       pais: 'Argentina',

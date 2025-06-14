@@ -9,7 +9,7 @@ export async function POST(req) {
 
   try {
     const body = await req.json();
-    console.log("body back:", body);
+    //console.log("body back:", body);
     const paymentMethod = body.paymentMethod || "mercadopago";
     const cart = body.cart;
     const pref_id = body.pref_id

@@ -143,9 +143,7 @@ const fetchUserData = async () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Mi Perfil</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Actualiza tu información personal y de contacto
-          </p>
+          <p className="mt-2 text-sm text-gray-600"> Actualiza tu información personal y de contacto </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -153,25 +151,25 @@ const fetchUserData = async () => {
             <div className="flex flex-col sm:col-span-1">
               <label htmlFor="nombreCompleto">Nombre completo <span className='text-xs text-red-500'>*</span></label>
               <Input {...register('nombreCompleto')} className="" />
-              {errors.nombreCompleto && <p className="error">{errors.nombreCompleto.message}</p>}
+              {errors.nombreCompleto && <p className="text-red-500 text-sm">{errors.nombreCompleto.message}</p>}
             </div>
 
             <div className="flex flex-col sm:col-span-1">
               <label htmlFor="correo">Correo electrónico <span className='text-xs text-red-500'>*</span></label>
               <Input {...register('correo')} disabled className="input bg-gray-100" />
-              {errors.correo && <p className="error">{errors.correo.message}</p>}
+              {errors.correo && <p className="text-red-500 text-sm">{errors.correo.message}</p>}
             </div>
 
             <div className="flex flex-col sm:col-span-1"> 
               <label htmlFor="telefono">Teléfono</label>
               <Input {...register('telefono')} className="input" />
-              {errors.telefono && <p className="error">{errors.telefono.message}</p>}
+              {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
             </div>
 
             <div className="flex flex-col sm:col-span-1">
               <label htmlFor="dniOCuit">DNI o CUIT</label>
               <Input {...register('dniOCuit')} className="input" />
-              {errors.dniOCuit && <p className="error">{errors.dniOCuit.message}</p>}
+              {errors.dniOCuit && <p className="text-red-500 text-sm">{errors.dniOCuit.message}</p>}
             </div>
 
             <div className="sm:col-span-2 border-t pt-4 mt-4">
