@@ -114,7 +114,7 @@ export default function EmpresaForm() {
           <option value="Consumidor Final">Consumidor Final</option>
           <option value="Monotributo Social">Monotributo Social</option>
           <option value="Monotributo">Monotributo</option>
-          <option value="Exento">Exento</option>
+          <option value="Exento">IVA Exento</option>
           <option value="No Responsable">No Responsable</option>
           <option value="Responsable inscripto">Responsable inscripto</option>
         </select>
