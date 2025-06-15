@@ -2,14 +2,19 @@ import { useSearchParams } from 'next/navigation';
 
 const useLinks = () => {
     const searchParams = useSearchParams();
-    const queryString = searchParams.toString();
+    const perfil = searchParams.get('perfil');
+
+    const pedidosHref =
+        perfil === 'perfil'
+            ? '/Dashboard?perfil=pedidos'
+            : '/Dashboard';
 
     return [
-        {name: 'Home', href: queryString? '?' + queryString + '#home':'#home'},
-        {name: 'Productos', href: queryString? '?' + queryString +'#productos':'#productos'},
-        {name: 'Nosotros', href: queryString? '?' + queryString +'#nosotros':'#nosotros'},
-        {name: 'Contacto', href: queryString? '?' + queryString +'#contacto':'#contacto'},
-        {name: 'Mis Pedidos', href: queryString? '?' + queryString +'/Dashboard':'/Dashboard'}
+        { name: 'Home', href: '#home' },
+        { name: 'Productos', href: '#productos' },
+        { name: 'Nosotros', href: '#nosotros' },
+        { name: 'Contacto', href: '#contacto' },
+        { name: 'Mis Pedidos', href: pedidosHref }
     ];
 };
 

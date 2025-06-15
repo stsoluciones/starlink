@@ -5,9 +5,10 @@ import Image from 'next/image';
 
 const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
     const router = useRouter();
+    //console.log('user:',user);
     
     const handleAdminRedirect = () => {
-        router.push('/Admin');
+        router.push('/Dashboard?perfil=perfil');
         toggleDropdown();
     };
 
@@ -45,7 +46,7 @@ const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
                     </button>
                     {isDropdownOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-40">
-                            <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={handleAdminRedirect} aria-label="Perfil">Mi Perfil</button>
+                            <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={()=>handleAdminRedirect('perfil')} aria-label="Perfil">Mi Perfil</button>
                             <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={handleLogOut} aria-label="cerrar sesion">Cerrar Sesión
                             </button>
                         </div>

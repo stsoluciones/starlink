@@ -2,13 +2,13 @@
 
   import React, { useEffect, useState, useCallback } from 'react'
   import axios from 'axios'
-  import { useRouter } from 'next/navigation'
+  import { useSearchParams , useRouter } from 'next/navigation'
   import { getInLocalStorage } from '../../Hooks/localStorage'
   import Loading from '../Loading/Loading'
   import PedidoCard from './PedidoCard'
   import PerfilPage from '../Perfil/Perfil'
   import FormularioFactura from '../Perfil/FormularioFactura'
-import Swal from 'sweetalert2'
+  import Swal from 'sweetalert2'
 
   // Constantes para estados
   const ESTADOS_ACTIVOS = ["pendiente", "pagado", "enviado"] as const
@@ -42,12 +42,16 @@ import Swal from 'sweetalert2'
   }
 
   const Dashboard = () => {
+    const searchParams = useSearchParams();
+    const perfil = searchParams?.get('perfil');  
+    //console.log('perfil:',perfil)
+
     const router = useRouter()
     const [usuarioUid, setUsuarioUid] = useState<string | null>(null)
     const [pedidos, setPedidos] = useState<Pedido[]>([])
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
-    const [activeTab, setActiveTab] = useState<'pedidos' | 'perfil' | 'facturacion'>('pedidos')
+    const [activeTab, setActiveTab] = useState<'pedidos' | 'perfil' | 'facturacion'>(perfil ==='perfil'?'perfil':'pedidos')
     const [datosFactura, setDatosFactura] = useState(null)
 
 

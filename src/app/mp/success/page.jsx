@@ -36,7 +36,7 @@ export default function SuccessPage() {
           onClick={() => router.push("/Dashboard")}
           className="bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition"
         >
-          Ir al Dashboard ahora
+          Ir a Mis Pedidos ahora
         </button>
       </div>
     </div>
