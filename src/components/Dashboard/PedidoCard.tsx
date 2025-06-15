@@ -3,6 +3,9 @@ import { Pedido } from './Dashboard' // Asegúrate que la interfaz Pedido defina
 import { toast } from 'react-toastify';
 import Loading from '../Loading/Loading';
 import Link from 'next/link';
+import actualizarEstado from "../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
+import Swal from 'sweetalert2';
+
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
 // Es buena práctica tener un tipo para las llaves de estado si son un conjunto conocido.
@@ -72,6 +75,10 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   const estadoParaTimeline = mapEstadoToTimeline(pedido.estado);
   const estadoColorClass = ESTADO_COLORS[estadoParaTimeline] || ESTADO_COLORS.desconocido;
   const estadoDisplayText = estadoParaTimeline.toUpperCase();
+  const [actualizandoId, setActualizandoId] = useState(null); // No parece usarse para feedback visual directo en este componente, pero se pasa.
+  const [pedidosProcesando, setPedidosProcesando] = useState([]);
+
+
 
 
   const isCanceled = estadoParaTimeline === 'cancelado';
@@ -116,21 +123,46 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
       setLoading(false);
     }
   };
+  const handleCancelPedido = async(pedido)=>{
+    console.log(pedido._id)
+    const seguro = Swal.fire({
+      title:'¿Esta seguro que quiere cancelar este pedido?',
+      text:'esta accion no puede deshacerse',
+      icon:'error',
+      showCancelButton: true,
+      showConfirmButton: true,
+      cancelButtonText:'No',
+      confirmButtonText:'Estoy Seguro',
+      allowOutsideClick: true,
+    })
+    if ((await seguro).isConfirmed){
+      actualizarEstado(
+        pedido._id,
+        "cancelado",
+        setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
+        setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
+        true // Importante: Omitir la confirmación individual de actualizarEstado
+      )
+    }
+  }
     // En JSX: botón para subir comprobante si corresponde
   const puedeSubirTicket =
     mapEstadoToTimeline(pedido.estado) === 'pendiente' &&
     pedido.paymentMethod === 'transferencia';
-
+          
   return (
     <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
       <div className="grid grid-cols-3 items-center text-center mb-2 gap-2">
-        <h3 className="text-sm md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
+        <div className="flex gap-2">
+          <h3 className="text-sm md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
+           {estadoDisplayText==='PENDIENTE'?<button onClick={()=>handleCancelPedido(pedido)} className='text-red-500 hover:cursor-pointer bg-red-300 px-2 rounded-full text-sm' title='cancelar pedido'> X </button>:null} 
+        </div>
         <div className="col-span-1">
           {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
             <button onClick={() => setShowUploadModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Adj. comprobante</button>) : pedido?.metadata?.ticketUrl ? (
             <Link href={pedido.metadata.ticketUrl} target="_blank" className="text-blue-600 hover:underline text-xs md:text-sm"> Ver comprobante</Link>) : null}
         </div>
-        <span className={`col-span-1 px-3 py-1 rounded-full text-xs md:text-sm font-medium ${estadoColorClass}`}>{estadoDisplayText}</span>
+        <span className={`col-span-1 px-3 py-1 rounded-full text-xs md:text-sm font-medium  ${estadoColorClass}`}>{estadoDisplayText}</span>
       </div>
 
       {/* Modal */}
@@ -178,12 +210,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
       <div className="mb-4">
         <div className="flex items-center justify-between relative">
           <div className="absolute top-3 left-0 right-0 h-1 bg-gray-200 z-0">
-            <div 
-              className={`h-1 ${isCanceled ? 'bg-red-400' : 'bg-blue-500'}`} 
-              style={{ 
-                width: `${isCanceled ? 100 : (currentStateIndex >=0 && ESTADOS_ORDENADOS_TIMELINE.length > 1 ? (currentStateIndex / (ESTADOS_ORDENADOS_TIMELINE.length - 2)) * 100 : 0)}%`
-              }}
-            ></div>
+            <div className={`h-1 ${isCanceled ? 'bg-red-400' : 'bg-blue-500'}`} style={{ width: `${isCanceled ? 100 : (currentStateIndex >=0 && ESTADOS_ORDENADOS_TIMELINE.length > 1 ? (currentStateIndex / (ESTADOS_ORDENADOS_TIMELINE.length - 2)) * 100 : 0)}%`}} ></div>
           </div>
           
           {ESTADOS_ORDENADOS_TIMELINE.map((estadoTimeline, index) => {
@@ -211,6 +238,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : null}
+                  
                 </div>
                 <span className={`text-xs mt-1 text-center ${isCurrent && !isCancelledNode ? 'font-bold text-blue-600' : isCancelledNode ? 'font-bold text-red-600' : 'text-gray-800'}`}>
                   {estadoTimeline.charAt(0).toUpperCase() + estadoTimeline.slice(1)}
@@ -228,7 +256,8 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
           <p>{pedido.fechaPedido ? new Date(pedido.fechaPedido).toLocaleDateString('es-ES') : 'N/A'}</p>
         </div>
         <div>
-          <p className="text-gray-500">Valor Total</p>
+          {pedido.paymentMethod==='transferencia'?<p className="text-green-700 font-semibold">Valor Total</p>:<p className="text-gray-700 font-semibold">Valor Total</p>}
+          {pedido.paymentMethod==='transferencia'?<small className='text-xs text-green-700'>Abonado con Descuento</small>:null}
           <p className="font-medium">${(pedido.total || 0).toFixed(2)}</p>
         </div>
       </div>

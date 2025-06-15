@@ -40,7 +40,7 @@ const handleGuardarPedido = async (user, cart) => {
         cart: cart.map(item => ({
           cod_producto: item.cod_producto,
           nombre: item.nombre,
-          precio: item.precio,
+          precio: item.precio * 0.85,
           quantity: item.quantity,
           titulo_de_producto: item.titulo_de_producto || '',
         })),
@@ -58,7 +58,7 @@ const handleGuardarPedido = async (user, cart) => {
         paymentId: `transf_intent_${new Date().getTime()}`,
         paymentMethod: 'transferencia',
         estado: 'pendiente',
-        total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0),
+        total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0)* 0.85,
       }),
     });
 

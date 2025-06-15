@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useContext } from 'react';
 import { createRoot } from 'react-dom/client';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
@@ -18,10 +19,12 @@ import FormularioFactura from '../../Perfil/FormularioFactura';
 import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
 
 const ShopCart = () => {
+  const router = useRouter();
   const [cart, setCart] = useContext(CartContext);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const preguntarRef = useRef(null);
+  const totalRef = useRef(null)
 
 useEffect(() => {
   if (typeof window !== "undefined") {
@@ -38,7 +41,7 @@ useEffect(() => {
             <p><strong>Alias: </strong>${userBank.alias}</p>
             <p><strong>CBU: </strong>${userBank.cbu}</p>
             <p><strong>Titular: </strong>${userBank.titular}</p>
-            <p><strong>Monto Total: </strong>${cart.reduce((acc, item) => acc + item.precio * item.quantity, 0).toLocaleString('es-AR', {
+            <p><strong>Monto Total: </strong>${cart.reduce((acc, item) => (acc + item.precio * item.quantity) * 0.85, 0).toLocaleString('es-AR', {
               style: 'currency',
               currency: 'ARS',
             })}</p>
@@ -203,16 +206,39 @@ const handleComprar = async () => {
         userCompleto.direccionEnvio = userCompleto.direccion;
       }
 
-    // Preguntar por método de pago
-    const result = await Swal.fire({
-      title: '¿Cómo deseas pagar?',
-      icon: 'question',
-      showCancelButton: true,
-      allowOutsideClick: false,
-      confirmButtonText: 'MercadoPago',
-      cancelButtonText: 'Transferencia',
-      reverseButtons: true,
-    });
+      // 1. Obtener el subtotal como texto y limpiarlo
+      const rawSubtotal = totalRef.current?.textContent?.replace('Subtotal: ', '').replace(/\./g, '').replace(',', '.').replace('$', '').trim();
+      const subtotalNumber = parseFloat(rawSubtotal); // Ej: 120000.00
+
+      // 2. Calcular precios con y sin descuento
+      const transferenciaPrecio = subtotalNumber * 0.85;
+      const mercadoPagoPrecio = subtotalNumber;
+
+      // 3. Formatear en ARS
+      const formatCurrency = (num) => num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', });
+
+      // 4. Mostrar SweetAlert
+      const result = await Swal.fire({
+        title: '¿Cómo deseas pagar?',
+        icon: 'question',
+        showCancelButton: true,
+        allowOutsideClick: false,
+        confirmButtonText: 'MercadoPago',
+        cancelButtonText: 'Transferencia',
+        reverseButtons: true,
+        allowOutsideClick:true,
+        html: `
+          <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 1rem;">
+            <span style="color: #15803d;">Transferencia (15% OFF)</span>
+            <span>MercadoPago</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+            <span style="color: #15803d;">${formatCurrency(transferenciaPrecio)}</span>
+            <span>${formatCurrency(mercadoPagoPrecio)}</span>
+          </div>
+        `,
+      });
+
 
     if (result.isConfirmed) {
       // Procesar pago con MercadoPago      
@@ -222,7 +248,7 @@ const handleComprar = async () => {
       const compraData = await compraResponse.json();
       if (compraData.init_point) {
         //console.log('init_point:', compraData.init_point);
-        console.log('userCompleto:', userCompleto);
+        //console.log('userCompleto:', userCompleto);
         console.log('cart:', cart);
         await handleGuardarPedidoMercado(userCompleto, cart, compraData);
         window.location.href = compraData.init_point;
@@ -231,6 +257,8 @@ const handleComprar = async () => {
         throw new Error("No se pudo obtener el init_point");
       }
     } else if (result.isDismissed) {
+      console.log('cart:', cart);
+
       // Procesar transferencia bancaria
       const guardarPedidoData = await handleGuardarPedido(userCompleto, cart);
       
@@ -329,6 +357,7 @@ const handleComprar = async () => {
     });
   } finally {
     setLoading(false);
+    router.push('/Dashboard');
   }
 };
 
@@ -369,7 +398,8 @@ const handleComprar = async () => {
     });
   };
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-
+  //console.log('totalRef:',totalRef.current?.textContent?.replace('Subtotal: ', '') || '');
+  
   return (
     <section className="flex flex-col items-center md:items-start mb-6">
         <article className="flex flex-col max-w-[1200px] m-2 self-center">
@@ -422,7 +452,7 @@ const handleComprar = async () => {
             <div id="resumen" className="bg-slate-100 rounded-lg shadow-xl p-7 relative flex flex-col justify-between" style={{ alignSelf: "start" }}>
               <h2 className="text-2xl mb-2">Resumen de Compra</h2>
               <div className="grid grid-cols-1  flex-grow">
-                <span>
+                <span ref={totalRef}>
                   <strong>Subtotal: </strong>
                   {cart.reduce((acc, item) => acc + item.precio * item.quantity, 0).toLocaleString('es-AR', {
                     style: 'currency',

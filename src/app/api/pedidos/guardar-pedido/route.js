@@ -88,7 +88,7 @@ export async function POST(req) {
       items,
       total: totalOrden,
     };
-    console.log("Nueva orden a guardar:", nuevaOrdenData);
+    //console.log("Nueva orden a guardar:", nuevaOrdenData);
     if (paymentMethod === "mercadopago" && payment) {
       Object.assign(nuevaOrdenData, {
         collectionId: payment.id.toString(),
