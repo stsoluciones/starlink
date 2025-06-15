@@ -39,6 +39,7 @@ const handleGuardarPedido = async (user, cart) => {
       body: JSON.stringify({
         cart: cart.map(item => ({
           cod_producto: item.cod_producto,
+          foto_1_1:item.foto_1_1,
           nombre: item.nombre,
           precio: item.precio * 0.85,
           quantity: item.quantity,

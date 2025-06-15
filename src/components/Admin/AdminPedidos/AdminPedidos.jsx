@@ -12,7 +12,8 @@ import actualizarEstado from "../../../Utils/actualizarEstado";
 export default function AdminPedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [actualizandoId, setActualizandoId] = useState(null);
+  const [actualizandoId, setActualizandoId] = useState([]);
+  const [pedidosProcesando, setPedidosProcesando] =useState([])
   const [search, setSearch] = useState("");
   const [filtroEstado, setFiltroEstado] = useState("todos");
   const [paginaActual, setPaginaActual] = useState(1);
@@ -88,7 +89,7 @@ const handleStados = (id, nuevoEstado) => {
 
       {/* Contenido de los tabs */}
       {tabActivo === TABS.PEDIDOS && (
-        <Todos search={search} filtroEstado={filtroEstado} setSearch={setSearch} setFiltroEstado={setFiltroEstado} cambiarPagina={cambiarPagina} estados={estados} pedidosPaginados={pedidosPaginados} actualizandoId={actualizandoId} paginaActual={paginaActual} totalPaginas={totalPaginas} handleStados={handleStados} />
+        <Todos search={search} filtroEstado={filtroEstado} setSearch={setSearch} setFiltroEstado={setFiltroEstado} cambiarPagina={cambiarPagina} estados={estados} pedidosPaginados={pedidosPaginados} actualizandoId={actualizandoId} setActualizandoId={setActualizandoId} setPedidosProcesando={setPedidosProcesando} paginaActual={paginaActual} totalPaginas={totalPaginas} handleStados={handleStados} />
       )}
       {tabActivo === TABS.PAGADOS && (
         <Pagados />

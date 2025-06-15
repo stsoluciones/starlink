@@ -57,6 +57,7 @@ export async function POST(req) {
           nombre: producto?.nombre || "Producto desconocido",
           external_reference:external_reference,
           titulo_de_producto: producto?.titulo_de_producto || "",
+          foto_1_1:item.foto_1_1,
           cantidad: item.quantity,
           precioUnitario: item.precio,
           foto: producto?.foto_1_1 || "",
@@ -78,6 +79,7 @@ export async function POST(req) {
           (paymentMethod === "mercadopago" && payment?.payer?.email) ||
           body.emailUsuario ||
           "",
+        telefono:usuario?.telefono,
       },
       metadata: metadata,
       tipoFactura,

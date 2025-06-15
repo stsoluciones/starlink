@@ -4,9 +4,10 @@ import Swal from 'sweetalert2';
 import Loading from '../../Loading/Loading';
 import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
+import Link from 'next/link';
 
 
-const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId,setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina }) => {
+const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina, setPedidosProcesando }) => {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   const [mostrarFacturaModal, setMostrarFacturaModal] = useState(false);
   const [seleccionados, setSeleccionados] = useState([]);
@@ -108,51 +109,50 @@ const generarEtiquetas = async (pedidoUnico = null) => {
       });
 
       // Generar etiquetas (descomenta y adapta según tu lógica)
-      const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar.map(p => p._id));
-
-      // Cerrar el "Procesando"
-      Swal.close();
+      
+                      //***************************
+      // const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar.map(p => p._id));
 
       // Mostrar mensaje de éxito y preguntar por impresión
-      const imprimir = await Swal.fire({
-        title: `Se generaron ${etiquetasGeneradas.length} etiqueta(s).`,
-        icon: 'success',
-        showCancelButton: true,
-        confirmButtonText: 'Imprimir Etiquetas',
-        cancelButtonText: 'No Imprimir',
-        reverseButtons: true
-      });
+      // const imprimir = await Swal.fire({
+      //   title: `Se generaron ${etiquetasGeneradas.length} etiqueta(s).`,
+      //   icon: 'success',
+      //   showCancelButton: true,
+      //   confirmButtonText: 'Imprimir Etiquetas',
+      //   cancelButtonText: 'No Imprimir',
+      //   reverseButtons: true
+      // });
 
-      if (imprimir.isConfirmed) {
-        etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
-          const blob = new Blob(
-            [Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))],
-            { type: 'application/pdf' }
-          );
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `Etiqueta-${pedidoId}.pdf`;
-          document.body.appendChild(link);
-          link.click();
-          URL.revokeObjectURL(url);
-          link.remove();
-        });
+      // if (imprimir.isConfirmed) {
+      //   etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
+      //     const blob = new Blob(
+      //       [Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))],
+      //       { type: 'application/pdf' }
+      //     );
+      //     const url = URL.createObjectURL(blob);
+      //     const link = document.createElement('a');
+      //     link.href = url;
+      //     link.download = `Etiqueta-${pedidoId}.pdf`;
+      //     document.body.appendChild(link);
+      //     link.click();
+      //     URL.revokeObjectURL(url);
+      //     link.remove();
+      //   });
 
-        Swal.fire('Imprimiendo etiquetas...', 'Se guardaron las etiquetas en los pedidos.', 'info');
-      } else {
-        Swal.fire('Etiquetas no impresas', 'Las etiquetas fueron generadas pero no se imprimieron.', 'info');
-      }
+       // Swal.fire('Imprimiendo etiquetas...', 'Se guardaron las etiquetas en los pedidos.', 'info');
+      // } else {
+      //   Swal.fire('Etiquetas no impresas', 'Las etiquetas fueron generadas pero no se imprimieron.', 'info');
+      // }
 
       // Finalmente actualizar el estado de los pedidos
-      Swal.fire({
-        title: 'Actualizando pedidos...',
-        html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
-        allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
+      // Swal.fire({
+      //   title: 'Actualizando pedidos...',
+      //   html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
+      //   allowOutsideClick: false,
+      //   didOpen: () => {
+      //     Swal.showLoading();
+      //   }
+      // });
 
       // Finalizar
       Swal.close();
@@ -229,7 +229,19 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                     </td>
                   </tr>
                 ) : (
-                pedidosPaginados.map((pedido) => (
+                pedidosPaginados
+                .slice() 
+                .sort((a, b) => {
+                  const ordenEstados = {
+                    pagado: 0,
+                    pendiente: 1,
+                    enviado: 2,
+                    entregado:3,
+                    cancelado:4,
+                  };
+                  return (ordenEstados[a.estado] ?? 99) - (ordenEstados[b.estado] ?? 99);
+                })
+                .map((pedido) => (
                   <tr key={pedido._id} className="border-t">
                     <td colSpan={8} className="p-4">
                       <div className="border rounded-lg shadow-sm p-4 space-y-4">
@@ -269,15 +281,11 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         <div className="flex flex-wrap gap-4">
                           {pedido.metadata?.cart?.map((item, index) => (
                             <div key={index} className="flex items-center border rounded p-2 w-full md:w-auto md:min-w-[250px]">
-                              <img
-                                src={item.foto_1_1 || '/images/sinFoto.webp'}
-                                alt={item.nombre}
-                                className="w-16 h-16 object-contain mr-4"
-                              />
+                              <img src={item.foto_1_1 || '/images/sinFoto.webp'} alt={item.nombre} title={item.nombre} className="w-16 h-16 object-contain mr-4" />
                               <div>
                                 <p className="text-sm font-semibold">{item.titulo_de_producto}</p>
                                 <p className="text-xs text-gray-600">
-                                  Cantidad: <span className="text-blue-600 font-bold">{item.quantity}</span>
+                                  Cantidad: <span className="text-red-500 font-bold text-xl">{item.quantity}</span>
                                 </p>
                               </div>
                             </div>
@@ -287,7 +295,8 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         {/* Datos del comprador */}
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t mt-4">
                           <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
-                          <a href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Iniciar conversación</a>
+                          <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
+                          {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.usuarioInfo?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
                           <button onClick={() => abrirModalFactura(pedido)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded ml-2">
                             Ver datos de Factura
                           </button>
@@ -313,7 +322,6 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                       </div>
                     </td>
                   </tr>
-
                 )))}
               </tbody>
             </table>
