@@ -22,9 +22,9 @@ module.exports = {
       },
       colors: {
         primary: {
-          DEFAULT: '#007ACC',  // Azul claro para un diseño limpio y tecnológico
-          hover: '#005FA3',    // Azul más oscuro para el efecto hover
-          active: '#004080',   // Azul oscuro al hacer clic
+          DEFAULT: '#F3781B',  // Naranja para un diseño limpio y tecnológico
+          hover: '#d86a1c',    // Naranja más oscuro para el efecto hover
+          active: '#ce5708',   // Naranja oscuro al hacer clic
           background: '#F5F8FA', // Color de fondo claro y fresco
           background2: '#FFFFFF',
           whats: '#25D366',    // Color para el logo de WhatsApp (verde característico)

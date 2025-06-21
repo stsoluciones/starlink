@@ -206,7 +206,7 @@ export default function StarLinkAdapterInfo() {
       <div className="text-center">
         <Link
           href={`https://api.whatsapp.com/send/?phone=%2B${userData.codigoPais}${userData.contact}&text=Hola%2C+me+gustaria+consultar+sobre%2C+el+adaptador+SL1230+&type=phone_number&app_absent=0`}
-          className="inline-block bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-300"
+          className="inline-block bg-primary text-white font-bold py-2 px-4 rounded hover:bg-primary-hover transition duration-300"
           title="Consulta ahora y asegura tu conexión confiable"
           aria-label="Botón para consultar y asegurar la conexión confiable"
           target="_blank"

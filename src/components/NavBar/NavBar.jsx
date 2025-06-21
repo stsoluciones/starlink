@@ -71,9 +71,8 @@ const NavBar = () => {
   return (
     <section className="bg-white border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-2 py-1">
-        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse rounded-full my-3" title="starlinksoluciones Logo">
-          <Image src={Logo.src} width={60} height={60} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-8 md:w-10 lg:w-12'/>
-          <p className='uppercase text-4xl text-transparent font-bold bg-clip-text bg-primary tracking-tight leading-none scale-x-90 '>SLS</p>
+        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse rounded-full" title="starlinksoluciones Logo">
+          <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-10 lg:w-20'/>
         </Link>
 
         <div className="flex items-center gap-1 justify-between">
