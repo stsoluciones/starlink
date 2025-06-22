@@ -245,7 +245,7 @@ const Comprobantes = () => {
   
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-7xl mx-auto p-1 md:p-4">
       <h2 className="text-lg md:text-2xl font-bold mb-2">Generar Presupuesto o Recibo</h2>
       {/* Tipo de documento y Fecha */}
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
@@ -284,7 +284,7 @@ const Comprobantes = () => {
           });
       }}/>
       <Buttons
-        className="col-span-1 md:col-span-2 w-40 m-2"
+        className="col-span-1 md:col-span-2 w-40 my-2"
         onClick={() =>
           setEmpresa({
             nombre: '',
@@ -446,7 +446,7 @@ const Comprobantes = () => {
             </div>
           )}
         <div className="flex gap-4 mt-4">
-          <Buttons onClick={handleAddItem} className="bg-blue-600 text-white px-4 py-2 rounded mt-2">ADD Manualmente</Buttons>
+          <Buttons onClick={handleAddItem} className="bg-blue-600 text-white px-4 py-2 rounded mt-2">ADD Manual</Buttons>
           <Buttons onClick={() => setShowModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded mt-2">ADD Producto</Buttons>
         </div>
         <div className="mt-6 text-right">

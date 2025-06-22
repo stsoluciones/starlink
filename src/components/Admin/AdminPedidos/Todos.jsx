@@ -55,6 +55,9 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
       <div className="p-4">
         <h2 className="text-lg font-semibold">No hay pedidos disponibles</h2>
         <p className="text-gray-600">Intenta ajustar los filtros o buscar por otro término.</p>
+        <button onClick={() => setFiltroEstado('todos')} className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-hover">
+          Limpiar Filtros
+        </button>
       </div>
     );
   }
@@ -328,7 +331,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
           </div>
 
           {/* Paginación */}
-          <div className="mt-4 flex flex-col sm:flex-row items-center gap-2">
+          <div className="mt-4 flex justify-center flex-row items-center gap-2">
             <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} className="px-3 py-1 border rounded disabled:opacity-50">
               <FaBackward/>
             </button>

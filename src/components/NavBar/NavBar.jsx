@@ -67,16 +67,20 @@ const NavBar = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+  
+  const handleGoToLogin = () => {
+      router.push('/user/Login');
+  };
 
   return (
     <section className="bg-white border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-2 py-1">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse rounded-full" title="starlinksoluciones Logo">
-          <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-10 lg:w-20'/>
+          <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-16 lg:w-20 m-2'/>
         </Link>
 
-        <div className="flex items-center gap-1 justify-between">
-          <div className="block md:hidden">
+        <div className="flex items-center gap-4 justify-between align-middle m-2">
+          <div className="block md:hidden align-middle items-center">
             <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
           </div>
           <Link href='/Shopcart' className="relative block md:hidden" title="Shopcart">
@@ -100,23 +104,18 @@ const NavBar = () => {
       </div>
 
         <article className={`w-full md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border items-center border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white">
+          <ul className="flex flex-col p-4 md:p-0 mt-4 border items-center border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white text-sm md:text-md md:font-normal md:text-base">
             {Links?.map((link, key) => (
               <li key={key}>
-                <Link
-                  href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)}
-                  className={`block py-2 px-3 ${currentLink === link.href ? 'text-blue-700' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0`}
-                  aria-current="page"
-                  onClick={() => handleLinkClick(link.href)}
-                  title={link.name.toUpperCase()}
-                >
+                <Link href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)} className={`block py-2 px-3 ${currentLink === link.href ? 'text-blue-700' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-sm md:text-md md:font-normal md:text-base`}     aria-current="page" onClick={() => handleLinkClick(link.href)} title={link.name.toUpperCase()}>
                   {link.name.toUpperCase()}
                 </Link>
               </li>
             ))}
+              <button className="md:hidden items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2" onClick={handleGoToLogin} title="Login usuario" aria-label="Login usuario">Ingresar</button>
               <Link href='/Shopcart' className='relative' title='Carrito de compras'>
                 <div className={`hidden md:block absolute text-white px-2 m-1 rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
-                <IoCartOutline size={30} className='mx-2 hidden md:block' />
+                <IoCartOutline size={30} className='hidden md:block' />
               </Link>
                 <div className="hidden md:block">
                   <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />

@@ -29,7 +29,7 @@ export default function Admin() {
   const [isModalClose, setIsModalClose] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalType, setModalType] = useState(null);
-  const [section, setSection] = useState('Productos')
+  const [section, setSection] = useState('Pedidos')
   const [currentPage, setCurrentPage] = useState(1);
   const [productos, setProductos] = useState([]);
 
@@ -182,7 +182,7 @@ export default function Admin() {
         <Nav handleSelectSection={handleSelectSection} />
         {section === 'Productos' && (
           <div>
-            <section id="tablaProductosAdmin" className="bg-primary-background p-2 sm:p-3 md:p-5">
+            <section id="tablaProductosAdmin" className="bg-primary-background p-2 md:p-4 lg:p-6">
               <div className="mx-auto max-w-screen-xl px-0 lg:px-12">
                 <div className="bg-white relative shadow-md sm:rounded-lg overflow-hidden">
                   <div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -199,7 +199,7 @@ export default function Admin() {
                       </div>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500" id="productosAdmin">
+                    <table className="w-full text-xs md:text-base text-left text-gray-500" id="productosAdmin">
                       <thead className="text-xs text-gray-900 uppercase bg-gray-400">
                         <tr>
                           <th scope="col" className="px-1 py-2 md:px-4 md:py-3 text-center">Producto</th>
