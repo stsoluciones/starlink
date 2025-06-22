@@ -86,7 +86,7 @@ const SearchBase = ({ inputClassName = '', placeholder = 'Buscar...' }) => {
             )}
             <button
               type="submit"
-              className="text-white absolute right-2.5 bottom-2.5 font-medium rounded-lg text-sm px-4 py-2 bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active"
+              className="text-white absolute right-2.5 bottom-2.5 font-medium rounded-lg text-sm px-4 py-2 bg-primary hover:bg-primary-hover active:bg-primary-active"
               aria-label="buscar"
             >
               BUSCAR

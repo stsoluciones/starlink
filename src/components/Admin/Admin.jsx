@@ -191,7 +191,7 @@ export default function Admin() {
                     </div>
                     <div className="md:flex md:justify-end gap-3 grid grid-cols-5 w-full">
                       <div className="col-span-3">
-                      <button type="button" aria-label="agregar producto" className="flex items-center text-white border bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active font-medium w-full justify-center rounded-lg h-10 text-xs xs:text-sm px-5 py-2 text-center " onClick={() => openModal('add')}>+  Agregar producto</button>
+                      <button type="button" aria-label="agregar producto" className="flex items-center text-white border bg-primary hover:bg-primary-hover active:bg-primary-active font-medium w-full justify-center rounded-lg h-10 text-xs xs:text-sm px-5 py-2 text-center " onClick={() => openModal('add')}>+  Agregar producto</button>
                       {isModalOpen && modalType === 'add' && (
                         <AddProduct toggleModal={closeModal} isOpenModal={isModalOpen} marca={marcas} categoria={categorias} />
                       )}
