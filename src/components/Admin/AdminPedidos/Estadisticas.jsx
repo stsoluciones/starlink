@@ -14,49 +14,52 @@ const Estadisticas = () => {
   const [trends, setTrends] = useState(null);
   const [customers, setCustomers] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const [summaryRes, productsRes, trendsRes, customersRes] = await Promise.all([
-          fetch(`/api/estadisticas/resumen?rango=${selectedTimeRange}`),
-          fetch(`/api/estadisticas/productos?rango=${selectedTimeRange}&limite=5`),
-          fetch('/api/estadisticas/tendencias?meses=12'),
-          fetch('/api/estadisticas/clientes')
-        ]); 
+useEffect(() => {
+  const fetchStatisticsData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Endpoints a consultar
+      const endpoints = [
+        `/api/estadisticas/resumen?rango=${selectedTimeRange}`,
+        `/api/estadisticas/productos?rango=${selectedTimeRange}&limite=5`,
+        '/api/estadisticas/tendencias?meses=12',
+        '/api/estadisticas/clientes'
+      ];
 
-        
-        if (!summaryRes.ok || !productsRes.ok || !trendsRes.ok || !customersRes.ok) {
-          throw new Error('Error al cargar datos estadísticos');
-        }
+      // Realizar todas las peticiones en paralelo
+      const responses = await Promise.all(
+        endpoints.map(endpoint => fetch(endpoint))
+      );
 
-        const [summaryData, productsData, trendsData, customersData] = await Promise.all([
-          summaryRes.json(),
-          productsRes.json(),
-          trendsRes.json(),
-          customersRes.json()
-        ]);
-
-        setSummary(summaryData);
-        setProducts(productsData);
-        setTrends(trendsData);
-        setCustomers(customersData);
-        //console.log('summaryData:', summaryData); 
-        //console.log('productsData:', productsData);
-        //console.log('trendsData:', trendsData);
-        //console.log('customersData:', customersData);
-      } catch (err) {
-        console.error("Error loading statistics:", err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      // Verificar errores en las respuestas
+      const hasError = responses.some(response => !response.ok);
+      if (hasError) {
+        throw new Error('Algunos datos no se pudieron cargar');
       }
-    };
 
-    fetchData();
-  }, [selectedTimeRange]);
+      // Procesar los JSON de las respuestas
+      const [summary, products, trends, customers] = await Promise.all(
+        responses.map(response => response.json())
+      );
+
+      // Actualizar el estado
+      setSummary(summary);
+      setProducts(products);
+      setTrends(trends);
+      setCustomers(customers);
+
+    } catch (err) {
+      console.error("Error al cargar estadísticas:", err);
+      setError(err.message || 'Error desconocido al cargar datos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchStatisticsData();
+}, [selectedTimeRange]);
 
   if (loading) {
     return <div className="p-4"><Loading /></div>;

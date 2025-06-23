@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import Order from '../../../../models/Order';
+import {connectDB} from '../../../../lib/mongodb';
+
 
 export async function GET(request) {
+    await connectDB();
+  
   const { searchParams } = new URL(request.url);
   const months = parseInt(searchParams.get('meses')) || 12;
 

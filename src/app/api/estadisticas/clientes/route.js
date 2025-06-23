@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 import User from '../../../../models/User';
+import {connectDB} from '../../../../lib/mongodb';
 
 export async function GET(request) {
+    await connectDB();
+  
   try {
     const [totalCustomers, customersWithOrders] = await Promise.all([
       User.countDocuments({}),

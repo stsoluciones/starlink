@@ -262,21 +262,13 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
                           {/* Selector de estado */}
                           <div className="flex flex-col md:flex-row md:items-center gap-2">
-                            <select
-                              disabled={actualizandoId === pedido._id}
-                              className="border rounded px-2 py-1 w-full md:w-auto"
-                              value={pedido.estado}
-                              onChange={(e) => handleStados(pedido._id, e.target.value)}
-                            >
-                              {estados.map((estado) => (
-                                <option key={estado} value={estado}>{estado}</option>
-                              ))}
+                            <select disabled={actualizandoId === pedido._id} className="border rounded px-2 py-1 w-full md:w-auto" value={pedido.estado} onChange={(e) => handleStados(pedido._id, e.target.value)}>
+                              {estados.map((estado) => ( <option key={estado} value={estado}>{estado}</option> ))}
                             </select>
-                            {actualizandoId === pedido._id && (
-                              <span className="ml-2 text-xs text-gray-500 inline-flex items-center">
-                                Guardando <Loading />
-                              </span>
-                            )}
+                            {actualizandoId === pedido._id && ( <span className="ml-2 text-xs text-gray-500 inline-flex items-center"> Guardando <Loading /></span>)}
+                            <p className="text-lg font-semibold text-gray-800">
+                              {pedido.total.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
                           </div>
                         </div>
 
@@ -300,10 +292,10 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
                           <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
                           {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.usuarioInfo?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
-                          <button onClick={() => abrirModalFactura(pedido)} className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded ml-2">
+                          <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
                             Ver datos de Factura
                           </button>
-                          {mostrarFacturaModal && pedidoSeleccionado && (
+                          {mostrarFacturaModal && pedidoSeleccionado && (                        
                               <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>

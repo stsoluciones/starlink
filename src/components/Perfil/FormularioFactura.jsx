@@ -37,6 +37,7 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usua
   })
 
   useEffect(() => {
+    // Don't make the API call here if initialData is provided as prop
     if (initialData) {
       reset({
         tipo: tipo || 'B',
@@ -46,8 +47,37 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usua
         codigoPostal: initialData.codigoPostal || '',
         condicionIva: initialData.condicionIva || '',
       })
+    } else if (usuarioUid) {
+      // Only fetch if no initialData provided
+      const fetchData = async () => {
+        try {
+          const response = await fetch(`/api/usuarios/${usuarioUid}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          const userData = await response.json();
+          
+          reset({
+            tipo: tipo || 'B',
+            razonSocial: userData.factura?.razonSocial || '',
+            cuit: userData.factura?.cuit || userData.dniOCuit || '',
+            domicilio: userData.factura?.domicilio || 
+              (userData.direccion ? 
+                `${userData.direccion.calle || ''} ${userData.direccion.numero || ''}, ${userData.direccion.ciudad || ''}`.trim() : ''),
+            codigoPostal: userData.factura?.codigoPostal || userData.direccion?.codigoPostal || '',
+            condicionIva: userData.factura?.condicionIva || 'consumidorFinal'
+          });
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      };
+      
+      fetchData();
     }
-  }, [initialData, reset, tipo])
+  }, [initialData, reset, tipo, usuarioUid])
 
   const enviar = (datos) => {
     onSubmit(datos)

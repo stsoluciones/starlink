@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import Order from '../../../../models/Order';
 import { getDateRange } from '../statsUtils';
+import {connectDB} from '../../../../lib/mongodb';
 
 export async function GET(request) {
+  await connectDB();
+  
   const { searchParams } = new URL(request.url);
   const timeRange = searchParams.get('rango') || 'mes';
   const limit = parseInt(searchParams.get('limite')) || 3;
