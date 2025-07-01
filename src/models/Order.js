@@ -38,6 +38,8 @@ const orderSchema = new mongoose.Schema({
     calle: {type: String},
     numero: {type: String},
     casaOTorre: {type: String},
+    telefono: {type: String},
+    entreCalles: {type: String},
     depto: {type: String},
     codigoPostal: {type: String},
   },

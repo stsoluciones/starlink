@@ -5,6 +5,7 @@ import Loading from '../Loading/Loading';
 import Link from 'next/link';
 import actualizarEstado from "../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
 import Swal from 'sweetalert2';
+import userBank from '../constants/userBank';
 
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
@@ -70,6 +71,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   const estadoBackend = pedido.estado || "desconocido";
   const [loading, setLoading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showDatosModal, setShowDatosModal] = useState(false);
   const [ticketFile, setTicketFile] = useState<File | null>(null);
   const [nroComprobante, setNroComprobante] = useState('');
   const estadoParaTimeline = mapEstadoToTimeline(pedido.estado);
@@ -154,9 +156,10 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
     <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
       <div className="grid grid-cols-3 items-center text-center mb-2 gap-2">
         <div className="flex gap-2">
-          <h3 className="text-sm md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
-           {estadoDisplayText==='PENDIENTE'?<button onClick={()=>handleCancelPedido(pedido)} className='text-red-500 hover:cursor-pointer bg-red-300 px-2 rounded-full text-sm' title='cancelar pedido'> X </button>:null} 
+          <h3 className="text-xs md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
+           {estadoDisplayText==='PENDIENTE'?<button onClick={()=>handleCancelPedido(pedido)} className='text-red-500 hover:cursor-pointer bg-red-300 text-xs md:px-2 rounded-full md:text-sm' title='cancelar pedido'> X </button>:null} 
         </div>
+        <button onClick={() => setShowDatosModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Ver Datos para Transferir</button>
         <div className="col-span-1">
           {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
             <button onClick={() => setShowUploadModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Adj. comprobante</button>) : pedido?.metadata?.ticketUrl ? (
@@ -201,6 +204,29 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
               >
                 {loading ? <Loading/> : 'Subir'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+            {/* Modal */}
+      {showDatosModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 className="text-lg font-bold mb-4 text-center">Datos para Transferencia</h2>
+                  <p>Por favor, realizala a la siguiente cuenta:</p><br/>
+                  <p><strong>Banco: </strong>{userBank.banco}</p>
+                  <p><strong>Alias: </strong>{userBank.alias}</p>
+                  <p><strong>CBU: </strong>{userBank.cbu}</p>
+                  <p><strong>Titular: </strong>{userBank.titular}</p><br/>
+                  <div>
+                    {pedido.paymentMethod==='transferencia'?<p className="text-green-700 font-semibold">Valor Total <small className='text-xs text-green-700'>Abonado con Descuento</small></p>:<p className="text-gray-700 font-semibold">Valor Total</p>}
+                    <p className="font-medium">${(pedido.total || 0).toFixed(2)}</p>
+                  </div>
+                  <p className="mt-4 text-sm"><span className='text-red-500'>*</span>Una vez realizada la transferencia y haya adjuntado el comprobante, nuestro equipo verificara la transferencia e ingresara el pedido en estado de Pago</p>
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowDatosModal(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
+                salir
               </button>
             </div>
           </div>

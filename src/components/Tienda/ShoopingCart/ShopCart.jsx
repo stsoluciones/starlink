@@ -11,7 +11,6 @@ import producto from '../../../../public/images/sinFoto.webp';
 import EmptyCart from '../EmptyCart/EmptyCart';
 import { CartContext } from '../../Context/ShoopingCartContext';
 import { getInLocalStorage } from '../../../Hooks/localStorage';
-import completarDatosUser  from '../../../Utils/completarDatosUser';
 import handleGuardarPedido  from '../../../Utils/handleGuardarPedido';
 import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercado';
@@ -69,213 +68,103 @@ const handleComprar = async () => {
 
   try {
     setLoading(true);
+
     const facturaPrompt = await Swal.fire({
-        title: '¿Es consumidor final?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Consumidor Final',
-        cancelButtonText: 'Empresa',
-        reverseButtons: true,
-        allowOutsideClick: true,
-    });
-    // Primero completar los datos del usuario SIEMPRE
-    const userCompleto = await completarDatosUser(user, setUser);
-
-    //Factura
-    if (facturaPrompt.isConfirmed) {
-        userCompleto.factura = { tipo: 'B', condicionIva: 'consumidorFinal' };
-    } else { // ✅ Preguntar tipo de factura
-        const tipoFactura = await Swal.fire({
-          title: 'Selecciona el tipo de factura',
-          input: 'select',
-          inputOptions: {
-             'A': 'Factura A',
-             'B': 'Factura B',
-             'C': 'Factura C',
-          },
-          inputPlaceholder: 'Selecciona un tipo',
-          showCancelButton: true,
-        });
-        if (!tipoFactura.isConfirmed) throw new Error('Debes seleccionar un tipo de factura');
-        // ✅ Verificar si tiene datos de factura
-        const tieneFactura =
-          userCompleto.factura?.tipo &&
-          userCompleto.factura?.razonSocial &&
-          userCompleto.factura?.cuit &&
-          userCompleto.factura?.condicionIva &&
-          userCompleto.factura?.domicilio &&
-          userCompleto.factura?.codigoPostal;
-
-          if (!tieneFactura) {
-            // No hay datos, pedirlos directamente
-            const datosFactura = await new Promise((resolve) => {
-              Swal.fire({
-                html: '<div id="form-factura"></div>',
-                showCancelButton: true,
-                showConfirmButton: false,
-                didOpen: () => {
-                  const root = document.getElementById('form-factura');
-                  const container = document.createElement('div');
-                  root.appendChild(container);
-                  const rootReact = createRoot(container);
-                  rootReact.render(
-                    <FormularioFactura
-                      tipo={tipoFactura.value}
-                      onSubmit={(data) => resolve(data)}
-                      onCancel={() => resolve(null)}
-                    />
-                  );
-                },
-              });
-            });
-
-            if (!datosFactura) throw new Error('Debes completar los datos de facturación');
-              userCompleto.factura = { ...datosFactura };
-            } else {
-              //console.log('datos usuarios:', userCompleto.factura.tipo);
-              // Ya hay datos, preguntar si los quiere usar o reemplazar
-              const { isConfirmed } = await Swal.fire({
-                title: 'Datos de facturación encontrados',
-                html: `
-                  <p><strong>Razón Social:</strong> ${userCompleto.factura.razonSocial}</p>
-                  <p><strong>CUIT:</strong> ${userCompleto.factura.cuit}</p>
-                  <p><strong>Condición IVA:</strong> ${userCompleto.factura.condicionIva}</p>
-                  <p><strong>Domicilio:</strong> ${userCompleto.factura.domicilio}</p>
-                  <p><strong>Código Postal:</strong> ${userCompleto.factura.codigoPostal}</p>
-                  <p><strong>Tipo:</strong> ${tipoFactura.value}</p>
-                  <br/>
-                  ¿Querés continuar con estos datos o reemplazarlos?
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'Usar estos datos',
-                cancelButtonText: 'Reemplazar',
-              });
-
-              if (!isConfirmed) {
-                // Mostrar formulario para reemplazar los datos
-                const nuevosDatos = await new Promise((resolve) => {
-                  Swal.fire({
-                    html: '<div id="form-factura"></div>',
-                    showCancelButton: true,
-                    showConfirmButton: false,
-                    didOpen: () => {
-                      const root = document.getElementById('form-factura');
-                      const container = document.createElement('div');
-                      root.appendChild(container);
-                      const rootReact = createRoot(container);
-                      rootReact.render(
-                        <FormularioFactura
-                          tipo={tipoFactura.value}
-                          onSubmit={(data) => resolve(data)}
-                          onCancel={() => resolve(null)}
-                        />
-                      );
-                    },
-                  });
-                });
-
-                if (!nuevosDatos) throw new Error('Debes completar los datos de facturación');
-                userCompleto.factura = { ...nuevosDatos };
-              } else {
-                userCompleto.factura.tipo = tipoFactura.value;
-              }
-            }
-
-        }
-    
-    // Verificar que todos los campos obligatorios estén completos
-    if (!userCompleto.nombreCompleto || !userCompleto.telefono || !userCompleto.direccion) {
-      throw new Error('Debes completar todos tus datos personales para continuar');
-    }
-    // ✅ Dirección de envío
-    const direccionPrompt = await Swal.fire({
-      title: '¿Usar dirección de perfil para el envío?',
+      title: '¿Es consumidor final?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí',
-      cancelButtonText: 'No, ingresar otra',
+      confirmButtonText: 'Consumidor Final',
+      cancelButtonText: 'Empresa',
       reverseButtons: true,
+      allowOutsideClick: true,
     });
 
-    if (direccionPrompt.isDismissed) {
-      // Pedir nueva dirección (puedes crear un componente como FormularioDireccion)
-      const nuevaDireccion = await solicitarNuevaDireccion(); // debes implementar esta función
-      if (!nuevaDireccion) throw new Error('Debes ingresar una dirección de envío');
-      userCompleto.direccionEnvio = nuevaDireccion;
-    } else {
-        userCompleto.direccionEnvio = userCompleto.direccion;
-      }
+    const esConsumidorFinal = facturaPrompt.isConfirmed;
+    const tipoFactura = esConsumidorFinal ? 'B' : 'A';
 
-      // 1. Obtener el subtotal como texto y limpiarlo
-      const rawSubtotal = totalRef.current?.textContent?.replace('Subtotal: ', '').replace(/\./g, '').replace(',', '.').replace('$', '').trim();
-      const subtotalNumber = parseFloat(rawSubtotal); // Ej: 120000.00
-
-      // 2. Calcular precios con y sin descuento
-      const transferenciaPrecio = subtotalNumber * 0.85;
-      const mercadoPagoPrecio = subtotalNumber;
-
-      // 3. Formatear en ARS
-      const formatCurrency = (num) => num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', });
-
-      // 4. Mostrar SweetAlert
-      const result = await Swal.fire({
-        title: '¿Cómo deseas pagar?',
-        icon: 'question',
-        showCancelButton: true,
-        allowOutsideClick: false,
-        confirmButtonText: 'MercadoPago',
-        cancelButtonText: 'Transferencia',
-        reverseButtons: true,
-        allowOutsideClick:true,
-        html: `
-          <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 1rem;">
-            <span style="color: #15803d;">Transferencia (15% OFF)</span>
-            <span>MercadoPago</span>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
-            <span style="color: #15803d;">${formatCurrency(transferenciaPrecio)}</span>
-            <span>${formatCurrency(mercadoPagoPrecio)}</span>
-          </div>
-        `,
+    const datosFactura = await new Promise((resolve) => {
+      Swal.fire({
+        html: '<div id="form-factura"></div>',
+        showConfirmButton: false,
+        didOpen: () => {
+          const root = document.getElementById('form-factura');
+          const container = document.createElement('div');
+          root.appendChild(container);
+          const rootReact = createRoot(container);
+          rootReact.render(
+            <FormularioFactura
+              tipo={tipoFactura}
+              onSubmit={(data) => resolve(data)}
+              onCancel={() => resolve(null)}
+            />
+          );
+        },
       });
+    });
 
+    if (!datosFactura) throw new Error('Debes completar los datos de facturación');
+
+    const userCompleto = {
+      ...user,
+      factura: { ...datosFactura, tipo: tipoFactura },
+    };
+
+    const nuevaDireccion = await solicitarNuevaDireccion();
+    if (!nuevaDireccion) throw new Error('Debes ingresar una dirección de envío');
+    userCompleto.direccionEnvio = nuevaDireccion;
+    
+    // Subtotal
+    const rawSubtotal = totalRef.current?.textContent?.replace('Subtotal: ', '').replace(/\./g, '').replace(',', '.').replace('$', '').trim();
+    const subtotalNumber = parseFloat(rawSubtotal);
+
+    const transferenciaPrecio = subtotalNumber * 0.85;
+    const mercadoPagoPrecio = subtotalNumber;
+
+    const formatCurrency = (num) =>
+      num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+
+    const result = await Swal.fire({
+      title: '¿Cómo deseas pagar?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'MercadoPago',
+      cancelButtonText: 'Transferencia',
+      reverseButtons: true,
+      html: `
+        <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 1rem;">
+          <span style="color: #15803d;">Transferencia (15% OFF)</span>
+          <span>MercadoPago</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
+          <span style="color: #15803d;">${formatCurrency(transferenciaPrecio)}</span>
+          <span>${formatCurrency(mercadoPagoPrecio)}</span>
+        </div>
+      `,
+    });
+    userCompleto.nombreCompleto = userCompleto.nombreCompleto || userCompleto.displayName || userCompleto.factura.razonSocial;
+    userCompleto.dniOCuit = userCompleto.dniOCuit || userCompleto.factura.cuit || userCompleto.documento || ''; 
+    userCompleto.telefono = userCompleto.telefono || userCompleto.direccionEnvio.telefono || userCompleto.telefono || '';
+    userCompleto.correo = userCompleto.correo || userCompleto.correo || userCompleto.email || '';
+    userCompleto.direccion = userCompleto.direccionEnvio 
 
     if (result.isConfirmed) {
-      // Procesar pago con MercadoPago      
       const compraResponse = await handleComprarMercadoPago(cart, userCompleto);
       if (!compraResponse.ok) throw new Error("Falló la creación de la orden con MercadoPago");
-      
-      const compraData = await compraResponse.json();
-      if (compraData.init_point) {
-        //console.log('init_point:', compraData.init_point);
-        //console.log('userCompleto:', userCompleto);
-        console.log('cart:', cart);
-        await handleGuardarPedidoMercado(userCompleto, cart, compraData);
-        window.location.href = compraData.init_point;
-        setCart([]);
-      } else {
-        throw new Error("No se pudo obtener el init_point");
-      }
-    } else if (result.isDismissed) {
-      console.log('cart:', cart);
 
-      // Procesar transferencia bancaria
+      const compraData = await compraResponse.json();
+      if (!compraData.init_point) throw new Error("No se pudo obtener el init_point");
+
+      await handleGuardarPedidoMercado(userCompleto, cart, compraData);
+      setCart([]);
+      window.location.href = compraData.init_point;
+
+    } else if (result.isDismissed) {
       const guardarPedidoData = await handleGuardarPedido(userCompleto, cart);
-      
-      if (!guardarPedidoData.success) {
-        console.error("Detalles del error:", guardarPedidoData.error);
-        throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
-      }
-      
-      // Mostrar información de transferencia
-      await Swal.fire({
-        title: 'Transferencia Bancaria',
-        html: transferInfo,
-        icon: 'info',
-        confirmButtonText: 'Aceptar',
-      });
-      
-      const { isConfirmed } = await Swal.fire({
+      if (!guardarPedidoData.success) throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
+
+      await Swal.fire({ title: 'Transferencia Bancaria', html: transferInfo, icon: 'info' });
+
+      const { isConfirmed: subirAhora } = await Swal.fire({
         title: '¿Quieres subir el comprobante ahora?',
         icon: 'question',
         showCancelButton: true,
@@ -284,7 +173,7 @@ const handleComprar = async () => {
         reverseButtons: true,
       });
 
-      if (isConfirmed) {
+      if (subirAhora) {
         const { value: formValues } = await Swal.fire({
           title: 'Subir Comprobante',
           html: `
@@ -302,8 +191,7 @@ const handleComprar = async () => {
               Swal.showValidationMessage('Debes ingresar el número de comprobante y seleccionar un archivo.');
               return;
             }
-            console.log('guardarPedidoData:', guardarPedidoData);
-            
+
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
             formData.append('numeroComprobante', nroInput.value.trim());
@@ -316,11 +204,7 @@ const handleComprar = async () => {
               });
 
               const data = await res.json();
-
-              if (!res.ok || !data.success) {
-                throw new Error(data?.error || 'Error desconocido');
-              }
-
+              if (!res.ok || !data.success) throw new Error(data?.error || 'Error al subir comprobante');
               return data;
             } catch (err) {
               Swal.showValidationMessage(`Error al subir el comprobante: ${err.message}`);
@@ -336,16 +220,15 @@ const handleComprar = async () => {
             icon: 'success',
           });
         }
+
       } else {
         await Swal.fire({
           title: 'Comprobante no subido',
           text: 'Puedes subirlo más tarde desde tu perfil.',
           icon: 'info',
-          confirmButtonText: 'Aceptar',
         });
       }
-      
-      // Limpiar carrito después de éxito
+
       setCart([]);
     }
   } catch (error) {
@@ -360,6 +243,7 @@ const handleComprar = async () => {
     router.push('/Dashboard');
   }
 };
+
 
 
   //console.log('cart:',cart)

@@ -6,7 +6,6 @@ export const solicitarNuevaDireccion = () => {
   return new Promise((resolve) => {
     Swal.fire({
       html: '<div id="form-direccion-envio"></div>',
-      showCancelButton: true,
       showConfirmButton: false,
       didOpen: () => {
         const root = document.getElementById('form-direccion-envio');

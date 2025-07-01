@@ -85,7 +85,7 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usua
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-lg max-w-md mx-auto">
-      <h2 className="text-xl font-semibold mb-4">Datos para Factura {tipo}</h2>
+      <h2 className="text-xl font-semibold mb-4">Datos del Cliente </h2>
       <form onSubmit={handleSubmit(enviar)} className="space-y-4">
         <div>
           <label className="block text-sm">Razón Social</label>

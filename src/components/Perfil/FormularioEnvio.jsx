@@ -41,6 +41,8 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
         ciudad: '',
         calle: '',
         numero: '',
+        entreCalles: '',
+        telefono: '',
         casaOTorre: '',
         depto: '',
         codigoPostal: ''

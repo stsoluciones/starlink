@@ -25,6 +25,8 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
       calle: '',
       numero: '',
       casaOTorre: '',
+      telefono: '',
+      entreCalles: '',
       depto: '',
       codigoPostal: '',
     }
@@ -39,17 +41,18 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
           <input {...register('pais')} className="w-full border rounded p-2" />
           {errors.pais && <p className="text-red-500 text-sm">{errors.pais.message}</p>}
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-sm">Provincia</label>
+            <input {...register('provincia')} className="w-full border rounded p-2" />
+            {errors.provincia && <p className="text-red-500 text-sm">{errors.provincia.message}</p>}
+          </div>
 
-        <div>
-          <label className="block text-sm">Provincia</label>
-          <input {...register('provincia')} className="w-full border rounded p-2" />
-          {errors.provincia && <p className="text-red-500 text-sm">{errors.provincia.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm">Ciudad</label>
-          <input {...register('ciudad')} className="w-full border rounded p-2" />
-          {errors.ciudad && <p className="text-red-500 text-sm">{errors.ciudad.message}</p>}
+          <div>
+            <label className="block text-sm">Ciudad</label>
+            <input {...register('ciudad')} className="w-full border rounded p-2" />
+            {errors.ciudad && <p className="text-red-500 text-sm">{errors.ciudad.message}</p>}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2">
@@ -76,10 +79,24 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm">Código Postal</label>
-          <input {...register('codigoPostal')} className="w-full border rounded p-2" />
-          {errors.codigoPostal && <p className="text-red-500 text-sm">{errors.codigoPostal.message}</p>}
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-sm">Código Postal</label>
+            <input {...register('codigoPostal')} className="w-full border rounded p-2" />
+            {errors.codigoPostal && <p className="text-red-500 text-sm">{errors.codigoPostal.message}</p>}
+          </div>
+          <div>
+            <label className="block text-sm">Entre Calles</label>
+            <input {...register('entreCalles')} className="w-full border rounded p-2" />
+            {errors.entreCalles && <p className="text-red-500 text-sm">{errors.entreCalles.message}</p>}
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-sm">telefono</label>
+            <input {...register('telefono')} className="w-full border rounded p-2" />
+            {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
+          </div>
         </div>
 
         <div className="flex justify-between mt-4">
