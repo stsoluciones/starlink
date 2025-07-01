@@ -55,7 +55,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
       <div className="p-4">
         <h2 className="text-lg font-semibold">No hay pedidos disponibles</h2>
         <p className="text-gray-600">Intenta ajustar los filtros o buscar por otro término.</p>
-        <button onClick={() => setFiltroEstado('todos')} className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-hover">
+        <button onClick={() => {setFiltroEstado('todos'); setSearch("")}} className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-hover">
           Limpiar Filtros
         </button>
       </div>
@@ -233,17 +233,8 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                   </tr>
                 ) : (
                 pedidosPaginados
-                .slice() 
-                .sort((a, b) => {
-                  const ordenEstados = {
-                    pagado: 0,
-                    pendiente: 1,
-                    enviado: 2,
-                    entregado:3,
-                    cancelado:4,
-                  };
-                  return (ordenEstados[a.estado] ?? 99) - (ordenEstados[b.estado] ?? 99);
-                })
+                .slice()
+                .sort((a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido))
                 .map((pedido) => (
                   <tr key={pedido._id} className="border-t">
                     <td colSpan={8} className="p-4">
