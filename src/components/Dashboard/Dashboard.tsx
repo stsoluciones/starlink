@@ -173,6 +173,9 @@
           <section>
             <article className="mb-10">
               <SectionHeader title="🟢 Pedidos Activos" count={pedidosActivos.length} />
+              <span className="text-sm text-gray-500 mb-4 block">
+                Se actualizara el estado de los Pedidos PENDIENTES a PAGO una vez que realice la transferencia, adjunte el comprobante y el equipo la verifique. Si necesitas cancelar un pedido que aun no abonaste, haz clic en el botón "X" junto al pedido.
+              </span>
               <PedidosList pedidos={pedidosActivos} emptyMessage="No tienes pedidos activos." />
             </article>
 

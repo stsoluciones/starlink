@@ -154,19 +154,43 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
           
   return (
     <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>
-      <div className="grid grid-cols-3 items-center text-center mb-2 gap-2">
-        <div className="flex gap-2">
-          <h3 className="text-xs md:text-lg font-semibold md:font-bold col-span-1">Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}</h3>
-           {estadoDisplayText==='PENDIENTE'?<button onClick={()=>handleCancelPedido(pedido)} className='text-red-500 hover:cursor-pointer bg-red-300 text-xs md:px-2 rounded-full md:text-sm' title='cancelar pedido'> X </button>:null} 
+      <div className="grid grid-cols-1 md:grid-cols-4 items-center text-center mb-2 gap-2">
+        <div className="flex gap-2 justify-center justify-items-center items-center">
+          <h3 className="text-xs md:text-sm font-semibold md:font-bold">
+            Pedido #{pedido._id?.slice(-6).toUpperCase() || "N/A"}
+          </h3>
+          {estadoDisplayText === 'PENDIENTE' && (
+            <button onClick={() => handleCancelPedido(pedido)} className="text-red-500 hover:cursor-pointer bg-red-300 px-2 align-middle  rounded-full md:text-sm" title="cancelar pedido"> X </button> )}
         </div>
-        <button onClick={() => setShowDatosModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Ver Datos para Transferir</button>
-        <div className="col-span-1">
+
+        <button onClick={() => setShowDatosModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm"> Ver datos para Transferir </button>
+
+        <div>
           {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
-            <button onClick={() => setShowUploadModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">Adj. comprobante</button>) : pedido?.metadata?.ticketUrl ? (
-            <Link href={pedido.metadata.ticketUrl} target="_blank" className="text-blue-600 hover:underline text-xs md:text-sm"> Ver comprobante</Link>) : null}
+            <button
+              onClick={() => setShowUploadModal(true)}
+              className="text-blue-600 hover:underline text-xs md:text-sm"
+            >
+              Adj. comprobante
+            </button>
+          ) : pedido?.metadata?.ticketUrl ? (
+            <Link
+              href={pedido.metadata.ticketUrl}
+              target="_blank"
+              className="text-blue-600 hover:underline text-xs md:text-sm"
+            >
+              Ver comprobante
+            </Link>
+          ) : null}
         </div>
-        <span className={`col-span-1 px-3 py-1 rounded-full text-xs md:text-sm font-medium  ${estadoColorClass}`}>{estadoDisplayText}</span>
+
+        <span
+          className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium ${estadoColorClass}`}
+        >
+          {estadoDisplayText}
+        </span>
       </div>
+
 
       {/* Modal */}
       {showUploadModal && (
@@ -223,7 +247,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
                     {pedido.paymentMethod==='transferencia'?<p className="text-green-700 font-semibold">Valor Total <small className='text-xs text-green-700'>Abonado con Descuento</small></p>:<p className="text-gray-700 font-semibold">Valor Total</p>}
                     <p className="font-medium">${(pedido.total || 0).toFixed(2)}</p>
                   </div>
-                  <p className="mt-4 text-sm"><span className='text-red-500'>*</span>Una vez realizada la transferencia y haya adjuntado el comprobante, nuestro equipo verificara la transferencia e ingresara el pedido en estado de Pago</p>
+                  <p className="mt-4 text-sm"><span className='text-red-500'>*</span>Después de que realices la transferencia y adjuntes el comprobante, nuestro equipo verificará el pago y actualizará el estado del pedido.</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setShowDatosModal(false)} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
                 salir
