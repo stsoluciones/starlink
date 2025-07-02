@@ -18,7 +18,7 @@ const schemaFactura = yup.object().shape({
   condicionIva: yup.string().required('Selecciona una condición frente al IVA'),
 })
 
-export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid, initialData, esConsumidorFinal }) {
+export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid, initialData, esConsumidorFinal=true }) {
   const {
     register,
     reset,
