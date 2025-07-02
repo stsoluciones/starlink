@@ -52,6 +52,7 @@ const orderSchema = new mongoose.Schema({
   paymentType: {type: String},
   merchantOrderId: {type: String},
   preferenceId: {type: String},
+  init_point: {type: String},
   siteId: {type: String},
   processingMode: {type: String},
   merchantAccountId: {type: String},

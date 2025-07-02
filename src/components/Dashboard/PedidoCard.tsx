@@ -162,9 +162,17 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
           {estadoDisplayText === 'PENDIENTE' && (
             <button onClick={() => handleCancelPedido(pedido)} className="text-red-500 hover:cursor-pointer bg-red-300 px-2 align-middle  rounded-full md:text-sm" title="cancelar pedido"> X </button> )}
         </div>
-
-        <button onClick={() => setShowDatosModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm"> Ver datos para Transferir </button>
-
+        {pedido?.estado === 'pendiente' && (
+          pedido?.paymentMethod === 'mercadopago' ? (
+            <Link href={pedido?.init_point || '#'} target="_blank" className="text-primary hover:underline text-xs md:text-sm">
+              Terminar Pago
+            </Link>
+          ) : (
+            <button onClick={() => setShowDatosModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">
+              Ver datos para Transferir
+            </button>
+          )
+        )}
         <div>
           {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
             <button

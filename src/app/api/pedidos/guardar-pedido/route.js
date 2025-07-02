@@ -12,6 +12,7 @@ export async function POST(req) {
     //console.log("body back:", body);
     const paymentMethod = body.paymentMethod || "mercadopago";
     const cart = body.cart;
+    const init_point = body.init_point || "";
     const pref_id = body.pref_id
     const uid = body.user?.uid;
     const external_reference = body.external_reference || "";
@@ -85,6 +86,7 @@ export async function POST(req) {
       tipoFactura,
       direccionEnvio,
       pref_id:pref_id,
+      init_point,
       external_reference: external_reference,
       paymentMethod,
       items,

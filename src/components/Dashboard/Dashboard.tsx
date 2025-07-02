@@ -39,6 +39,8 @@
     metadata?:PedidoMetadata
     paymentMethod: string
     paymentId?: string
+    init_point?: string
+    external_reference?: string
   }
 
   const Dashboard = () => {

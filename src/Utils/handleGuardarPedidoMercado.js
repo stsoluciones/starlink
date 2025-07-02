@@ -71,6 +71,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           fecha: new Date()
         } ,
         external_reference: externalReference,
+        init_point: compraData?.init_point || '',
         pref_id: prefId,
         paymentId: prefId,
         paymentMethod: 'mercadopago',
