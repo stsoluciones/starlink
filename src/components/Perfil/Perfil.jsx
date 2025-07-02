@@ -56,9 +56,12 @@ const PerfilPage = ({ usuarioUid }) => {
         ciudad: '',
         calle: '',
         numero: '',
+        entreCalles: '',
+        telefono: '',
         casaOTorre: '',
         depto: '',
-        codigoPostal: ''
+        codigoPostal: '',
+        referencia:''
       }
     }
   });
@@ -99,9 +102,12 @@ const fetchUserData = async () => {
         ciudad: '',
         calle: '',
         numero: '',
+        entreCalles: '',
+        telefono: '',
         casaOTorre: '',
         depto: '',
-        codigoPostal: ''
+        codigoPostal: '',
+        referencia:''
       }
     });
   } catch (error) {
@@ -161,13 +167,13 @@ const fetchUserData = async () => {
             </div>
 
             <div className="flex flex-col sm:col-span-1"> 
-              <label htmlFor="telefono">Teléfono</label>
+              <label htmlFor="telefono">Teléfono <span className='text-red-500'>*</span> <span className='text-xs text-gray-500'>ej.(sin 0) 113631770</span></label>
               <Input {...register('telefono')} className="input" />
               {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
             </div>
 
             <div className="flex flex-col sm:col-span-1">
-              <label htmlFor="dniOCuit">DNI o CUIT</label>
+              <label htmlFor="dniOCuit">DNI o CUIT<span className='text-red-500'>*</span> </label>
               <Input {...register('dniOCuit')} className="input" />
               {errors.dniOCuit && <p className="text-red-500 text-sm">{errors.dniOCuit.message}</p>}
             </div>
@@ -196,7 +202,7 @@ const fetchUserData = async () => {
               <Input {...register('direccion.codigoPostal')} className="input" />
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
               <label htmlFor="direccion.calle">Calle</label>
               <Input {...register('direccion.calle')} className="input" />
             </div>
@@ -215,10 +221,14 @@ const fetchUserData = async () => {
               <label htmlFor="direccion.depto">Depto</label>
               <Input {...register('direccion.depto')} className="input" />
             </div>
+            <div className='col-span-2'>
+              <label htmlFor="direccion.referencia">Referencia</label>
+              <Input {...register('direccion.referencia')} className="input" />
+            </div>
           </div>
 
           <div className="text-center">
-            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <button type="submit" className="px-6 py-2 bg-primary text-white rounded hover:bg-primary-hover">
               Guardar cambios
             </button>
           </div>

@@ -29,6 +29,7 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
       entreCalles: '',
       depto: '',
       codigoPostal: '',
+      referencia: '',
     }
   });
 
@@ -97,20 +98,18 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
             <input {...register('telefono')} className="w-full border rounded p-2" />
             {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
           </div>
+          <div>
+            <label className="block text-sm">Referencia</label>
+            <input {...register('referencia')} className="w-full border rounded p-2" />
+            {errors.referencia && <p className="text-red-500 text-sm">{errors.referencia.message}</p>}
+          </div>
         </div>
 
         <div className="flex justify-between mt-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
+          <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
             Cancelar
           </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <button type="submit" className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover">
             Guardar
           </button>
         </div>

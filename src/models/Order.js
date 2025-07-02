@@ -42,6 +42,7 @@ const orderSchema = new mongoose.Schema({
     entreCalles: {type: String},
     depto: {type: String},
     codigoPostal: {type: String},
+    referencia: {type: String},
   },
   estado: { type: String, enum: ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado'], default: 'pendiente' },
   total: { type: Number, required: true, min: 0 },

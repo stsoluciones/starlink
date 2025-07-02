@@ -19,22 +19,29 @@ const schemaFactura = yup.object().shape({
 })
 
 export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usuarioUid, initialData }) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors }
-  } = useForm({
-    resolver: yupResolver(schemaFactura),
-    defaultValues: {
-      tipo,
-      razonSocial: '',
-      cuit: '',
-      domicilio: '',
-      codigoPostal: '',
-      condicionIva: '',
-    }
-  })
+const {
+  register,
+  handleSubmit,
+  reset,
+  watch,
+  formState: { errors }
+} = useForm({
+  resolver: yupResolver(schemaFactura),
+  defaultValues: {
+    tipo: '',
+    razonSocial: '',
+    cuit: '',
+    domicilio: '',
+    codigoPostal: '',
+    condicionIva: '',
+  }
+})
+
+    // Ver el valor actual de condicionIva
+  const condicionIva = watch('condicionIva')
+
+  // Determinar tipo según condición de IVA
+  const tipoFactura = condicionIva === 'responsableInscripto' ? 'A' : 'B'
 
   useEffect(() => {
     // Don't make the API call here if initialData is provided as prop
@@ -80,13 +87,14 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usua
   }, [initialData, reset, tipo, usuarioUid])
 
   const enviar = (datos) => {
-    onSubmit(datos)
+    const tipoFactura = datos.condicionIva === 'responsableInscripto' ? 'A' : 'C'
+    onSubmit({ ...datos, tipo: tipoFactura })
   }
 
   return (
     <div className="p-6 bg-white rounded-xl shadow-lg max-w-md mx-auto">
       <h2 className="text-xl font-semibold mb-4">Datos del Cliente </h2>
-      <form onSubmit={handleSubmit(enviar)} className="space-y-4">
+      <form className="space-y-4">
         <div>
           <label className="block text-sm">Razón Social</label>
           <input placeholder="Ej: Mi empresa S.A." {...register('razonSocial')} className="w-full border rounded p-2" />
@@ -122,19 +130,16 @@ export default function FormularioFactura({ tipo = 'B', onSubmit, onCancel, usua
           </select>
           {errors.condicionIva && <p className="text-red-500 text-sm">{errors.condicionIva.message}</p>}
         </div>
+        <div>
+            <label className="block text-sm">Tipo de Factura</label>
+            <input value={tipoFactura} readOnly className="w-full border rounded p-2 bg-gray-100 text-gray-600" />
+        </div>
 
         <div className="flex justify-between mt-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
+          <button type="button" onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">
             Cancelar
           </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <button type="submit" onClick={enviar} className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover" >
             Guardar
           </button>
         </div>

@@ -12,6 +12,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   const [mostrarFacturaModal, setMostrarFacturaModal] = useState(false);
   const [seleccionados, setSeleccionados] = useState([]);
   const [todosSeleccionados, setTodosSeleccionados] = useState(false);
+  const [mostrarEnvioModal, setMostrarEnvioModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const objectIdRegex = /^[a-f\d]{24}$/i;
   
@@ -286,6 +287,9 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
                             Ver datos de Factura
                           </button>
+                          <button onClick={() => { setPedidoSeleccionado(pedido);setMostrarEnvioModal(true) }}  className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
+                            Ver datos de Envío
+                          </button>
                           {mostrarFacturaModal && pedidoSeleccionado && (                        
                               <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
@@ -300,6 +304,30 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                     <li><strong>Fecha:</strong> {new Date(pedidoSeleccionado.tipoFactura?.fecha).toLocaleDateString('es-AR')}</li>
                                   </ul>
                                   <button onClick={cerrarModalFactura} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded" >Cerrar</button>
+                                </div>
+                              </div>
+                            )}
+                            {mostrarEnvioModal && pedidoSeleccionado && (
+                              <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
+                                <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
+                                  <h2 className="text-lg font-semibold mb-4">Datos de Envío</h2>
+                                  <ul className="text-sm space-y-2">
+                                    <li><strong>Teléfono:</strong> {pedidoSeleccionado.direccionEnvio?.telefono}</li>
+                                    <li><strong>Email:</strong> {pedidoSeleccionado.usuarioInfo?.correo}</li>
+                                    <li><strong>País:</strong> {pedidoSeleccionado.direccionEnvio?.pais}</li>
+                                    <li><strong>Provincia:</strong> {pedidoSeleccionado.direccionEnvio?. provincia}</li>
+                                    <li><strong>Ciudad:</strong> {pedidoSeleccionado.direccionEnvio?.ciudad}</li>
+                                    <li><strong>Calle:</strong> {pedidoSeleccionado.direccionEnvio?.calle}</li>
+                                    <li><strong>Número:</strong> {pedidoSeleccionado.direccionEnvio?.numero}</li>
+                                    <li><strong>Torre / Casa:</strong> {pedidoSeleccionado.direccionEnvio?.casaOTorre}</li>
+                                    <li><strong>Departamento:</strong> {pedidoSeleccionado.direccionEnvio?.depto}</li>
+                                    <li><strong>Código Postal:</strong> {pedidoSeleccionado.direccionEnvio?.codigoPostal}</li>
+                                    <li><strong>Entre Calles:</strong> {pedidoSeleccionado.direccionEnvio?.entreCalles}</li>
+                                    <li><strong>Referencia:</strong> {pedidoSeleccionado.direccionEnvio?.referencia}</li>
+                                  </ul>
+                                  <button onClick={() => setMostrarEnvioModal(false)} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded"   >
+                                    Cerrar
+                                  </button>
                                 </div>
                               </div>
                             )}

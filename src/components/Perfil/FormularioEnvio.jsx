@@ -45,7 +45,8 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
         telefono: '',
         casaOTorre: '',
         depto: '',
-        codigoPostal: ''
+        codigoPostal: '',
+        referencia:''
       }
     }
   });
@@ -65,7 +66,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {missingFields.includes('nombreCompleto') && (
                 <div>
-                  <label>Nombre completo *</label>
+                  <label>Nombre completo <span className='text-red-500'>*</span> </label>
                   <Input {...register('nombreCompleto')} />
                   {errors.nombreCompleto && (
                     <p className="text-red-500 text-sm">{errors.nombreCompleto.message}</p>
@@ -75,7 +76,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('dniOCuit') && (
                 <div>
-                  <label>DNI o CUIT *</label>
+                  <label>DNI o CUIT <span className='text-red-500'>*</span> </label>
                   <Input {...register('dniOCuit')} />
                   {errors.dniOCuit && (
                     <p className="text-red-500 text-sm">{errors.dniOCuit.message}</p>
@@ -85,7 +86,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('telefono') && (
                 <div>
-                  <label>Teléfono *</label>
+                  <label>Teléfono <span className='text-red-500'>*</span> <span className='text-xs text-gray-500'>ej.(sin 0) 113631770</span></label>
                   <Input {...register('telefono')} />
                   {errors.telefono && (
                     <p className="text-red-500 text-sm">{errors.telefono.message}</p>
@@ -107,7 +108,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {missingFields.includes('pais') && (
                 <div>
-                  <label>País *</label>
+                  <label>País <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.pais')} />
                   {errors.direccion?.pais && (
                     <p className="text-red-500 text-sm">{errors.direccion.pais.message}</p>
@@ -117,7 +118,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('provincia') && (
                 <div>
-                  <label>Provincia *</label>
+                  <label>Provincia <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.provincia')} />
                   {errors.direccion?.provincia && (
                     <p className="text-red-500 text-sm">{errors.direccion.provincia.message}</p>
@@ -127,7 +128,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('ciudad') && (
                 <div>
-                  <label>Ciudad *</label>
+                  <label>Ciudad <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.ciudad')} />
                   {errors.direccion?.ciudad && (
                     <p className="text-red-500 text-sm">{errors.direccion.ciudad.message}</p>
@@ -137,7 +138,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('calle') && (
                 <div>
-                  <label>Calle *</label>
+                  <label>Calle <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.calle')} />
                   {errors.direccion?.calle && (
                     <p className="text-red-500 text-sm">{errors.direccion.calle.message}</p>
@@ -147,7 +148,7 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               
               {missingFields.includes('numero') && (
                 <div>
-                  <label>Número *</label>
+                  <label>Número <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.numero')} />
                   {errors.direccion?.numero && (
                     <p className="text-red-500 text-sm">{errors.direccion.numero.message}</p>
@@ -174,10 +175,19 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
               )}
               {missingFields.includes('codigoPostal') && (
                 <div>
-                  <label>Código Postal *</label>
+                  <label>Código Postal <span className='text-red-500'>*</span> </label>
                   <Input {...register('direccion.codigoPostal')} />
                   {errors.direccion?.codigoPostal && (
                     <p className="text-red-500 text-sm">{errors.direccion.codigoPostal.message}</p>
+                  )}
+                </div>
+              )}
+              {missingFields.includes('referencia') && (
+                <div>
+                  <label>Referencia</label>
+                  <Input {...register('direccion.referencia')} />
+                  {errors.direccion?.referencia && (
+                    <p className="text-red-500 text-sm">{errors.direccion.referencia.message}</p>
                   )}
                 </div>
               )}
@@ -186,17 +196,10 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
         )}
 
         <div className="flex justify-end gap-3 mt-6">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          >
+          <button type="button" onClick={onCancel}  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
             Cancelar
           </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
+          <button type="submit" className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover">
             Guardar y continuar
           </button>
         </div>
