@@ -29,10 +29,18 @@ const Card = ({ product, handleProductSelect }) => {
     window.open(enviar, '_blank');
   };
 
-  const consultMessage = `Hola, quería consultar por ${product.nombre} (${product.cod_producto})`;
+  const getProductLink = (product) => {
+    const nombreURL = product.nombre.replace(/\s+/g, '_');
+    return `${typeof window !== 'undefined' ? window.location.origin : ''}/productos/${nombreURL}`;
+  };
+
+  const linkProducto =  getProductLink(product);
+  
+  const consultMessage = `Hola, quería consultar por ${product.nombre} (${product.cod_producto}). Link: ${linkProducto}`;
   const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(
     consultMessage || userData.textoPredefinido
   )}`;
+
   const user = getInLocalStorage('USER');
 
   const handleComprar = (e) => {
