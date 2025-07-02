@@ -37,27 +37,33 @@ export default function StatsSummary({ data }) {
           </div>
         </div>
 
-        <div>
-        <h4 className="font-medium mb-2">Métodos de Pago</h4>
-        <div className="space-y-2">
+        <div className="md:border-l md:pl-6 *:border-gray-400">
+          <h4 className="font-medium mb-2">Métodos de Pago</h4>
+          <div className="space-y-2">
             {data.paymentMethods ? (
-            Object.entries(data.paymentMethods).map(([method, count]) => (
-                <div key={method} className="flex items-center">
-                <span className="w-32 capitalize">{method}:</span>
-                <div className="flex-1 bg-gray-200 rounded-full h-4">
-                    <div 
-                    className="bg-green-500 h-4 rounded-full" 
-                    style={{ width: `${(count / data.totalOrders) * 100}%` }}
-                    />
+              Object.entries(data.paymentMethods).map(([method, { count, total }]) => (
+                <div key={method} className="flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="flex items-center w-full sm:w-2/3">
+                    <span className="w-32 capitalize">{method}:</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-4">
+                      <div 
+                        className="bg-green-500 h-4 rounded-full" 
+                        style={{ width: `${(count / data.totalOrders) * 100}%` }}
+                      />
+                    </div>
+                    <span className="ml-2 w-12 text-right">{count}</span>
+                  </div>
+                  <div className="sm:ml-auto text-sm text-gray-600 sm:w-1/3 sm:text-left">
+                    Total: <span className="text-base text-green-800 font-semibold">${total.toLocaleString('es-AR')}</span>
+                  </div>
                 </div>
-                <span className="ml-2 w-12 text-right">{count}</span>
-                </div>
-            ))
+              ))
             ) : (
-            <p className="text-gray-500">No hay datos de métodos de pago disponibles</p>
+              <p className="text-gray-500">No hay datos de métodos de pago disponibles</p>
             )}
+          </div>
         </div>
-        </div>
+
       </div>
     </div>
   );

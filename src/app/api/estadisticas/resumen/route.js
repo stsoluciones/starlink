@@ -42,26 +42,29 @@ export async function GET(request) {
       
       // 4. Métodos de pago (versión corregida)
       Order.aggregate([
-        { 
-          $match: { 
+        {
+          $match: {
             fechaPedido: { $gte: startDate, $lte: endDate },
-            estado: { $ne: 'cancelado' } 
-          } 
+            estado: { $ne: 'cancelado' }
+          }
         },
-        { 
-          $group: { 
-            _id: { $ifNull: ['$paymentMethod', 'no especificado'] }, 
-            count: { $sum: 1 } 
-          } 
+        {
+          $group: {
+            _id: { $ifNull: ['$paymentMethod', 'no especificado'] },
+            count: { $sum: 1 },
+            total: { $sum: '$total' }
+          }
         },
-        { 
-          $project: { 
-            _id: 0, 
-            method: '$_id', 
-            count: 1 
-          } 
+        {
+          $project: {
+            _id: 0,
+            method: '$_id',
+            count: 1,
+            total: 1
+          }
         }
       ]),
+
       
       // 5. Carritos abandonados
       Order.countDocuments({
@@ -80,7 +83,10 @@ export async function GET(request) {
     // Convertir paymentMethodsData a objeto
     const paymentMethods = {};
     paymentMethodsData.forEach(item => {
-      paymentMethods[item.method] = item.count;
+      paymentMethods[item.method] = {
+        count: item.count,
+        total: item.total
+      };
     });
 
     return NextResponse.json({
