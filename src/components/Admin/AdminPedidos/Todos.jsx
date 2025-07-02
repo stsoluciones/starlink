@@ -64,9 +64,25 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   }
 
 const generarEtiquetas = async (pedidoUnico = null) => {
+  console.log('Generando etiquetas para pedidos:', pedidoUnico);
+  console.log('Pedidos paginados:', pedidosPaginados)
+  console.log('Seleccionados:', seleccionados);
+  
+  
   const pedidosAActualizar = pedidoUnico
     ? [pedidoUnico]
-    : pedidosPaginados.filter(pedido => seleccionados.includes(pedido._id));
+    : (seleccionados.length > 0
+        ? pedidosPaginados.filter(pedido =>
+            typeof pedido?._id === "string" && seleccionados.includes(pedido._id)
+          )
+        : pedidosPaginados);
+
+  if (pedidoUnico === null && seleccionados.length > 0 && pedidosAActualizar.length < seleccionados.length) {
+    const encontrados = pedidosAActualizar.map(p => p._id);
+    const faltantes = seleccionados.filter(id => !encontrados.includes(id));
+    console.warn("⚠️ Algunos IDs seleccionados no fueron encontrados en pedidosPaginados:", faltantes);
+  }
+
 
     if (pedidosAActualizar.length === 0) {
       Swal.fire("Atención", "No hay pedidos seleccionados para generar etiquetas.", "info");
@@ -219,7 +235,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
               <input type="checkbox" id="seleccionarTodos" checked={todosSeleccionados} onChange={manejarSeleccionGeneral}/>
               <label htmlFor="seleccionarTodos" className="font-medium cursor-pointer">Imprimir todas las etiquetas</label>
             </div>
-            <button onClick={generarEtiquetas} disabled={seleccionados.length === 0 || loading } className="bg-blue-600 text-white text-sm p-2 my-2 rounded hover:bg-blue-700 disabled:bg-gray-300">Generar y Enviar ({seleccionados.length})</button>
+            <button onClick={(e) => { e.preventDefault(); generarEtiquetas()}} disabled={seleccionados.length === 0 || loading } className="bg-blue-600 text-white text-sm p-2 my-2 rounded hover:bg-blue-700 disabled:bg-gray-300">Generar y Enviar ({seleccionados.length})</button>
           </div>
 
           {/* Tabla de pedidos */}
