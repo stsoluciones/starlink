@@ -59,6 +59,7 @@ const PerfilPage = ({ usuarioUid }) => {
         entreCalles: '',
         telefono: '',
         casaOTorre: '',
+        piso: '',
         depto: '',
         codigoPostal: '',
         referencia:''
@@ -105,6 +106,7 @@ const fetchUserData = async () => {
         entreCalles: '',
         telefono: '',
         casaOTorre: '',
+        piso: '',
         depto: '',
         codigoPostal: '',
         referencia:''
@@ -216,7 +218,10 @@ const fetchUserData = async () => {
               <label htmlFor="direccion.casaOTorre">Casa o Torre</label>
               <Input {...register('direccion.casaOTorre')} className="input" />
             </div>
-
+            <div>
+              <label htmlFor="direccion.piso">Piso</label>
+              <Input {...register('direccion.piso')} className="input" />
+            </div>
             <div>
               <label htmlFor="direccion.depto">Depto</label>
               <Input {...register('direccion.depto')} className="input" />

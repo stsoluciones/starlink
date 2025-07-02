@@ -23,9 +23,13 @@ const envioSchema = yup.object().shape({
     ciudad: yup.string().required('La ciudad es requerida'),
     calle: yup.string().required('La calle es requerida'),
     numero: yup.string().required('El número es requerido'),
-    codigoPostal: yup.string().required('El código postal es requerido'),
     casaOTorre: yup.string(),
-    depto: yup.string()
+    piso: yup.string(),
+    depto: yup.string(),
+    telefono: yup.string(),
+    entreCalles: yup.string(),
+    codigoPostal: yup.string().required('El código postal es requerido'),
+    referencia: yup.string(),
   })
 });
 
@@ -41,10 +45,11 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
         ciudad: '',
         calle: '',
         numero: '',
-        entreCalles: '',
-        telefono: '',
         casaOTorre: '',
+        piso: '',
         depto: '',
+        telefono: '',
+        entreCalles: '',
         codigoPostal: '',
         referencia:''
       }
@@ -161,6 +166,15 @@ export const FormularioEnvio = ({ user, onCancel, onSubmit: externalOnSubmit, mi
                   <Input {...register('direccion.casaOTorre')} />
                   {errors.direccion?.casaOTorre && (
                     <p className="text-red-500 text-sm">{errors.direccion.casaOTorre.message}</p>
+                  )}
+                </div>
+              )}
+              {missingFields.includes('piso') && (
+                <div>
+                  <label>Piso</label>
+                  <Input {...register('direccion.piso')} />
+                  {errors.direccion?.piso && (
+                    <p className="text-red-500 text-sm">{errors.direccion.piso.message}</p>
                   )}
                 </div>
               )}

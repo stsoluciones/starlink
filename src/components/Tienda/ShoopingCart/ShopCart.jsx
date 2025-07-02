@@ -92,21 +92,17 @@ const handleComprar = async () => {
           root.appendChild(container);
           const rootReact = createRoot(container);
           rootReact.render(
-            <FormularioFactura
-              tipo={tipoFactura}
-              onSubmit={(data) => resolve(data)}
-              onCancel={() => resolve(null)}
-            />
+            <FormularioFactura tipo={tipoFactura} esConsumidorFinal={esConsumidorFinal} onSubmit={(data) => resolve(data)} onCancel={() => resolve(null)} />
           );
         },
       });
     });
 
     if (!datosFactura) throw new Error('Debes completar los datos de facturación');
-
+    
     const userCompleto = {
       ...user,
-      factura: { ...datosFactura, tipo: tipoFactura },
+      factura: { ...datosFactura, tipo: tipoFactura, cuit: datosFactura.cuit || datosFactura.dniOCuit },
     };
 
     const nuevaDireccion = await solicitarNuevaDireccion();

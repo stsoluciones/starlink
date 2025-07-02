@@ -30,7 +30,10 @@ const handleGuardarPedido = async (user, cart) => {
   if (!carritoValido) {
     return { success: false, error: 'El carrito contiene items inválidos' };
   }
-
+  console.log('handleGuardarPedido - Datos del usuario:', user );
+  console.log('handleGuardarPedido - Datos del carrito:', cart );
+  
+  
   try {
     const response = await fetch('/api/pedidos/guardar-pedido', {
       method: 'POST',
@@ -53,7 +56,7 @@ const handleGuardarPedido = async (user, cart) => {
           direccion: user.direccion,
         },
         direccionEnvio: user.direccionEnvio,
-        tipoFactura: user.factura ? {
+        tipoFactura:  {
           tipo: user.factura.tipo,
           razonSocial: user.factura.razonSocial,
           cuit: user.factura.cuit,
@@ -61,15 +64,8 @@ const handleGuardarPedido = async (user, cart) => {
           codigoPostal: user.factura.codigoPostal,
           condicionIva: user.factura.condicionIva,
           fecha: new Date()
-        } : {
-          tipo: 'B',
-          razonSocial: user.nombreCompleto,
-          cuit: user?.dniOCuit || '',
-          domicilio: user.direccion,
-          codigoPostal: user?.codigoPostal || '',
-          condicionIva: 'consumidorFinal',
-          fecha: new Date(),
         },
+        etiquetaEnvio: user.etiquetaEnvio || '',
         external_reference: `order_${user.uid}_${new Date().getTime()}`,
         direccionEnvio: user.direccionEnvio || user.direccion,
         pref_id: '',

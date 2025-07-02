@@ -61,7 +61,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           direccion: user.direccion,
         },
         direccionEnvio: user.direccionEnvio,
-        tipoFactura: user.factura ? {
+        tipoFactura: {
           tipo: user.factura.tipo,
           razonSocial: user.factura.razonSocial,
           cuit: user.factura.cuit,
@@ -69,7 +69,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           codigoPostal: user.factura.codigoPostal,
           condicionIva: user.factura.condicionIva,
           fecha: new Date()
-        } : undefined,
+        } ,
         external_reference: externalReference,
         pref_id: prefId,
         paymentId: prefId,

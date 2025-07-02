@@ -25,9 +25,10 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
       calle: '',
       numero: '',
       casaOTorre: '',
+      piso: '',
+      depto: '',
       telefono: '',
       entreCalles: '',
-      depto: '',
       codigoPostal: '',
       referencia: '',
     }
@@ -73,6 +74,10 @@ export default function FormularioDireccion({ onSubmit, onCancel }) {
           <div>
             <label className="block text-sm">Casa / Torre</label>
             <input {...register('casaOTorre')} className="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label className="block text-sm">Piso</label>
+            <input {...register('piso')} className="w-full border rounded p-2" />
           </div>
           <div>
             <label className="block text-sm">Depto</label>

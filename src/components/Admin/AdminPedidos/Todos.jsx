@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FaBackward, FaForward } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import Loading from '../../Loading/Loading';
-import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
+// import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
 
@@ -307,7 +307,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                             Ver datos de Envío
                           </button>
                           {mostrarFacturaModal && pedidoSeleccionado && (                        
-                              <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
+                              <div className="fixed inset-0 bg-black/5 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>
                                   <ul className="text-sm space-y-2">
@@ -324,21 +324,25 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                               </div>
                             )}
                             {mostrarEnvioModal && pedidoSeleccionado && (
-                              <div className="fixed inset-0 bg-gray-500/10 flex justify-center items-center z-50">
+                              console.log('pedidoSeleccionado', pedidoSeleccionado),                              
+                              <div className="fixed inset-0 bg-black/5 flex justify-center items-center z-50 p-2 rounded-md">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos de Envío</h2>
-                                  <ul className="text-sm space-y-2">
+                                  <ul className="text-sm grid grid-cols-2 gap-2 p-2">
+                                    <li className='col-span-1'><strong>Email:</strong> {pedidoSeleccionado.usuarioInfo?.correo}</li><br/>
+                                    <li><strong>Nombre:</strong> {pedidoSeleccionado.tipoFactura?.razonSocial}</li>
+                                    <li><strong>DNI/CUIT:</strong> {pedidoSeleccionado.tipoFactura?.cuit}</li>
                                     <li><strong>Teléfono:</strong> {pedidoSeleccionado.direccionEnvio?.telefono}</li>
-                                    <li><strong>Email:</strong> {pedidoSeleccionado.usuarioInfo?.correo}</li>
                                     <li><strong>País:</strong> {pedidoSeleccionado.direccionEnvio?.pais}</li>
                                     <li><strong>Provincia:</strong> {pedidoSeleccionado.direccionEnvio?. provincia}</li>
                                     <li><strong>Ciudad:</strong> {pedidoSeleccionado.direccionEnvio?.ciudad}</li>
                                     <li><strong>Calle:</strong> {pedidoSeleccionado.direccionEnvio?.calle}</li>
                                     <li><strong>Número:</strong> {pedidoSeleccionado.direccionEnvio?.numero}</li>
                                     <li><strong>Torre / Casa:</strong> {pedidoSeleccionado.direccionEnvio?.casaOTorre}</li>
+                                    <li><strong>Piso:</strong> {pedidoSeleccionado.direccionEnvio?.piso}</li>
                                     <li><strong>Departamento:</strong> {pedidoSeleccionado.direccionEnvio?.depto}</li>
-                                    <li><strong>Código Postal:</strong> {pedidoSeleccionado.direccionEnvio?.codigoPostal}</li>
                                     <li><strong>Entre Calles:</strong> {pedidoSeleccionado.direccionEnvio?.entreCalles}</li>
+                                    <li><strong>Código Postal:</strong> {pedidoSeleccionado.direccionEnvio?.codigoPostal}</li>
                                     <li><strong>Referencia:</strong> {pedidoSeleccionado.direccionEnvio?.referencia}</li>
                                   </ul>
                                   <button onClick={() => setMostrarEnvioModal(false)} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded"   >
