@@ -126,7 +126,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
     }
   };
   const handleCancelPedido = async(pedido)=>{
-    console.log(pedido._id)
+    //console.log(pedido._id)
     const seguro = Swal.fire({
       title:'¿Esta seguro que quiere cancelar este pedido?',
       text:'esta accion no puede deshacerse',

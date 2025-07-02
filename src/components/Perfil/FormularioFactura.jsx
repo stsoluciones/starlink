@@ -87,7 +87,7 @@ export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid
       cuit: datos.cuit.trim(),
     }
 
-    console.log('Datos a enviar:', datosEnviar) // Para depuración
+    //console.log('Datos a enviar:', datosEnviar) // Para depuración
     onSubmit(datosEnviar)
   }
 

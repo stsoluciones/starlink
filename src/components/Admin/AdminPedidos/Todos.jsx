@@ -64,9 +64,9 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   }
 
 const generarEtiquetas = async (pedidoUnico = null) => {
-  console.log('Generando etiquetas para pedidos:', pedidoUnico);
-  console.log('Pedidos paginados:', pedidosPaginados)
-  console.log('Seleccionados:', seleccionados);
+  // console.log('Generando etiquetas para pedidos:', pedidoUnico);
+  // console.log('Pedidos paginados:', pedidosPaginados)
+  // console.log('Seleccionados:', seleccionados);
   
   
   const pedidosAActualizar = pedidoUnico
@@ -323,8 +323,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                 </div>
                               </div>
                             )}
-                            {mostrarEnvioModal && pedidoSeleccionado && (
-                              console.log('pedidoSeleccionado', pedidoSeleccionado),                              
+                            {mostrarEnvioModal && pedidoSeleccionado && (                          
                               <div className="fixed inset-0 bg-black/5 flex justify-center items-center z-50 p-2 rounded-md">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos de Envío</h2>

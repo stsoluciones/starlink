@@ -132,7 +132,7 @@ const Comprobantes = () => {
           )
         
           if (!empresaYaExiste) {
-            console.log('first', empresa);
+            //console.log('first', empresa);
             const res = await fetch('/api/empresa', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

@@ -8,7 +8,7 @@ const ClientLayout = dynamic(() => import('../../ClientLayout'))
 export async function generateMetadata({ params }) {
   const product = await fetchProduct(params.nombre);
   if (!params || !params.nombre) return defaultMetadata;
-  console.log('producto de meta:', product);
+  //console.log('producto de meta:', product);
 
   return {
     ...defaultMetadata, // Usa los valores por defecto si no están definidos en el producto

@@ -30,8 +30,8 @@ const handleGuardarPedido = async (user, cart) => {
   if (!carritoValido) {
     return { success: false, error: 'El carrito contiene items inválidos' };
   }
-  console.log('handleGuardarPedido - Datos del usuario:', user );
-  console.log('handleGuardarPedido - Datos del carrito:', cart );
+  // console.log('handleGuardarPedido - Datos del usuario:', user );
+  // console.log('handleGuardarPedido - Datos del carrito:', cart );
   
   
   try {
