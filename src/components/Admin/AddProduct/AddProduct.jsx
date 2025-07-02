@@ -316,7 +316,7 @@ const hasImageChanges = () => {
                       htmlFor="nombre"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Nombre
+                      Nombre<spam className='text-xs text-red-500'>*</spam>
                     </label>
                     <div className='flex'>
 
@@ -446,7 +446,7 @@ const hasImageChanges = () => {
                       htmlFor="modeloAdd"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Modelo
+                      Modelo<spam className='text-xs text-red-500'>*</spam>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -519,7 +519,7 @@ const hasImageChanges = () => {
                   {/* Precio */}
                   <div>
                     <label htmlFor="precioAdd" className="block mb-2 text-sm font-medium text-gray-900">
-                      Precio
+                      Precio<spam className='text-xs text-red-500'>*</spam>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -531,10 +531,10 @@ const hasImageChanges = () => {
                       placeholder="$100.000"
                     />
                    {/* usd */}
-                    <div className='flex gap-2 mb-2'>
+                    {/* <div className='flex gap-2 mb-2'>
                       <input onChange={handleChangeInput} type="checkbox" name="usd" id="usdAdd" checked={producto.usd}/>
                       <label htmlFor="usdAdd" className="block  text-sm font-medium text-gray-900" >usd?</label>
-                    </div>
+                    </div> */}
                   </div>
   
                   {/* Descripción */}
@@ -543,7 +543,7 @@ const hasImageChanges = () => {
                       htmlFor="descripcionAdd"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Descripción
+                      Descripción<spam className='text-xs text-red-500'>*</spam>
                     </label>
                     <textarea
                       onChange={handleChangeInput}
@@ -559,10 +559,10 @@ const hasImageChanges = () => {
                   <div className='flex gap-2 mb-2'>
                     <input onChange={handleChangeInput} type="checkbox" name="destacados" id="destacadosAdd" checked={producto.destacados}/>
                     <label htmlFor="destacadosAdd" className="block  text-sm font-medium text-gray-900" >Destacado?</label>
-                    <input onChange={handleChangeInput} type="checkbox" name="usado" id="usadoAdd" checked={producto.usado}/>
-                    <label htmlFor="usadoAdd" className="block  text-sm font-medium text-gray-900" >Usado?</label>
-                    <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoAdd" checked={producto.vendido}/>
-                    <label htmlFor="vendidoAdd" className="block  text-sm font-medium text-gray-900" >vendido?</label>
+                    {/* <input onChange={handleChangeInput} type="checkbox" name="usado" id="usadoAdd" checked={producto.usado}/> */}
+                    {/* <label htmlFor="usadoAdd" className="block  text-sm font-medium text-gray-900" >Usado?</label> */}
+                    {/* <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoAdd" checked={producto.vendido}/> */}
+                    {/* <label htmlFor="vendidoAdd" className="block  text-sm font-medium text-gray-900" >vendido?</label> */}
                   </div>
                 </div>
   

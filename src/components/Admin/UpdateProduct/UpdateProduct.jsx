@@ -279,7 +279,7 @@ export default function UpdateProduct({
                <div className="grid gap-4 mb-4 sm:grid-cols-2">       
               {/* Nombre */}
                 <div>
-                  <label htmlFor="nombreUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Nombre</label>
+                  <label htmlFor="nombreUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Nombre<spam className='text-xs text-red-500'>*</spam></label>
                   <div className="flex">
                     <input onChange={handleChangeInput} type="text" name="nombre" id="nombreUpdate" value={producto.nombre} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Nombre del producto"/>
                     {producto.destacados
@@ -383,7 +383,7 @@ export default function UpdateProduct({
                     htmlFor="modeloUpdate"
                     className="block mb-2 text-sm font-medium text-gray-900"
                   >
-                    Modelo
+                    Modelo<spam className='text-xs text-red-500'>*</spam>
                   </label>
                   <input
                     onChange={handleChangeInput}
@@ -450,7 +450,7 @@ export default function UpdateProduct({
                 {/* Precio */}
                 <div>
                     <label htmlFor="precioUpdate" className="block mb-2 text-sm font-medium text-gray-900">
-                      Precio
+                      Precio<spam className='text-xs text-red-500'>*</spam>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -461,15 +461,15 @@ export default function UpdateProduct({
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                       placeholder="$100.000"
                     />
-                    <div className='flex gap-2 mb-2'>
+                    {/* <div className='flex gap-2 mb-2'>
                       <input onChange={handleChangeInput} type="checkbox" name="usd" id="usdUpdate" checked={producto.usd}/>
                       <label htmlFor="usdUpdate" className="block  text-sm font-medium text-gray-900" >usd?</label>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Descripción */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="descripcionUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Descripción</label>
+                  <label htmlFor="descripcionUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Descripción<spam className='text-xs text-red-500'>*</spam></label>
                   <textarea
                     onChange={handleChangeInput}
                     id="descripcionUpdate"
@@ -486,10 +486,10 @@ export default function UpdateProduct({
               <div className='flex gap-2 mb-4'>
                 <input onChange={handleChangeInput} type="checkbox" name="destacados" id="destacadosUpdate" checked={producto.destacados}/>
                 <label htmlFor="destacadosUpdate" className="block text-sm font-medium text-gray-900" >Destacado?</label>
-                <input onChange={handleChangeInput} type="checkbox" name="usado" id="usadoUpdate" checked={producto.usado}/>
-                <label htmlFor="usadoUpdate" className="block  text-sm font-medium text-gray-900" >Usado?</label>
-                <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoUpdate" checked={producto.vendido}/>
-                <label htmlFor="vendidoUpdate" className="block  text-sm font-medium text-gray-900" >vendido?</label>
+                {/* <input onChange={handleChangeInput} type="checkbox" name="usado" id="usadoUpdate" checked={producto.usado}/> */}
+                {/* <label htmlFor="usadoUpdate" className="block  text-sm font-medium text-gray-900" >Usado?</label> */}
+                {/* <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoUpdate" checked={producto.vendido}/> */}
+                {/* <label htmlFor="vendidoUpdate" className="block  text-sm font-medium text-gray-900" >vendido?</label> */}
               </div>
                 
               {/* Subir Archivo */}
