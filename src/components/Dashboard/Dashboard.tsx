@@ -181,10 +181,10 @@
               <PedidosList pedidos={pedidosActivos} emptyMessage="No tienes pedidos activos." />
             </article>
 
-            <article>
+            {/* <article>
               <SectionHeader title="📜 Historial de Compras" count={pedidosCompletados.length} />
               <PedidosList pedidos={pedidosCompletados} emptyMessage="No tienes compras anteriores." />
-            </article>
+            </article> */}
           </section>
         )}
         {activeTab === 'perfil' && (

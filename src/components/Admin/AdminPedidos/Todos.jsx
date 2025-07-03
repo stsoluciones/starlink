@@ -297,7 +297,10 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
                         {/* Datos del comprador */}
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t mt-4">
-                          <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
+                          <div className="">
+                            <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
+                            <p className="text-sm text-gray-700">{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
+                          </div>
                           <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
                           {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.direccionEnvio?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
                           <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">

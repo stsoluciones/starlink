@@ -14,16 +14,7 @@ export const solicitarNuevaDireccion = () => {
 
         const rootReact = createRoot(container);
         rootReact.render(
-          <FormularioDireccion
-            onSubmit={(data) => {
-              resolve(data);
-              Swal.close();
-            }}
-            onCancel={() => {
-              resolve(null);
-              Swal.close();
-            }}
-          />
+          <FormularioDireccion onSubmit={(data) => {resolve(data); Swal.close();}} onCancel={() => {resolve(null); Swal.close();}}/>
         );
       }
     });
