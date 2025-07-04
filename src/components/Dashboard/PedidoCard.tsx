@@ -175,10 +175,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
         )}
         <div>
           {puedeSubirTicket && !pedido?.metadata?.ticketUrl ? (
-            <button
-              onClick={() => setShowUploadModal(true)}
-              className="text-blue-600 hover:underline text-xs md:text-sm"
-            >
+            <button onClick={() => setShowUploadModal(true)} className="text-blue-600 hover:underline text-xs md:text-sm">
               Adj. comprobante
             </button>
           ) : pedido?.metadata?.ticketUrl ? (
@@ -192,11 +189,16 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
           ) : null}
         </div>
 
-        <span
-          className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium ${estadoColorClass}`}
-        >
+        <span className={`px-3 py-1 rounded-full text-xs md:text-sm font-medium ${estadoColorClass}`}>
           {estadoDisplayText}
         </span>
+        {pedido.etiquetaEnvio && (
+          <div className='flex flex-col items-center gap-1'>
+            <Link href={pedido.etiquetaEnvio} target="_blank" className="text-white bg-blue-400 px-2 rounded-md hover:bg-blue-500 text-xs md:text-sm">
+              Ver Etiqueta de Envio: <span>{pedido.trackingCode}</span>
+            </Link>
+          </div>
+        )}
       </div>
 
 
@@ -241,7 +243,7 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
           </div>
         </div>
       )}
-            {/* Modal */}
+      {/* Modal */}
       {showDatosModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">

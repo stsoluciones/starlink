@@ -41,6 +41,8 @@
     paymentId?: string
     init_point?: string
     external_reference?: string
+    etiquetaEnvio?: string
+    trackingCode?: string
   }
 
   const Dashboard = () => {

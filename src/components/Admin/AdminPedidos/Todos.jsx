@@ -5,6 +5,7 @@ import Loading from '../../Loading/Loading';
 // import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 
 const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina, setPedidosProcesando }) => {
@@ -12,6 +13,11 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   const [mostrarFacturaModal, setMostrarFacturaModal] = useState(false);
   const [seleccionados, setSeleccionados] = useState([]);
   const [todosSeleccionados, setTodosSeleccionados] = useState(false);
+  const [mostrarEtiquetaModal, setMostrarEtiquetaModal] = useState(false);
+  const [etiqueta, setEtiqueta] = useState(null);
+  const [confirmarEliminarModal, setConfirmarEliminarModal] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [trackingFile, setTrackingFile] = useState(null);
   const [mostrarEnvioModal, setMostrarEnvioModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const objectIdRegex = /^[a-f\d]{24}$/i;
@@ -220,6 +226,95 @@ const generarEtiquetas = async (pedidoUnico = null) => {
     }
   };
 
+  const handleUpload = async (pedido) => {
+    if (!trackingFile || !etiqueta) {
+      toast.warning('Debes seleccionar un archivo y escribir el número de Tracking.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', trackingFile);
+    formData.append('numeroTracking', etiqueta.trim());
+    formData.append('pedidoId', pedido._id);
+
+    setLoading(true);
+
+    try {
+      const res = await fetch('/api/pedidos/guardar-etiqueta', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Error al subir la etiqueta.');
+        return;
+      }
+
+      toast.success('Etiqueta guardada correctamente.');
+
+      setShowUploadModal(false);
+      setTrackingFile(null);
+      setEtiqueta('');
+      setPedidoSeleccionado(null);
+      setMostrarEtiquetaModal(false);
+    } catch (error) {
+      console.error('Error al subir la etiqueta:', error);
+      toast.error('Error de red o del servidor al subir la etiqueta.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEliminarEtiqueta = async () => {
+    if (!pedidoSeleccionado) return;
+
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/pedidos/eliminar-etiqueta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pedidoId: pedidoSeleccionado._id }),
+      });
+
+      // Verificar si la respuesta es JSON
+      const contentType = res.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        throw new Error(`Respuesta inesperada del servidor: ${text.substring(0, 100)}...`);
+      }
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        toast.error(data.error || 'Error al eliminar la etiqueta.');
+        return;
+      }
+
+      toast.success('Etiqueta eliminada correctamente.');
+      setMostrarEtiquetaModal(false);
+      setConfirmarEliminarModal(false);
+      
+      // Actualizar el estado local del pedido
+      setPedidosPaginados(prev => prev.map(p => 
+        p._id === pedidoSeleccionado._id 
+          ? { ...p, etiquetaEnvio: undefined, trackingCode: undefined, estado: 'pagado' }
+          : p
+      ));
+      
+      setPedidoSeleccionado(null);
+      
+    } catch (error) {
+      console.error('Error al eliminar la etiqueta:', error);
+      toast.error(error.message || 'Error de red o del servidor al eliminar la etiqueta.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
           <section>
           {/* Filtros */}
@@ -240,7 +335,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
           {/* Tabla de pedidos */}
           <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-300 text-sm">
+            <table className="min-w-full text-sm">
               <tbody>
                 {pedidosPaginados.length === 0 ? (
                   <tr>
@@ -299,7 +394,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t mt-4">
                           <div className="">
                             <p className="text-sm text-gray-700">{pedido.usuarioInfo?.nombreCompleto || "Sin nombre"}</p>
-                            <p className="text-sm text-gray-700">{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
+                            <p className={`text-sm ${pedido.tipoFactura?.condicionIva === 'consumidorFinal'?'text-gray-500':'text-red-800 text-center px-1 rounded-md font-semibold bg-red-400'} `}>{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
                           </div>
                           <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
                           {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.direccionEnvio?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
@@ -309,7 +404,172 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <button onClick={() => { setPedidoSeleccionado(pedido);setMostrarEnvioModal(true) }}  className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
                             Ver datos de Envío
                           </button>
-                          {mostrarFacturaModal && pedidoSeleccionado && (                        
+                            {pedido.estado === 'enviado' && (
+                              <button 
+                                onClick={() => {
+                                  setPedidoSeleccionado(pedido);
+                                  setMostrarEtiquetaModal(true);
+                                }}
+                                className={`${pedido.etiquetaEnvio ? 'bg-green-600 hover:bg-green-700' : 'bg-primary hover:bg-primary-hover'} text-white text-sm px-3 py-1 rounded ml-2`}
+                              >
+                                {pedido.etiquetaEnvio ? 'Ver Etiqueta' : 'Adj. Etiqueta'}
+                              </button>
+                            )}
+                            {mostrarEtiquetaModal && pedidoSeleccionado?._id === pedido._id && (
+                              <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
+                                <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
+                                  <h2 className="text-lg font-semibold mb-4">Etiqueta de Envío</h2>
+                                  
+                                  {pedidoSeleccionado.etiquetaEnvio ? (
+                                    <div className="space-y-4">
+                                      <div className="flex flex-col items-center">
+                                          <Link 
+                                            href={pedidoSeleccionado.etiquetaEnvio}
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="text-white bg-blue-600 py-2 px-4 rounded-md hover:bg-blue-700 text-xs md:text-sm mb-4"
+                                          >
+                                            Ver Etiqueta
+                                          </Link>
+                                        <p className="text-sm mb-2">
+                                          <strong>Número de Tracking:</strong> {pedidoSeleccionado.trackingCode || 'No disponible'}
+                                        </p>
+                                      </div>
+                                      
+                                      <div className="flex flex-col gap-2">
+                                        <button 
+                                          onClick={() => {
+                                            setMostrarEtiquetaModal(false);
+                                            setShowUploadModal(true);
+                                          }} 
+                                          className="text-white bg-yellow-500 py-2 px-4 rounded-md hover:bg-yellow-600 text-xs md:text-sm"
+                                        >
+                                          Reemplazar Etiqueta
+                                        </button>
+                                        
+                                        <button 
+                                          onClick={() => setConfirmarEliminarModal(true)}
+                                          className="text-white bg-red-500 py-2 px-4 rounded-md hover:bg-red-600 text-xs md:text-sm"
+                                        >
+                                          Eliminar Etiqueta
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex flex-col items-center">
+                                      <button 
+                                        onClick={() => {
+                                          setMostrarEtiquetaModal(false);
+                                          setShowUploadModal(true);
+                                        }} 
+                                        className="text-white bg-primary py-2 px-4 rounded-md hover:bg-primary-hover text-xs md:text-sm"
+                                      >
+                                        Adjuntar Etiqueta
+                                      </button>
+                                    </div>
+                                  )}
+                                  
+                                  <button 
+                                    onClick={() => setMostrarEtiquetaModal(false)} 
+                                    className="mt-4 w-full bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                                  >
+                                    Cerrar
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                            {confirmarEliminarModal && (
+                              <div className="fixed inset-0 bg-black/10 flex justify-center items-center z-50">
+                                <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
+                                  <h2 className="text-lg font-semibold mb-4">Confirmar Eliminación</h2>
+                                  <p className="mb-4">¿Estás seguro que deseas eliminar la etiqueta de envío de este pedido?</p>
+                                  
+                                  <div className="flex justify-end gap-2">
+                                    <button 
+                                      onClick={() => setConfirmarEliminarModal(false)} 
+                                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button 
+                                      onClick={handleEliminarEtiqueta} 
+                                      disabled={loading}
+                                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                    >
+                                      {loading ? <Loading /> : 'Eliminar'}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {showUploadModal && pedidoSeleccionado && (
+                              <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                                <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                                  <h2 className="text-lg font-bold mb-4">
+                                    {pedidoSeleccionado.etiquetaEnvio ? 'Reemplazar etiqueta' : 'Subir etiqueta'}
+                                  </h2>
+
+                                  <div className="space-y-4">
+                                    <label className="block">
+                                      Número de tracking:
+                                      <input 
+                                        type="text" 
+                                        value={etiqueta || pedidoSeleccionado.trackingCode || ''} 
+                                        onChange={(e) => setEtiqueta(e.target.value)} 
+                                        className="mt-1 w-full border rounded p-2"
+                                        placeholder="Ingrese el número de tracking"
+                                      />
+                                    </label>
+
+                                    <label className="block">
+                                      Archivo (PDF, JPG, PNG):
+                                      <input 
+                                        type="file" 
+                                        accept="application/pdf,image/jpeg,image/png" 
+                                        onChange={(e) => setTrackingFile(e.target.files?.[0] || null)}
+                                        className="mt-1 block w-full text-sm text-gray-500
+                                          file:mr-4 file:py-2 file:px-4
+                                          file:rounded-md file:border-0
+                                          file:text-sm file:font-semibold
+                                          file:bg-primary file:text-white
+                                          hover:file:bg-primary-hover"
+                                      />
+                                      <p className="mt-1 text-xs text-gray-500">
+                                        Formatos aceptados: PDF, JPG, PNG (máx. 5MB)
+                                      </p>
+                                    </label>
+
+                                    {trackingFile && (
+                                      <div className="p-2 border rounded bg-gray-50">
+                                        <p className="text-sm font-medium">Archivo seleccionado:</p>
+                                        <p className="text-sm">{trackingFile.name} ({(trackingFile.size / 1024 / 1024).toFixed(2)} MB)</p>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex justify-end gap-2 mt-6">
+                                    <button 
+                                      onClick={() => {
+                                        setShowUploadModal(false);
+                                        setTrackingFile(null);
+                                        setEtiqueta('');
+                                      }} 
+                                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button 
+                                      onClick={() => handleUpload(pedidoSeleccionado)} 
+                                      disabled={loading || (!trackingFile && !etiqueta)} 
+                                      className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                      {loading ? <Loading /> : (pedidoSeleccionado.etiquetaEnvio ? 'ACTUALIZAR' : 'GUARDAR')}
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {mostrarFacturaModal && pedidoSeleccionado && (                        
                               <div className="fixed inset-0 bg-black/5 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>

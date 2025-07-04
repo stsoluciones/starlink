@@ -27,9 +27,9 @@ const orderSchema = new mongoose.Schema({
     fecha: {type: Date},
     cuit: {type: String},
     razonSocial: {type: String},
-    domicilio: {type: String},
-    codigoPostal: {type: String},
-    condicionIva: { type: String, enum: ['responsableInscripto', 'monotributista', 'exento', 'consumidorFinal'], default: 'consumidorFinal' }
+    telefono: {type: String},
+    email: {type: String},
+    condicionIva: { type: String, enum: ['Responsable Inscripto', 'Monotributista', 'IVA Exento', 'Consumidor Final'], default: 'Consumidor Final' }
   },
   direccionEnvio: {
     pais: {type: String},
@@ -59,6 +59,7 @@ const orderSchema = new mongoose.Schema({
   payerEmail: {type: String},
   metadata: mongoose.Schema.Types.Mixed,
   etiquetaEnvio: { type: String, default: '' },
+  trackingCode: { type: String, default: '' },
   paymentDetails: {
     status: {type: String},
     status_detail: {type: String},
