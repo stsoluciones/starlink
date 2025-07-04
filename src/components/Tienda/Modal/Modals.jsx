@@ -78,7 +78,6 @@ const Modal = ({ selectedProduct, closeModal, isDialog = true }) => {
               thumbnails={thumbnails}
               handleShare={(e)=>handleShare(e,selectedProduct)}
               handleAddToCart={handleAddToCart}
-              enviar={enviar}
           />
           </div>
         </section>
@@ -91,7 +90,6 @@ const Modal = ({ selectedProduct, closeModal, isDialog = true }) => {
               thumbnails={thumbnails}
               handleShare={(e)=>handleShare(e,selectedProduct)}
               handleAddToCart={handleAddToCart}
-              enviar={enviar}
           />
         </div>
       )}
