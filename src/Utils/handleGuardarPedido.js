@@ -44,7 +44,7 @@ const handleGuardarPedido = async (user, cart) => {
           cod_producto: item.cod_producto,
           foto_1_1:item.foto_1_1,
           nombre: item.nombre,
-          precio: item.precio * 0.85,
+          precio: item.precio * (1 - (item.descuento / 100)),
           quantity: item.quantity,
           titulo_de_producto: item.titulo_de_producto || '',
         })),
@@ -72,7 +72,7 @@ const handleGuardarPedido = async (user, cart) => {
         paymentId: `transf_intent_${new Date().getTime()}`,
         paymentMethod: 'transferencia',
         estado: 'pendiente',
-        total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0)* 0.85,
+        total: cart.reduce((acc, item) => acc + (item.precio * item.quantity), 0)* (1 - (item.descuento / 100)),
       }),
     });
 

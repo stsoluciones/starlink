@@ -20,6 +20,7 @@ import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
 const ShopCart = () => {
   const router = useRouter();
   const [cart, setCart] = useContext(CartContext);
+  const [descuento, setDescuento] = useState(0);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const preguntarRef = useRef(null);
@@ -47,7 +48,7 @@ useEffect(() => {
             <p class="mt-4">Una vez realizada la transferencia, por favor envíanos el comprobante a nuestro correo electrónico.</p>
           `;
 
-const handleComprar = async () => {
+const handleComprar = async (nuevoDescuento) => {
   if (cart.length === 0) {
     Swal.fire({
       icon: 'warning',
@@ -68,7 +69,9 @@ const handleComprar = async () => {
 
   try {
     setLoading(true);
-
+    console.log('descuento:',descuento);
+    console.log('nuevoDescuento:',nuevoDescuento);
+    
     const facturaPrompt = await Swal.fire({
       title: '¿Es consumidor final?',
       icon: 'question',
@@ -113,7 +116,7 @@ const handleComprar = async () => {
     const rawSubtotal = totalRef.current?.textContent?.replace('Subtotal: ', '').replace(/\./g, '').replace(',', '.').replace('$', '').trim();
     const subtotalNumber = parseFloat(rawSubtotal);
 
-    const transferenciaPrecio = subtotalNumber * 0.85;
+    const transferenciaPrecio = subtotalNumber * (1 - (nuevoDescuento / 100));
     const mercadoPagoPrecio = subtotalNumber;
 
     const formatCurrency = (num) =>
@@ -128,7 +131,7 @@ const handleComprar = async () => {
       reverseButtons: true,
       html: `
         <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 1rem;">
-          <span style="color: #15803d;">Transferencia (15% OFF)</span>
+          <span style="color: #15803d;">Transferencia (${nuevoDescuento}% OFF)</span>
           <span>MercadoPago</span>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
@@ -240,7 +243,11 @@ const handleComprar = async () => {
   }
 };
 
-
+const handleFinalizarCompra = async () => {
+  const nuevoDescuento = await cart[0]?.descuento ?? 0;
+  setDescuento(nuevoDescuento);
+  handleComprar(nuevoDescuento); 
+};
 
   //console.log('cart:',cart)
 
@@ -265,7 +272,8 @@ const handleComprar = async () => {
       )
     );
   };
-
+  
+  
   const handleDeleteAll = (e) => {
     e.preventDefault();
     Swal.fire({
@@ -349,9 +357,15 @@ const handleComprar = async () => {
                 </span>
               </div>
               <div className="flex justify-between items-center mt-4"></div>
-              <button onClick={handleComprar} disabled={loading} className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg w-full" title="Finalizar compra" aria-label="Finalizar compra">
-                {loading ? <Loading /> : 'Finalizar Compra'}
-              </button>
+                <button
+                  onClick={handleFinalizarCompra}
+                  disabled={loading}
+                  className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg w-full"
+                  title="Finalizar compra"
+                  aria-label="Finalizar compra"
+                >
+                  {loading ? <Loading /> : 'Finalizar Compra'}
+                </button>
             </div>
           </div>
         </div>

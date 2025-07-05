@@ -57,6 +57,7 @@ export default function UpdateProduct({
     foto_1_2: product.foto_1_2 || "",
     foto_1_3: product.foto_1_3 || "",
     foto_1_4: product.foto_1_4 || "",
+    descuento: product.descuento || '',
   });
 
   const marcaDropdownRef = useRef(null);

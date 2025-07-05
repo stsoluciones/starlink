@@ -85,6 +85,11 @@ const productoSchema = new mongoose.Schema({
     foto_1_4: { 
         type: String, 
         required: false 
+    },
+    descuento:{
+        type: Number,
+        required: false,
+        default: 0
     }
 });
 

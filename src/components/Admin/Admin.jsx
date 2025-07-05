@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState, Suspense } from "react";
 import dynamic from "next/dynamic";
-import ReactDOM from 'react-dom/client';
 import newFetchProductos from '../../Hooks/useNewFetchProducts';
 import { useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
@@ -176,6 +175,40 @@ export default function Admin() {
     setSection(section);
   };
 
+const handleDiscount = async (descuento) => {
+  if (typeof descuento !== 'number' || descuento <= 0 || descuento > 100) {
+    Swal.fire('Error', 'Descuento inválido', 'error');
+    return;
+  }
+
+  try {
+    Swal.fire({
+      title: 'Aplicando descuento...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    const res = await fetch('/api/updateDescuentoAll', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descuento }),
+    });
+
+    const data = await res.json();
+    Swal.close();
+
+    if (res.ok) {
+      Swal.fire('Éxito', data.message, 'success');
+      fetchProductos();
+    } else {
+      throw new Error(data.error || 'Error desconocido');
+    }
+  } catch (error) {
+    console.error(error);
+    Swal.fire('Error', 'No se pudo aplicar el descuento', 'error');
+  }
+};
+
   return (
     <Suspense fallback={<Loading/>}>
       <div className="flex flex-col min-h-screen">
@@ -191,12 +224,47 @@ export default function Admin() {
                     </div>
                     <div className="md:flex md:justify-end gap-3 grid grid-cols-5 w-full">
                       <div className="col-span-3">
-                      <button type="button" aria-label="agregar producto" className="flex items-center text-white border bg-primary hover:bg-primary-hover active:bg-primary-active font-medium w-full justify-center rounded-lg h-10 text-xs xs:text-sm px-5 py-2 text-center " onClick={() => openModal('add')}>+  Agregar producto</button>
-                      {isModalOpen && modalType === 'add' && (
-                        <AddProduct toggleModal={closeModal} isOpenModal={isModalOpen} marca={marcas} categoria={categorias} />
-                      )}
-                    </div>
+                        <button type="button" aria-label="agregar producto" className="flex items-center text-white border bg-primary hover:bg-primary-hover active:bg-primary-active font-medium w-full justify-center rounded-lg h-10 text-xs xs:text-sm px-5 py-2 text-center " onClick={() => openModal('add')}>+  Agregar producto</button>
+                        {isModalOpen && modalType === 'add' && (
+                          <AddProduct toggleModal={closeModal} isOpenModal={isModalOpen} marca={marcas} categoria={categorias} />
+                        )}
                       </div>
+                    </div>
+                    <div className="flex">
+                      <label htmlFor="descuento" className="sr-only">Descuento</label>
+                      <input
+                        type="number"
+                        id="descuento"
+                        placeholder="Descuento"
+                        step="0.01"
+                        min="0"
+                        max="90"
+                        className="w-24 text-xs md:text-sm bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                      />
+                      <button
+                        type="button"
+                        aria-label="Aplicar descuento"
+                        className="flex items-center text-white border bg-primary hover:bg-primary-hover active:bg-primary-active font-medium w-full justify-center rounded-lg h-10 text-xs xs:text-sm px-5 py-2 text-center ms-2"
+                        onClick={() => {
+                          const descuentoInput = document.getElementById('descuento');
+                          const descuento = parseFloat(descuentoInput.value.trim());
+
+                          if (!isNaN(descuento) && descuento > 0 && descuento <= 90) {
+                            handleDiscount(descuento);
+                          } else {
+                            Swal.fire({
+                              title: 'Descuento inválido',
+                              text: 'Por favor, ingresá un número válido entre 0 y 90.',
+                              icon: 'error',
+                              confirmButtonText: 'Aceptar'
+                            });
+                          }
+                        }}
+                      >
+                        Aplicar
+                      </button>
+                    </div>
+
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs md:text-base text-left text-gray-500" id="productosAdmin">
