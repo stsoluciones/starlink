@@ -154,90 +154,128 @@ const fetchUserData = async () => {
           <p className="mt-2 text-sm text-gray-600"> Actualiza tu información personal y de contacto </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div className="flex flex-col sm:col-span-1">
-              <label htmlFor="nombreCompleto">Nombre completo <span className='text-xs text-red-500'>*</span></label>
-              <Input {...register('nombreCompleto')} className="" />
-              {errors.nombreCompleto && <p className="text-red-500 text-sm">{errors.nombreCompleto.message}</p>}
-            </div>
-
-            <div className="flex flex-col sm:col-span-1">
-              <label htmlFor="correo">Correo electrónico <span className='text-xs text-red-500'>*</span></label>
-              <Input {...register('correo')} disabled className="input bg-gray-100" />
-              {errors.correo && <p className="text-red-500 text-sm">{errors.correo.message}</p>}
-            </div>
-
-            <div className="flex flex-col sm:col-span-1"> 
-              <label htmlFor="telefono">Teléfono <span className='text-red-500'>*</span> <span className='text-xs text-gray-500'>ej.(sin 0) 113631770</span></label>
-              <Input {...register('telefono')} className="input" />
-              {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
-            </div>
-
-            <div className="flex flex-col sm:col-span-1">
-              <label htmlFor="dniOCuit">DNI o CUIT<span className='text-red-500'>*</span> </label>
-              <Input {...register('dniOCuit')} className="input" />
-              {errors.dniOCuit && <p className="text-red-500 text-sm">{errors.dniOCuit.message}</p>}
-            </div>
-
-            <div className="sm:col-span-2 border-t pt-4 mt-4">
-              <h3 className="text-lg font-medium text-gray-900">Dirección</h3>
-            </div>
-
-            <div>
-              <label htmlFor="direccion.pais">País</label>
-              <Input {...register('direccion.pais')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.provincia">Provincia</label>
-              <Input {...register('direccion.provincia')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.ciudad">Ciudad</label>
-              <Input {...register('direccion.ciudad')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.codigoPostal">Código Postal</label>
-              <Input {...register('direccion.codigoPostal')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.calle">Calle</label>
-              <Input {...register('direccion.calle')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.numero">Número</label>
-              <Input {...register('direccion.numero')} className="input" />
-            </div>
-
-            <div>
-              <label htmlFor="direccion.casaOTorre">Casa o Torre</label>
-              <Input {...register('direccion.casaOTorre')} className="input" />
-            </div>
-            <div>
-              <label htmlFor="direccion.piso">Piso</label>
-              <Input {...register('direccion.piso')} className="input" />
-            </div>
-            <div>
-              <label htmlFor="direccion.depto">Depto</label>
-              <Input {...register('direccion.depto')} className="input" />
-            </div>
-            <div className='col-span-2'>
-              <label htmlFor="direccion.referencia">Referencia</label>
-              <Input {...register('direccion.referencia')} className="input" />
-            </div>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 px-4 sm:px-6"
+      >
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="flex flex-col">
+            <label htmlFor="nombreCompleto">
+              Nombre completo <span className="text-xs text-red-500">*</span>
+            </label>
+            <Input
+              {...register('nombreCompleto')}
+              className="input w-full"
+            />
+            {errors.nombreCompleto && (
+              <p className="text-red-500 text-sm">
+                {errors.nombreCompleto.message}
+              </p>
+            )}
           </div>
 
-          <div className="text-center">
-            <button type="submit" className="px-6 py-2 bg-primary text-white rounded hover:bg-primary-hover">
-              Guardar cambios
-            </button>
+          <div className="flex flex-col">
+            <label htmlFor="correo">
+              Correo electrónico <span className="text-xs text-red-500">*</span>
+            </label>
+            <Input
+              {...register('correo')}
+              disabled
+              className="input w-full bg-gray-100"
+            />
+            {errors.correo && (
+              <p className="text-red-500 text-sm">
+                {errors.correo.message}
+              </p>
+            )}
           </div>
-        </form>
+
+          <div className="flex flex-col">
+            <label htmlFor="telefono">
+              Teléfono <span className="text-red-500">*</span>{' '}
+              <span className="text-xs text-gray-500">(sin 0) 113631770</span>
+            </label>
+            <Input {...register('telefono')} className="input w-full" />
+            {errors.telefono && (
+              <p className="text-red-500 text-sm">{errors.telefono.message}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="dniOCuit">
+              DNI o CUIT <span className="text-red-500">*</span>
+            </label>
+            <Input {...register('dniOCuit')} className="input w-full" />
+            {errors.dniOCuit && (
+              <p className="text-red-500 text-sm">{errors.dniOCuit.message}</p>
+            )}
+          </div>
+
+          <div className="sm:col-span-2 border-t pt-4 mt-4">
+            <h3 className="text-lg font-medium text-gray-900">Dirección</h3>
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.pais">País</label>
+            <Input {...register('direccion.pais')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.provincia">Provincia</label>
+            <Input {...register('direccion.provincia')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.ciudad">Ciudad</label>
+            <Input {...register('direccion.ciudad')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.codigoPostal">Código Postal</label>
+            <Input {...register('direccion.codigoPostal')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.calle">Calle</label>
+            <Input {...register('direccion.calle')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.numero">Número</label>
+            <Input {...register('direccion.numero')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.casaOTorre">Casa o Torre</label>
+            <Input {...register('direccion.casaOTorre')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.piso">Piso</label>
+            <Input {...register('direccion.piso')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="direccion.depto">Depto</label>
+            <Input {...register('direccion.depto')} className="input w-full" />
+          </div>
+
+          <div className="flex flex-col sm:col-span-2">
+            <label htmlFor="direccion.referencia">Referencia</label>
+            <Input {...register('direccion.referencia')} className="input w-full" />
+          </div>
+        </div>
+
+        <div className="text-center">
+          <button
+            type="submit"
+            className="px-6 py-2 bg-primary text-white rounded hover:bg-primary-hover"
+          >
+            Guardar cambios
+          </button>
+        </div>
+      </form>
+
     </div>
   );
 };

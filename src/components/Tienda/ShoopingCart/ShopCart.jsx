@@ -158,7 +158,8 @@ const handleComprar = async (nuevoDescuento) => {
       window.location.href = compraData.init_point;
 
     } else if (result.isDismissed) {
-      const guardarPedidoData = await handleGuardarPedido(userCompleto, cart);
+      
+      const guardarPedidoData = await handleGuardarPedido(userCompleto, cart, nuevoDescuento);
       if (!guardarPedidoData.success) throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
 
       await Swal.fire({ title: 'Transferencia Bancaria', html: transferInfo, icon: 'info' });
@@ -309,9 +310,9 @@ const handleFinalizarCompra = async () => {
                     <p>{item.nombre}</p>
                     <p>{item.cod_producto}</p>
                     <div className="flex items-center gap-2 mt-2 justify-end">
-                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleDelete(item)} title="Disminuir cantidad"    aria-label="Disminuir cantidad">−</button>
+                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleDelete(item)} title="Disminuir cantidad"  aria-label="Disminuir cantidad">−</button>
                       <span className="text-blue-700 font-semibold">{item.quantity}</span>
-                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleAdd(item)} title="Aumentar cantidad"       aria-label="Aumentar cantidad">+</button>
+                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleAdd(item)} title="Aumentar cantidad"  aria-label="Aumentar cantidad">+</button>
                     </div>
                     <button onClick={() => handleDelete(item)} className="absolute top-2 right-2 text-gray-500 bg-transparent hover:bg-red-400 rounded-lg w-6 h-6 flex justify-center items-center" title="Quitar del carrito" aria-label="Quitar del carrito">
                       <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
