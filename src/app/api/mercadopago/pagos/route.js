@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import Order from "../../../../models/Order";
 import { connectDB } from "../../../../lib/mongodb";
+import userData from "@/components/constants/userData";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
@@ -59,6 +60,25 @@ export async function POST(req) {
       },
       { new: true }
     );
+    // 📨 Enviar notificación solo si el nuevo estado es "pagado"
+    if (newStatus === "pagado") {
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notificador`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clienteEmail: updatedOrder.usuarioInfo.correo,
+            clienteNombre: updatedOrder.usuarioInfo.nombreCompleto || 'Cliente',
+            estadoPedido: "pagado",
+            adminEmail: userData.email, // almacenalo en .env
+            numeroPedido: updatedOrder._id,
+            montoTotal: updatedOrder.total ?? 0,
+          }),
+        });
+      } catch (error) {
+        console.error(`⚠️ Error al notificar al cliente/admin por el pago del pedido #${updatedOrder._id}:`, error);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 

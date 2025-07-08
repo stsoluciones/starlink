@@ -56,8 +56,8 @@ const actualizarEstado = async (
       // 🔔 Notificación por correo después del cambio de estado
       try {
         const pedido = data.pedido;
-        console.log('pedido:',pedido);
-        console.log('estoy enviando la notificacion');
+        // console.log('pedido:',pedido);
+        // console.log('estoy enviando la notificacion');
         
         
         // Enviar SIEMPRE al cliente

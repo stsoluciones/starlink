@@ -69,8 +69,8 @@ const handleComprar = async (nuevoDescuento) => {
 
   try {
     setLoading(true);
-    console.log('descuento:',descuento);
-    console.log('nuevoDescuento:',nuevoDescuento);
+    // console.log('descuento:',descuento);
+    // console.log('nuevoDescuento:',nuevoDescuento);
     
     const facturaPrompt = await Swal.fire({
       title: '¿Es consumidor final?',

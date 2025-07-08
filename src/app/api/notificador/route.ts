@@ -11,12 +11,12 @@ export async function POST(req: NextRequest) {
       numeroPedido,
       montoTotal,
     } = await req.json();
-    console.log('clienteEmail:',clienteEmail)
-    console.log('clienteNombre:',clienteNombre)
-    console.log('estadoPedido:', estadoPedido)
-    console.log('adminEmail:',adminEmail)
-    console.log('numeroPedido:',numeroPedido)
-    console.log('montoTotal:',montoTotal)
+    // console.log('clienteEmail:',clienteEmail)
+    // console.log('clienteNombre:',clienteNombre)
+    // console.log('estadoPedido:', estadoPedido)
+    // console.log('adminEmail:',adminEmail)
+    // console.log('numeroPedido:',numeroPedido)
+    // console.log('montoTotal:',montoTotal)
 
     // Enviar email al cliente
     await sendEmail({
