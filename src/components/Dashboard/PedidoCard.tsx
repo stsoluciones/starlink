@@ -6,6 +6,7 @@ import Link from 'next/link';
 import actualizarEstado from "../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
 import Swal from 'sweetalert2';
 import userBank from '../constants/userBank';
+import userData from '../constants/userData';
 
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
@@ -143,7 +144,8 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
         "cancelado",
         setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
         setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
-        true // Importante: Omitir la confirmación individual de actualizarEstado
+        true, // Importante: Omitir la confirmación individual de actualizarEstado
+        userData
       )
     }
   }

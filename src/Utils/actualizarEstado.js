@@ -6,7 +6,8 @@ const actualizarEstado = async (
   nuevoEstado,
   setActualizandoId,
   setPedidos,
-  skipConfirmation = false // Nuevo parámetro con valor por defecto
+  skipConfirmation = false, // Nuevo parámetro con valor por defecto
+  userData
 ) => {
   try {
     if (!skipConfirmation) { // Solo mostrar confirmación si no se pide omitirla
@@ -52,6 +53,32 @@ const actualizarEstado = async (
       setPedidos((prev) =>
         prev.map((p) => (p._id === id ? data.pedido : p))
       );
+      // 🔔 Notificación por correo después del cambio de estado
+      try {
+        const pedido = data.pedido;
+        console.log('pedido:',pedido);
+        console.log('estoy enviando la notificacion');
+        
+        
+        // Enviar SIEMPRE al cliente
+        if (pedido.usuarioInfo.correo && pedido._id) {
+          await fetch('/api/notificador', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clienteEmail: pedido.usuarioInfo.correo,
+              clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
+              estadoPedido: pedido.estado,
+              adminEmail: pedido.estado === "pagado" && userData?.email ? userData.email : null, // solo si pagado
+              numeroPedido: pedido._id,
+              montoTotal: pedido.total ?? 0,
+            }),
+          });
+        }
+      } catch (error) {
+        console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
+      }
+
       return { success: true, pedido: data.pedido }; // Devolver un resultado puede ser útil
     } else {
       await Swal.fire({

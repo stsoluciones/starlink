@@ -6,6 +6,7 @@ import Loading from '../../Loading/Loading';
 import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
+import userData from '../../constants/userData';
 
 
 const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina, setPedidosProcesando }) => {
@@ -192,7 +193,8 @@ const generarEtiquetas = async (pedidoUnico = null) => {
             "enviado",
             setActualizandoId,
             setPedidosProcesando,
-            true
+            true,
+            userData
           )
         )
       );
@@ -212,6 +214,34 @@ const generarEtiquetas = async (pedidoUnico = null) => {
         text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
         icon: 'success'
       });
+
+    await Promise.allSettled(
+      resultados
+        .filter(r => r?.success && r.pedido && r.pedido.email && r.pedido.numeroPedido)
+        .map(async (r) => {
+          try {
+            const response = await fetch('/api/notificador', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clienteEmail: r.pedido.email,
+                clienteNombre: r.pedido.nombreCompleto || 'Cliente',
+                estadoPedido: "pagado",
+                adminEmail: userData.email, // podés usar una variable si lo querés reutilizar
+                numeroPedido: r.pedido.numeroPedido,
+                montoTotal: r.pedido.total ?? 0,
+              }),
+            });
+
+            if (!response.ok) {
+              console.error(`❌ Falló notificación para pedido #${r.pedido.numeroPedido}`);
+            }
+          } catch (error) {
+            console.error(`⚠️ Error al notificar pedido #${r.pedido.numeroPedido}:`, error);
+          }
+        })
+    );
+
 
       setSeleccionados([]);
       setTodosSeleccionados(false);
@@ -391,17 +421,17 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         </div>
 
                         {/* Datos del comprador */}
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t mt-4">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t my-4">
                           <div className="">
                             <p className="text-sm text-gray-700">{pedido.tipoFactura?.razonSocial || "Sin nombre"}</p>
                             <p className={`text-sm ${pedido.tipoFactura?.condicionIva === 'consumidorFinal'?'text-gray-500':'text-red-800 text-center px-1 rounded-md font-semibold bg-red-400'} `}>{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
                           </div>
                           <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
                           {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.direccionEnvio?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
-                          <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
+                          <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 my-1 rounded md:ml-2">
                             Ver datos de Factura
                           </button>
-                          <button onClick={() => { setPedidoSeleccionado(pedido);setMostrarEnvioModal(true) }}  className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 rounded ml-2">
+                          <button onClick={() => { setPedidoSeleccionado(pedido);setMostrarEnvioModal(true) }}  className="bg-primary my-1 hover:bg-primary text-white text-sm px-3 py-1 rounded md:ml-2">
                             Ver datos de Envío
                           </button>
                             {pedido.estado === 'enviado' && (
@@ -410,7 +440,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                   setPedidoSeleccionado(pedido);
                                   setMostrarEtiquetaModal(true);
                                 }}
-                                className={`${pedido.etiquetaEnvio ? 'bg-green-600 hover:bg-green-700' : 'bg-primary hover:bg-primary-hover'} text-white text-sm px-3 py-1 rounded ml-2`}
+                                className={`${pedido.etiquetaEnvio ? 'bg-green-600 hover:bg-green-700' : 'bg-primary hover:bg-primary-hover'} text-white my-1 text-sm px-3 py-1 rounded md:ml-2`}
                               >
                                 {pedido.etiquetaEnvio ? 'Ver Etiqueta' : 'Adj. Etiqueta'}
                               </button>

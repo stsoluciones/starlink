@@ -8,6 +8,7 @@ import Entregado from "./Entregado";
 import Todos from "./Todos";
 import cargarPedidos from "../../../Utils/cargarPedidos";
 import actualizarEstado from "../../../Utils/actualizarEstado";
+import userData from "../../constants/userData";
 
 export default function AdminPedidos() {
   const [pedidos, setPedidos] = useState([]);
@@ -48,7 +49,7 @@ export default function AdminPedidos() {
   }, [tabActivo]);
 
 const handleStados = (id, nuevoEstado) => {
-  actualizarEstado(id, nuevoEstado, setActualizandoId, setPedidos);
+  actualizarEstado(id, nuevoEstado, setActualizandoId, setPedidos,false,userData);
 };
 
   const pedidosFiltrados = pedidos.filter((pedido) => {

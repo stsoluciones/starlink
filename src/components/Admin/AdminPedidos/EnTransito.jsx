@@ -8,6 +8,7 @@ import { es } from "date-fns/locale";
 import actualizarEstado from "../../../Utils/actualizarEstado"; // Asegúrate que la ruta es correcta
 import Swal from "sweetalert2";
 import Link from "next/link";
+import userData from "../../constants/userData";
 
 // Regex simple para validar formato de ObjectId (24 caracteres hexadecimales)
 const objectIdRegex = /^[0-9a-fA-F]{24}$/;
@@ -108,7 +109,8 @@ const EnTransito= () => {
           "entregado",
           setActualizandoId, // Este setter podría usarse para mostrar un spinner individual si se quisiera
           setPedidosProcesando, // Esta función actualizará la lista local de pedidosProcesando
-          true // Importante: Omitir la confirmación individual de actualizarEstado
+          true, // Importante: Omitir la confirmación individual de actualizarEstado
+          userData
         )
       );
 
