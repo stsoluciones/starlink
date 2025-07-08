@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import Order from "../../../../models/Order";
 import { connectDB } from "../../../../lib/mongodb";
-import userData from "@/components/constants/userData";
+import userData from "../../../../components/constants/userData";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
