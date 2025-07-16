@@ -11,7 +11,8 @@ const notificador = async (pedido)=>{
                     clienteEmail: pedido.usuarioInfo.correo,
                     clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
                     estadoPedido: pedido.estado,
-                    adminEmail: pedido.trackingCode !== "" && userData?.email ? userData.email : null, // solo si pagado
+                    adminEmail: pedido.estado === 'pagado' && userData?.email ? userData.email : null, // solo si pagado
+                    tracking: pedido.trackingCode !== "",
                     numeroPedido: pedido._id,
                     montoTotal: pedido.total ?? 0,
                 }),

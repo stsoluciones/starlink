@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
       clienteNombre,
       estadoPedido,
       adminEmail,
+      tracking,
       numeroPedido,
       montoTotal,
     } = await req.json();
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Enviar email al administrador si el estado es "pagado"
-    if (estadoPedido.toLowerCase() === 'pagado') {
+    if (estadoPedido.toLowerCase() === 'pagado' || tracking !== "") {
       await sendEmail({
         to: adminEmail,
         subject: `🔔 Pedido #${numeroPedido} pagado`,
