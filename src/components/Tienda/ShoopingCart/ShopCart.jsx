@@ -220,7 +220,7 @@ const handleComprar = async (nuevoDescuento) => {
             text: 'Tu comprobante fue enviado correctamente.',
             icon: 'success',
           });
-          await notificador(pedido)
+          await notificador(pedido={guardarPedidoData})
         }
 
       } else {

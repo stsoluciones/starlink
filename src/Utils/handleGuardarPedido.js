@@ -86,7 +86,7 @@ const handleGuardarPedido = async (user, cart,nuevoDescuento) => {
     }
 
     const result = await response.json();
-    return { success: true, orderId: result.orderId };
+    return { success: true, orderId: result };
 
   } catch (error) {
     console.error('Error en handleGuardarPedido:', error);
