@@ -1,7 +1,7 @@
 import userData from "../components/constants/userData";
 
 const notificador = async (pedido)=>{
-    console.log('pedido en notificado:', pedido)
+    //console.log('pedido en notificado:', pedido)
     try{
         if (pedido.usuarioInfo.correo && pedido._id) {
             await fetch('/api/notificador', {
