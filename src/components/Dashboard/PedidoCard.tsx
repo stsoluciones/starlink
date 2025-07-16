@@ -93,11 +93,11 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   //console.log('estadoBackend:', estadoBackend);
 
   const handleUpload = async (pedido) => {
+    //console.log('pedido:',pedido)
     if (!ticketFile || !nroComprobante) {
       alert('Debes seleccionar un archivo y escribir el número de comprobante.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', ticketFile);
     formData.append('numeroComprobante', nroComprobante);
@@ -116,9 +116,28 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
         setShowUploadModal(false);
         setTicketFile(null);
         setNroComprobante('');
+
       } else {
         toast.error('Error al subir el comprobante.');
       }
+      try{
+        if (pedido.usuarioInfo.correo && pedido._id) {
+            await fetch('/api/notificador', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clienteEmail: pedido.usuarioInfo.correo,
+                clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
+                estadoPedido: pedido.estado,
+                adminEmail: pedido.trackingCode !== "" && userData?.email ? userData.email : null, // solo si pagado
+                numeroPedido: pedido._id,
+                montoTotal: pedido.total ?? 0,
+              }),
+            });
+          }
+        } catch (error) {
+          console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
+        }
     } catch (error) {
       console.error('Error al subir el ticket:', error);
       toast.error('Error al subir el ticket.');
