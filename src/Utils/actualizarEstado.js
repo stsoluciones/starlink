@@ -1,5 +1,6 @@
 // src/Utils/actualizarEstado.js
 import Swal from 'sweetalert2';
+import notificador from '../Utils/notificador';
 
 const actualizarEstado = async (
   id,
@@ -61,20 +62,21 @@ const actualizarEstado = async (
         
         
         // Enviar SIEMPRE al cliente
-        if (pedido.usuarioInfo.correo && pedido._id) {
-          await fetch('/api/notificador', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              clienteEmail: pedido.usuarioInfo.correo,
-              clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
-              estadoPedido: pedido.estado,
-              adminEmail: pedido.estado === "pagado" && userData?.email ? userData.email : null, // solo si pagado
-              numeroPedido: pedido._id,
-              montoTotal: pedido.total ?? 0,
-            }),
-          });
-        }
+        // if (pedido.usuarioInfo.correo && pedido._id) {
+        //   await fetch('/api/notificador', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //       clienteEmail: pedido.usuarioInfo.correo,
+        //       clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
+        //       estadoPedido: pedido.estado,
+        //       adminEmail: pedido.estado === "pagado" && userData?.email ? userData.email : null, // solo si pagado
+        //       numeroPedido: pedido._id,
+        //       montoTotal: pedido.total ?? 0,
+        //     }),
+        //   });
+        // }
+        await notificador(pedido)
       } catch (error) {
         console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
       }

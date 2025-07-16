@@ -7,6 +7,7 @@ import actualizarEstado from "../../Utils/actualizarEstado"; // Asegúrate que l
 import Swal from 'sweetalert2';
 import userBank from '../constants/userBank';
 import userData from '../constants/userData';
+import notificador from '../../Utils/notificador';
 
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
@@ -116,28 +117,10 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
         setShowUploadModal(false);
         setTicketFile(null);
         setNroComprobante('');
-
+        notificador(pedido)
       } else {
         toast.error('Error al subir el comprobante.');
       }
-      try{
-        if (pedido.usuarioInfo.correo && pedido._id) {
-            await fetch('/api/notificador', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                clienteEmail: pedido.usuarioInfo.correo,
-                clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
-                estadoPedido: pedido.estado,
-                adminEmail: pedido.trackingCode !== "" && userData?.email ? userData.email : null, // solo si pagado
-                numeroPedido: pedido._id,
-                montoTotal: pedido.total ?? 0,
-              }),
-            });
-          }
-        } catch (error) {
-          console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
-        }
     } catch (error) {
       console.error('Error al subir el ticket:', error);
       toast.error('Error al subir el ticket.');
@@ -172,6 +155,8 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
   const puedeSubirTicket =
     mapEstadoToTimeline(pedido.estado) === 'pendiente' &&
     pedido.paymentMethod === 'transferencia';
+
+  
           
   return (
     <div className={`border border-gray-200 rounded-lg p-1 md:p-4 hover:shadow-md transition-shadow duration-200 ${isCanceled ? 'bg-red-50' : 'bg-white'}`}>

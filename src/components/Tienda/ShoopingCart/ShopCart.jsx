@@ -16,6 +16,7 @@ import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercado';
 import FormularioFactura from '../../Perfil/FormularioFactura';
 import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
+import notificador from '../../..//Utils/notificador';
 
 const ShopCart = () => {
   const router = useRouter();
@@ -219,6 +220,7 @@ const handleComprar = async (nuevoDescuento) => {
             text: 'Tu comprobante fue enviado correctamente.',
             icon: 'success',
           });
+          await notificador(pedido)
         }
 
       } else {
