@@ -1,4 +1,4 @@
-import userData from "@/components/constants/userData";
+import userData from "../components/constants/userData";
 
 const notificador = async (pedido)=>{
     console.log('pedido en notificado:', pedido)
