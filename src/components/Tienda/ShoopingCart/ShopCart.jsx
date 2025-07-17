@@ -229,7 +229,7 @@ const handleComprar = async (nuevoDescuento) => {
           icon: 'info',
         });
       }
-
+      await notificador(guardarPedidoData.orderId)
       setCart([]);
     }
   } catch (error) {
