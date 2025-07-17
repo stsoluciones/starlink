@@ -220,6 +220,7 @@ const handleComprar = async (nuevoDescuento) => {
             text: 'Tu comprobante fue enviado correctamente.',
             icon: 'success',
           });
+          await notificador(guardarPedidoData.orderId)
         }
 
       } else {
@@ -229,7 +230,6 @@ const handleComprar = async (nuevoDescuento) => {
           icon: 'info',
         });
       }
-      await notificador(guardarPedidoData.orderId)
       setCart([]);
     }
   } catch (error) {
