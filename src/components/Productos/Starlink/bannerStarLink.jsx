@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function StarlinkMiniBanner() {
   return (
-    <section className="flex bg-gradient-to-b from-orange-800 through-orange-600 to-primary-background p-4 shadow-lg items-center justify-center" aria-label="Banner de Fuente Adaptador para Antena Starlink Mini">
+    <section className="flex bg-gradient-to-b from-primary through-orange-600 to-primary-background p-4 shadow-lg items-center justify-center" aria-label="Banner de Fuente Adaptador para Antena Starlink Mini">
 
       <article className="flex justify-between max-w-6xl w-full" role="region"  aria-labelledby="banner-heading" >
         <div className="flex w-full flex-col md:flex-row items-center">
