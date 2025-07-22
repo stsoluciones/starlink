@@ -18,9 +18,9 @@ export default function MainContent() {
       <SliderBanner />
       {/* <Banner /> */}
       {/* Middle part */}
-      <Header />
-      <Sobre />
+      {/* <Header /> */}
       <ProductGallery />
+      <Sobre />
       <SearchBase />
       <Productos />
       {/* Additional content */}

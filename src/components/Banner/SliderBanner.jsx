@@ -41,7 +41,7 @@ const SliderBanner = () => {
   const currentSlides = isMobile ? SlidesMovil : slides;
 
   return (
-    <section id='inicio' className="bg-black">
+    <section id='inicio' className="bg-black opacity-95">
       <div className="relative w-full">
         <div className="relative min-h-screen overflow-hidden rounded-lg md:h-96">
         {currentSlides.map((slide, index) => {

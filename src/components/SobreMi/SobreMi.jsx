@@ -5,8 +5,8 @@ import userData from "../constants/userData";
 const SobreMi = () => {
 
   return (
-    <section id="nosotros" className="shadow-xl shadow-blue-50" style={{textAlign:"-webkit-center"}}>
-      <article className="bg-primary-background">
+    <section id="nosotros" className="" style={{textAlign:"-webkit-center"}}>
+      <article className="">
         <div className="py-8 px-8 mx-auto max-w-6xl  sm:py-16 lg:px-6">
           <div className="max-w-6xl">
             <h2 className="mb-8 text-3xl md:text-4xl text-center font-extrabold text-primary uppercase ">¿Quines Somos?</h2>
