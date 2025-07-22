@@ -7,7 +7,7 @@ const SobreMi = () => {
   return (
     <section id="nosotros" className="" style={{textAlign:"-webkit-center"}}>
       <article className="">
-        <div className="py-8 px-8 mx-auto max-w-6xl  sm:py-16 lg:px-6">
+        <div className="py-8 px-8 mx-auto max-w-7xl  sm:py-16 lg:px-6">
           <div className="max-w-6xl">
             <h2 className="mb-8 text-3xl md:text-4xl text-center font-extrabold text-primary uppercase ">¿Quines Somos?</h2>
               <p className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">En 
