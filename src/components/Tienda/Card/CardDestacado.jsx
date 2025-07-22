@@ -53,15 +53,6 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
             height={150} 
             loading="lazy" 
             title={selectedProduct.nombre} />
-          <Image
-            className={`absolute bottom-1 right-1 inline-flex items-center justify-center bg-slate-200 hover:bg-boton-primary-hover active:bg-boton-primary-active rounded-md text-white z-10 `}
-            src={selectedProduct.usado? '/images/USADO.webp': '/images/NUEVO.webp'}
-            alt={selectedProduct.usado? 'producto usado': 'producto nuevo'}
-            title={selectedProduct.usado? 'producto usado': 'producto nuevo'}
-            loading="lazy"
-            width={selectedProduct.usado ? 112 : 64}
-            height={32}
-            />
         </div>      
       </div>
       <div className="px-5 pb-2">
@@ -74,7 +65,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
           <p className="text-xs md:text-sm font-bold text-gray-900">{selectedProduct.marca}</p>
           <a 
             href={enviar} 
-            className="w-full text-white font-medium rounded-lg text-sm px-3 py-1.5 text-center bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active" 
+            className="w-full text-white font-medium rounded-lg text-sm px-3 py-1.5 text-center bg-primary hover:bg-primary-hover active:bg-primary-active" 
             target='_blank' 
             rel="noopener noreferrer" 
             title='Consultar por WhatsApp' 

@@ -41,8 +41,8 @@ const SliderBanner = () => {
   const currentSlides = isMobile ? SlidesMovil : slides;
 
   return (
-    <section id='inicio' className="bg-black opacity-95">
-      <div className="relative w-full">
+    <section id='inicio' className="relative w-full">
+      <div>
         <div className="relative min-h-screen overflow-hidden rounded-lg md:h-96">
         {currentSlides.map((slide, index) => {
           const isActive = index === activeIndex;
@@ -53,7 +53,7 @@ const SliderBanner = () => {
               {isVideo ? (
                 <video
                   src={slide}
-                  className="block w-full h-full object-cover opacity-30"
+                  className="block w-full h-full object-cover "
                   autoPlay
                   muted
                   loop
@@ -64,7 +64,7 @@ const SliderBanner = () => {
               ) : (
                 <img
                   src={slide}
-                  className="block w-full h-full object-cover opacity-30"
+                  className="block w-full h-full object-cover"
                   alt={`Slide ${index + 1}`}
                   aria-label={`Imagen del Local ${index + 1}`}
                   title={`Imagen del Local ${index + 1}`}
@@ -75,12 +75,12 @@ const SliderBanner = () => {
         })}
 
           {/* Text overlay */}
-          <div className="absolute inset-0 flex justify-center items-center bottom-16 text-white z-10">
+          {/* <div className="absolute inset-0 flex justify-center items-center bottom-16 text-white z-10">
             <div className="text-center">
               <p className="text-[40px] md:text-[62px] text-primary leading-none font-oxanium tracking-wider"><strong>SLS</strong></p>
               <p className="text-[20px] md:text-[22px] text-secondary tracking-wide text-customBeige font-aileron font-light">SL Soluciones, para tus actividades</p>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>
