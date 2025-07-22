@@ -8,7 +8,7 @@ import SkeletonDestacado from "../Tienda/Card/SkeletonDestacados";
 import CardDestacado from "../Tienda/Card/CardDestacado";
 import Modals from "../Tienda/Modal/Modals";
 import Loading from "../Loading/Loading";
-import useProducts from "../../hooks/useProducts";
+import useProducts from "../../Hooks/useProducts";
 
 const Destacados = () => {
   const flickingRef = useRef(null);
