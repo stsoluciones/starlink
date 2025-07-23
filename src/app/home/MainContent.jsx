@@ -22,7 +22,7 @@ export default function MainContent() {
       {/* Middle part */}
       {/* <Header /> */}
       {/* <ProductGallery /> */}
-      <Sobre />
+      {/* <Sobre /> */}
       <SearchBase />
       <Productos />
       {/* Additional content */}

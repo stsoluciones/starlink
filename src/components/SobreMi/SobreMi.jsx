@@ -6,10 +6,10 @@ const SobreMi = () => {
 
   return (
     <section id="nosotros" className="" style={{textAlign:"-webkit-center"}}>
-      <article className="">
-        <div className="py-8 px-8 mx-auto max-w-7xl  sm:py-16 lg:px-6">
-          <div className="max-w-6xl">
-            <h2 className="mb-8 text-3xl md:text-4xl text-center font-extrabold text-primary uppercase ">¿Quines Somos?</h2>
+      <article className="px-4 md:pr-8 mx-auto max-w-7xl py-8 gap-2">
+        <div className="">
+          <div className="max-w-7xl">
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl text-center font-extrabold text-primary uppercase ">¿Quines Somos?</h2>
               <p className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">En 
                 <strong className="text-text-danger font-bold"> {userData.name}</strong>, nos dedicamos a la fabricación y comercialización de artículos tecnológicos diseñados para facilitar tu día a día.
               </p>
@@ -28,7 +28,7 @@ const SobreMi = () => {
               </Link> 
             </div>*/}
           </div>
-        <h2 className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">
+        <h2 className="text-gray-500 sm:text-lg md:text-xl md:hidden font-light md:max-w-7xl w-full text-justify mb-8">
           Encuentra los mejores productos y servicios aquí: <strong>Elevadores de tension, alargues, baterias</strong> y muchos accesorios como la <strong>fuente adaptador de STARLINK mini.</strong> Además contamos con Servicio de asesoramiento y envios.
         </h2>
         </div>

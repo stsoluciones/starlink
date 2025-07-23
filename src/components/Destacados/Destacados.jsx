@@ -70,6 +70,7 @@ const Destacados = () => {
   return (
     <Suspense fallback={<Loading />}>
       <section className="text-center max-w-7xl mx-auto" id="marcasDestacado">
+        <h2 className="mt-4 text-xl md:text-2xl lg:text-3xl xl:text-4xl text-center font-extrabold text-primary uppercase ">Productos Destacados</h2>
         {isModalOpen && selectedProduct && (
           <Modals closeModal={closeModal} selectedProduct={selectedProduct} />
         )}
