@@ -9,7 +9,7 @@ const SobreMi = () => {
       <article className="px-4 md:pr-8 mx-auto max-w-7xl py-8 gap-2">
         <div className="">
           <div className="max-w-7xl">
-            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl text-center font-extrabold text-primary uppercase ">¿Quines Somos?</h2>
+            <h2 className="mb-4 text-2xl md:text-3xl lg:text-4xl text-center font-extrabold text-primary uppercase ">¿Quiénes Somos?</h2>
               <p className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">En 
                 <strong className="text-text-danger font-bold"> {userData.name}</strong>, nos dedicamos a la fabricación y comercialización de artículos tecnológicos diseñados para facilitar tu día a día.
               </p>
@@ -18,7 +18,7 @@ const SobreMi = () => {
               </p>
               <h1 className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">
                 Uno de nuestros productos más destacados es el <strong>adaptador Starlink Mini para vehículos</strong>
-                , compatible con sistemas de 12 y 24 voltios, ideal para que puedas llevar tu conexión a donde vayas. Te invitamos a descubrir todo lo que tenemos para ofrecerte y ser parte de nuestras soluciones tecnológicas.
+                , compatible con sistemas de 12 y 24 voltios, ideal para que puedas llevar tu conexión a donde vayas. Te invitamos a descubrir todo lo que tenemos para ofrecerte y a ser parte de nuestras soluciones tecnológicas.
               </h1>
             {/* <div className="flex flex-col md:flex-row items-center justify-items-center justify-between mb-8">
               <Link href="/nosotros" title="Consulta">
@@ -29,7 +29,7 @@ const SobreMi = () => {
             </div>*/}
           </div>
         <h2 className="text-gray-500 sm:text-lg md:text-xl md:hidden font-light md:max-w-7xl w-full text-justify mb-8">
-          Encuentra los mejores productos y servicios aquí: <strong>Elevadores de tension, alargues, baterias</strong> y muchos accesorios como la <strong>fuente adaptador de STARLINK mini.</strong> Además contamos con Servicio de asesoramiento y envios.
+          Encuentra los mejores productos y servicios aquí: <strong>elevadores de tensión, alargues, baterías</strong> y muchos accesorios como la <strong>fuente adaptadora para Starlink Mini.</strong> Además, contamos con servicio de asesoramiento y envíos.
         </h2>
         </div>
       </article>

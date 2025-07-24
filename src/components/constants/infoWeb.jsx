@@ -5,7 +5,7 @@ export const infoWeb = {
     subtitle: 'Consulta por Whatsapp el producto que necesitas, somos de Wilde, Buenos Aires',
     contact:1136317470,
     codigoPais:54,
-    sobremi:`<strong class="text-text-danger font-bold">${userData.name}</strong>, es una Startup joven que nos dedicamos a la venta de insumos informaticos, trabajamos por whatsapp para entregas en persona y mercadoshops para quienes quieren envios.`,
+    sobremi:`<strong class="text-text-danger font-bold">${userData.name}</strong>, es una Startup joven que nos dedicamos a la venta de insumos informaticos, trabajamos por whatsapp para entregas en persona y mercadoshops para quienes quieren envíos  .`,
 };
 
 export const faqData = [
@@ -22,16 +22,14 @@ export const faqData = [
   {
     id: 3,
     question: "¿Incluye el cable para conectar a la antena?",
-    answer:"Si incluye 4 mtr de cable.",
-    linkText: "Ver ubicación en el mapa",
-    linkUrl: "http://localhost:3000.com/#nosotros"
+    answer:"Si incluye 5 mtr de cable.",
   },
   {
     id: 4,
     question: "¿La ficha es impermeable como la original ?",
     answer: "Sí, la ficha trae sello contra agua y polvo",
-    linkText: "Consulta nuestras opciones de envío",
-    linkUrl: "http://localhost:3000.com/envios"
+    // linkText: "Consulta nuestras opciones de envío",
+    // linkUrl: "http://localhost:3000.com/envíos  "
   },
   
 ];

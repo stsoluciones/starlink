@@ -31,7 +31,7 @@ async function crearEnvio(pedido, token) {
     referenciaCliente: pedido._id.toString(),
   };
 
-  const res = await fetch('https://api.andreani.com/v1/envios', {
+  const res = await fetch('https://api.andreani.com/v1/envíos  ', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

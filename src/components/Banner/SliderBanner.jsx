@@ -85,7 +85,7 @@ const SliderBanner = () => {
         </div>
       </div>
       <h2 className="text-gray-700 border-2 shadow-xl rounded-lg border-primary sm:text-lg md:text-xl font-light md:max-w-7xl w-full p-2 text-justify">
-          Encuentra los mejores productos y servicios aquí: <strong>Elevadores de tension, alargues, baterias</strong> y muchos accesorios como la <strong>fuente adaptador de STARLINK mini.</strong> Además contamos con Servicio de asesoramiento y envios.
+          Encuentra los mejores productos y servicios aquí: <strong>Elevadores de tensión, alargues, baterias</strong> y muchos accesorios como la <strong>fuente adaptador de STARLINK mini.</strong> Además contamos con Servicio de asesoramiento y envíos  .
       </h2>
 
     </section>
