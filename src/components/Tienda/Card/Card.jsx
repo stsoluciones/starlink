@@ -77,8 +77,7 @@ const Card = ({ product, handleProductSelect }) => {
             </button>
             )}
 
-            <button onClick={(e)=>handleShare(e,product)} className="absolute top-10 right-1 inline-flex items-center justify-center w-8 h-8 bg-orange-400 hover:bg-boton-primary-hover rounded-full text-white z-10"
-              disabled={product.vendido} >
+            <button onClick={(e)=>handleShare(e,product)} className="absolute top-10 right-1 inline-flex items-center justify-center w-8 h-8 bg-orange-400 hover:bg-boton-primary-hover rounded-full text-white z-10">
                 <RiShareFill />
             </button>
 
@@ -143,7 +142,6 @@ const Card = ({ product, handleProductSelect }) => {
                   title="Consultar por WhatsApp"
                   aria-label="Consultar por WhatsApp"
                   type="button"
-                  disabled={product.vendido?true:false}
                 >
                   <RiWhatsappLine size={16} /> <span>Consultar</span>
                 </button>
@@ -188,7 +186,7 @@ const Card = ({ product, handleProductSelect }) => {
               <button
                 onClick={handleComprar}
                 className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow transition duration-300 ${
-                  product.vendido ? 'bg-slate-500' : 'bg-primary hover:bg-primary-hover'
+                  product.vendido ? 'bg-slate-500 cursor-not-allowed' : 'bg-primary hover:bg-primary-hover'
                 }`}
                 title="Comprar ahora"
                 aria-label="Comprar ahora"

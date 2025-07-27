@@ -22,9 +22,24 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
     toast.success(`Agregado ${selectedProduct.nombre} (cod: ${selectedProduct.cod_producto}) al carrito.`);
   };
 
-  const icon = { ancho: 20, alto: 20, color: '#ffffff' };
-  const texto = `Hola, quería consultar por ${selectedProduct.nombre} (${selectedProduct.cod_producto}).`;
-  const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(texto)}`;
+  const handleConsult = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(enviar, '_blank');
+  };
+
+  const getProductLink = (selectedProduct) => {
+    const nombreURL = selectedProduct.nombre.replace(/\s+/g, '_');
+    return `${typeof window !== 'undefined' ? window.location.origin : ''}/productos/${nombreURL}`;
+  };
+
+  const linkProducto =  getProductLink(selectedProduct);
+
+  const consultMessage = `Hola, quería consultar por ${selectedProduct.nombre} (${selectedProduct.cod_producto}). Link: ${linkProducto}`;
+  const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(
+    consultMessage || userData.textoPredefinido
+  )}`;
+
 
   return (
     <li className="relative bg-white border border-gray-200 rounded-lg shadow min-h-56 w-52 md:min-w-60 md:min-h-80 list-none">
@@ -39,7 +54,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
             aria-label="Agregar al carrito"
             title="Agregar al carrito"
           >
-            <IconShoopingCart {...icon} />
+            <IconShoopingCart ancho={20} alto={20} color="#ffffff"  />
           </button>
 
           <Image
@@ -74,8 +89,8 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
         </div>
         <div className="flex items-center justify-between gap-2 mt-1 px-2">
           <p className="text-xs md:text-sm font-bold text-gray-900">{selectedProduct.marca}</p>
-          <a
-            href={enviar}
+          <button
+            onClick={handleConsult}
             className="text-white font-medium rounded-lg text-sm px-3 py-1.5 text-center bg-primary hover:bg-primary-hover active:bg-primary-active"
             target="_blank"
             rel="noopener noreferrer"
@@ -83,7 +98,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
             aria-label="Consultar por WhatsApp"
           >
             Consulta
-          </a>
+          </button>
         </div>
 
       </div>

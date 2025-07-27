@@ -45,6 +45,11 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                 {/* Sección de imágenes */}
                 <div id="imagenes" className="shrink-0 max-w-md lg:max-w-lg mx-auto flex flex-col justify-start" >
                 <div className="flex justify-center relative">
+                     {selectedProduct.vendido && (
+                    <p className="absolute inset-0 flex items-center justify-center text-white text-3xl font-bold bg-red-400 bg-opacity-80 rounded-t-lg grayscale">
+                        SIN STOCK
+                    </p>
+                    )}
                     {mainImage ? (
                     <Image
                         src={mainImage}
@@ -72,7 +77,7 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                         currency: 'ARS',
                     })}
                     </div>
-                    <button onClick={handleShare} className="inline-flex items-center justify-center w-10 h-10 bg-orange-400 hover:bg-green-600 rounded-full text-white z-10" disabled={selectedProduct.vendido} >
+                    <button onClick={handleShare} className="inline-flex items-center justify-center w-10 h-10 bg-orange-400 hover:bg-green-600 rounded-full text-white z-10" >
                         <RiShareFill />
                     </button>
                 </div>
@@ -148,10 +153,11 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                     {/* Botón Comprar */}
                     <button
                         onClick={handleComprar}
-                        className="flex items-center justify-center w-full md:w-1/2 px-4 py-2 gap-2 text-white rounded-md shadow transition duration-300 bg-primary hover:bg-primary-hover"
+                        className={`flex items-center justify-center w-full md:w-1/2 px-4 py-2 gap-2 text-white rounded-md shadow transition duration-300 bg-primary hover:bg-primary-hover ${selectedProduct.vendido ? 'bg-gray-400 cursor-not-allowed' : ''}`}
                         title="Comprar ahora"
                         aria-label="Comprar ahora"
                         type="button"
+                        disabled={selectedProduct.vendido}
                     >
                         <MdStore size={18} color="#ffffff" aria-label="botón para comprar" />
                         <span className="text-base">Comprar</span>
@@ -160,10 +166,11 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                     {/* Botón Agregar al Carrito */}
                     <button
                         onClick={handleAddToCart}
+                        disabled={selectedProduct.vendido}
                         type="button"
                         title="Agregar al carrito"
                         aria-label="Agregar producto al carrito"
-                        className="flex items-center justify-center w-full md:w-auto px-4 py-2 gap-2 text-gray-700 bg-white border border-gray-300 hover:bg-boton-secondary-hover rounded-lg text-sm font-medium transition"
+                        className={`flex items-center justify-center w-full md:w-auto px-4 py-2 gap-2 text-gray-700 bg-white border border-gray-300 hover:bg-boton-secondary-hover rounded-lg text-sm font-medium transition ${selectedProduct.vendido ? 'bg-gray-400 cursor-not-allowed' : ''}`}
                     >
                         <svg
                         className="w-5 h-5"
@@ -186,9 +193,11 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                     {/* Botón Consultar por WhatsApp */}
                     <button
                         onClick={handleConsult}
+                        disabled={selectedProduct.vendido}
+                        type="button"
                         title="Consultar producto por WhatsApp"
                         aria-label="Consultar producto por WhatsApp"
-                        className="flex items-center justify-center w-full md:w-auto px-4 py-2 gap-2 text-gray-700 bg-white border border-gray-300 hover:bg-boton-secondary-hover active:bg-boton-secondary-active rounded-lg text-sm font-medium transition"
+                        className={`flex items-center justify-center w-full md:w-auto px-4 py-2 gap-2 text-gray-700 bg-white border border-gray-300 hover:bg-boton-secondary-hover active:bg-boton-secondary-active rounded-lg text-sm font-medium transition ${selectedProduct.vendido ? 'bg-gray-400 cursor-not-allowed' : ''}`}
                         target="_blank"
                     >
                         CONSULTAR
