@@ -27,52 +27,65 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
   const enviar = `https://wa.me/+${userData.codigoPais}${userData.contact}?text=${encodeURIComponent(texto)}`;
 
   return (
-    <li className="relative bg-white border border-gray-200 rounded-lg shadow min-h-48 w-44 md:min-w-60 md:min-h-72 list-none">
-      <div className="flex justify-center relative" onClick={() => handleProductSelect(selectedProduct)}>
-        <button 
-          onClick={handleAddToCart} 
-          className="absolute top-1 right-1 flex items-center justify-center w-8 h-8 rounded-full text-white z-10 bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active" 
-          aria-label="Agregar al carrito"
-          title="Agregar al carrito">
-          <IconShoopingCart {...icon} />
-        </button>
-        <Image 
-          src='/images/FotoDestacados.webp' 
-          width={80} 
-          height={80} 
-          className="absolute top-[-15px] left-[-15px] xl:w-14 xl:h-14 w-10 z-10" 
-          alt="Producto destacado" 
-          loading='lazy' 
-          title='Producto destacado' />
-        <div className="rounded-lg overflow-hidden p-1">
-          <Image 
-            className="rounded-lg w-full md:w-48 md:h-48 lg:w-52 lg:h-52" 
-            src={selectedProduct.foto_1_1 || '/images/sinFoto.webp'} 
-            alt={selectedProduct.nombre} 
-            width={150} 
-            height={150} 
-            loading="lazy" 
-            title={selectedProduct.nombre} />
-        </div>      
-      </div>
-      <div className="px-5 pb-2">
-        <h2 className="text-xs md:text-sm text-start leading-tight pb-1 font-semibold tracking-tight text-gray-900 capitalize">
-          {selectedProduct.titulo_de_producto.length > 26
-            ? `${selectedProduct.titulo_de_producto.slice(0, 22)}...`
-            : selectedProduct.titulo_de_producto}
-        </h2>
-        <div className="flex items-center justify-between gap-2">
+    <li className="relative bg-white border border-gray-200 rounded-lg shadow min-h-56 w-52 md:min-w-60 md:min-h-80 list-none">
+      <div className="h-full flex flex-col">
+        <div
+          className="flex justify-center relative h-2/3"
+          onClick={() => handleProductSelect(selectedProduct)}
+        >
+          <button
+            onClick={handleAddToCart}
+            className="absolute top-1 right-1 flex items-center justify-center w-8 h-8 rounded-full text-white z-10 bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active"
+            aria-label="Agregar al carrito"
+            title="Agregar al carrito"
+          >
+            <IconShoopingCart {...icon} />
+          </button>
+
+          <Image
+            src="/images/FotoDestacados.webp"
+            width={80}
+            height={80}
+            className="absolute top-[-15px] left-[-15px] xl:w-14 xl:h-14 w-10 z-10"
+            alt="Producto destacado"
+            loading="lazy"
+            title="Producto destacado"
+          />
+
+          <div className="rounded-lg overflow-hidden p-1">
+            <Image
+              className="rounded-lg w-full md:w-48 md:h-48 lg:w-52 lg:h-52 object-contain"
+              src={selectedProduct.foto_1_1 || "/images/sinFoto.webp"}
+              alt={selectedProduct.nombre}
+              width={150}
+              height={150}
+              loading="lazy"
+              title={selectedProduct.nombre}
+            />
+          </div>
+        </div>
+
+        <div className="px-3 pt-1 pb-2 h-1/3 flex flex-col justify-between">
+          <div className="h-12 md:h-14 flex flex-col justify-between flex-wrap">
+            <h2 className="text-xs md:text-sm font-semibold tracking-tight text-gray-900 capitalize leading-snug text-wrap">
+              {selectedProduct.nombre}
+            </h2>
+          </div>
+        </div>
+        <div className="flex items-center justify-between gap-2 mt-1 px-2">
           <p className="text-xs md:text-sm font-bold text-gray-900">{selectedProduct.marca}</p>
-          <a 
-            href={enviar} 
-            className="w-full text-white font-medium rounded-lg text-sm px-3 py-1.5 text-center bg-primary hover:bg-primary-hover active:bg-primary-active" 
-            target='_blank' 
-            rel="noopener noreferrer" 
-            title='Consultar por WhatsApp' 
-            aria-label="Consultar por WhatsApp">
+          <a
+            href={enviar}
+            className="text-white font-medium rounded-lg text-sm px-3 py-1.5 text-center bg-primary hover:bg-primary-hover active:bg-primary-active"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Consultar por WhatsApp"
+            aria-label="Consultar por WhatsApp"
+          >
             Consulta
           </a>
         </div>
+
       </div>
     </li>
   );

@@ -1,15 +1,12 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import ReactDOM from 'react-dom/client';
 import { FaPlus } from "react-icons/fa";
-import { removeFromLocalStorage } from '../../../Hooks/localStorage';
-//import UploadImage from '../UploadImage'
+import Image from 'next/image';
+import UploadImage from '../UploadImage'
 import Swal from 'sweetalert2';
-
-const Loading = dynamic(() => import('../../Loading/Loading'));
-const UploadImage = dynamic(()=>import('../UploadImage'))
+import Loading from '../../Loading/Loading';
+import { removeFromLocalStorage } from '../../../Hooks/localStorage';
 
 export default function AddProduct({
     isOpenModal,
@@ -339,7 +336,7 @@ const hasImageChanges = () => {
   
                   {/* Marca */}
                   <div>
-                    <label  htmlFor="marcaAddProduct" className="block mb-2 text-sm font-medium text-gray-900" >Marca</label>
+                    <label  htmlFor="marcaAddProduct" className="block mb-2 text-sm font-medium text-gray-900" >Marca<span className='text-red-500'>*</span></label>
   
                     <div className="flex gap-4">
                       <select onChange={handleChangeInput} name="marca" id="marcaAddProduct" value={producto.marca} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
@@ -348,7 +345,7 @@ const hasImageChanges = () => {
                             <option key={index} value={marca}>
                               {marca}
                             </option>
-                          ))}
+                        ))}
                       </select>
   
                       <div className="relative" ref={marcaDropdownRef}>
@@ -358,22 +355,25 @@ const hasImageChanges = () => {
                         {isDropdownMarcaOpen && (
                           <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-40">
                             <div className="block w-full px-2 py-2 text-left text-gray-700">
-                            <input
-                              type="text"
-                              name="marcaNueva"
-                              id="marcaNueva"
-                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mb-1"
-                              placeholder="Ingrese una marca nueva"
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) => setMarcaNueva(e.target.value)}
-                              onKeyDown={(e) => {
-                                if (e.key === "Enter") handleAgregarNuevaMarca("marca", marcaNueva);
-                              }}
-                            />
-
-                            <button aria-label="agregar nueva marca" onClick={() => handleAgregarNuevaMarca("marca", marcaNueva)} className="w-full rounded-lg m-auto px-4 py-2 text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-500 focus:outline-none focus:ring-4" >
-                              AGREGAR
-                            </button>
+                              <input
+                                type="text"
+                                name="marcaNueva"
+                                id="marcaNueva"
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mb-1"
+                                placeholder="Ingrese una marca nueva"
+                                onClick={(e) => e.stopPropagation()}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter")
+                                    handleAgregarNuevaMarca(
+                                      "marca",
+                                      e.target.value
+                                    );
+                                }}
+                              />
+  
+                              <button aria-label="agregar nueva marca" onClick={() =>handleAgregarNuevaMarca("marca", document.getElementById("marcaNueva").value)} className="w-full rounded-lg m-auto px-4 py-2 text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-500 focus:outline-none focus:ring-4" >
+                                AGREGAR
+                              </button>
                             </div>
                           </div>
                         )}
@@ -383,13 +383,10 @@ const hasImageChanges = () => {
   
                   {/* Categoría */}
                   <div>
-                    <label htmlFor="categoriaAdd" className="block mb-2 text-sm font-medium text-gray-900">Categoría</label>
+                    <label htmlFor="categoriaAdd" className="block mb-2 text-sm font-medium text-gray-900">Categoría<span className='text-red-500'>*</span></label>
   
                     <div className="flex gap-4">
-                      <select onChange={handleChangeInput} name="categoria"       id="categoriaAdd"
-                        value={producto.categoria}
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                      >
+                      <select onChange={handleChangeInput} name="categoria" id="categoriaAdd" value={producto.categoria} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5">
                         <option value="" hidden>Seleccione una categoria</option>
                         {categorias.map((categoria, index) => (
                           <option key={index} value={categoria}>
@@ -411,6 +408,7 @@ const hasImageChanges = () => {
                           <FaPlus />
                         </button>
   
+  
                         {isDropdownCategoriaOpen && (
                           <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-200 rounded-lg shadow-lg z-40">
                             <div className="block w-full px-2 py-2 text-left text-gray-700">
@@ -421,14 +419,24 @@ const hasImageChanges = () => {
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mb-1 z-10"
                                 placeholder="Ingrese una categoría"
                                 onClick={(e) => e.stopPropagation()}
-                                onChange={(e) => setCategoriaNueva(e.target.value)}
                                 onKeyDown={(e) => {
-                                  if (e.key === "Enter")                           handleAgregarNuevaCategoria("categoria",categoriaNueva );
+                                  if (e.key === "Enter")
+                                    handleAgregarNuevaCategoria(
+                                      "categoria",
+                                      e.target.value
+                                    );
                                 }}
                               />
   
                               <button
-                              aria-label="agregar nueva categoria" onClick={()=> handleAgregarNuevaCategoria("categoria",categoriaNueva)}
+                              aria-label="agregar nueva categoria"
+                                onClick={() =>
+                                  handleAgregarNuevaCategoria(
+                                    "categoria",
+                                    document.getElementById("categoriaNueva")
+                                      .value
+                                  )
+                                }
                                 className="w-full rounded-lg m-auto px-4 py-2 text-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-blue-500 focus:outline-none focus:ring-4"
                               >
                                 AGREGAR
@@ -561,8 +569,8 @@ const hasImageChanges = () => {
                     <label htmlFor="destacadosAdd" className="block  text-sm font-medium text-gray-900" >Destacado?</label>
                     {/* <input onChange={handleChangeInput} type="checkbox" name="usado" id="usadoAdd" checked={producto.usado}/> */}
                     {/* <label htmlFor="usadoAdd" className="block  text-sm font-medium text-gray-900" >Usado?</label> */}
-                    {/* <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoAdd" checked={producto.vendido}/> */}
-                    {/* <label htmlFor="vendidoAdd" className="block  text-sm font-medium text-gray-900" >vendido?</label> */}
+                    <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoAdd" checked={producto.vendido}/>
+                    <label htmlFor="vendidoAdd" className="block  text-sm font-medium text-gray-900" >Sin Stock</label>
                   </div>
                 </div>
   

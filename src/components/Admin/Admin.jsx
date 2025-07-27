@@ -282,11 +282,11 @@ const handleDiscount = async (descuento) => {
                         <tbody>
                           {paginatedProducts.map((product, index) => (
                             <tr key={index} className={`border-b ${index % 2 === 0 ? "bg-gray-100" : "bg-gray-200"}`}>
-                              <th scope="row" className="px-1 py-6 md:px-4 md:py-4 font-medium text-gray-900 whitespace-nowrap">{product.nombre}</th>
-                              <th scope="row" className="px-1 py-6 md:px-4 md:py-4 font-medium text-gray-900 whitespace-nowrap">{product.precio}{product.usd?'usd':'ar'}</th>
-                              <td scope="row" className="px-1 py-6 md:px-4 md:py-4 hidden md:table-cell">{product.categoria}</td>
-                              <td scope="row" className="px-1 py-6 md:px-4 md:py-4 hidden md:table-cell">{product.marca}</td>
-                              <td scope="row" title={product.descripcion} className="px-1 py-1 md:px-4 md:py-3 text-center text-ellipsis hidden lg:table-cell">{product.descripcion.length > 50 ? `${product.descripcion.slice(0, 50)}...` : product.descripcion}</td>
+                              <th scope="row" className="px-1 py-6 md:px-4 md:py-4 font-medium text-gray-900 whitespace-nowrap text-xs uppercase">{product.nombre.length > 20 ? `${product.nombre.slice(0, 20)}...` : product.nombre}</th>
+                              <th scope="row" className="px-1 py-6 md:px-4 md:py-4 font-medium text-gray-900 whitespace-nowrap text-xs uppercase">{product.precio}{product.usd?'usd':'ar'}</th>
+                              <td scope="row" className="px-1 py-6 md:px-4 md:py-4 hidden md:table-cell text-xs uppercase">{product.categoria}</td>
+                              <td scope="row" className="px-1 py-6 md:px-4 md:py-4 hidden md:table-cell text-xs uppercase">{product.marca}</td>
+                              <td scope="row" title={product.descripcion} className="px-1 py-1 md:px-4 md:py-3 text-center text-ellipsis hidden lg:table-cell text-xs uppercase">{product.descripcion.length > 50 ? `${product.descripcion.slice(0, 50)}...` : product.descripcion}</td>
                               <td scope="row" className="px-1 py-6 md:px-4 md:py-4">
                                 <div className="flex justify-evenly items-center mx-1">
                                   <button aria-label="editar producto" id="updateProductButton" data-modal-target="updateProductModal" data-modal-toggle="updateProductModal"

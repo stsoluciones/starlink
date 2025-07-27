@@ -56,9 +56,9 @@ const Card = ({ product, handleProductSelect }) => {
   
 
   return (
-    <div className="relative sm:w-48 md:w-64 lg:w-56 xl:w-72 lg:h-80 xl:h-96 md:min-h-[320px] min-w-[150px] lg:min-h-[360px] xl:min-h-[420px] list-none cursor-pointer">
+    <div className="relative sm:w-48 md:w-64 lg:w-56 xl:w-72 lg:h-80 xl:h-96 md:min-h-[320px] min-w-[150px] lg:min-h-[410px] xl:min-h-[470px] list-none cursor-pointer shadow-md rounded-md hover:shadow-xl transition-shadow duration-300 bg-white border border-gray-200 ">
       <div
-        className="relative flex flex-col justify-between w-full h-full bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition-shadow duration-300"
+        className="relative flex flex-col justify-between w-full h-full "
         onClick={() => handleProductSelect(product)}
         role="button"
         tabIndex="0"
@@ -68,12 +68,15 @@ const Card = ({ product, handleProductSelect }) => {
           <div className="relative aspect-square">
             {product.vendido && (
               <p className="absolute inset-0 flex items-center justify-center text-white text-3xl font-bold bg-red-400 bg-opacity-80 rounded-t-lg grayscale">
-                VENDIDO
+                SIN STOCK
               </p>
             )}
+            {!product.vendido && (
             <button  onClick={handleAddToCart} className="absolute top-1 right-1 inline-flex items-center justify-center w-8 h-8 bg-boton-primary hover:bg-green-600 rounded-full text-white z-10" disabled={product.vendido} >
                 <IconShoopingCart ancho={20} alto={20} color="#ffffff" />
             </button>
+            )}
+
             <button onClick={(e)=>handleShare(e,product)} className="absolute top-10 right-1 inline-flex items-center justify-center w-8 h-8 bg-orange-400 hover:bg-boton-primary-hover rounded-full text-white z-10"
               disabled={product.vendido} >
                 <RiShareFill />
@@ -96,15 +99,19 @@ const Card = ({ product, handleProductSelect }) => {
               {product.usd ? ' usd' : ''}
             </div>
           </div>
-          <div className="px-4 py-1">
-            <h2 className="text-sm font-semibold text-gray-900 md:text-base md:font-bold text-center h-10 md:h-5">{product.nombre}</h2>
-            <p className="text-xs text-gray-700 md:text-base"><strong>Marca:</strong> {product.marca}</p>
-            <p className="text-xs text-gray-700 md:text-base h-8">
-              <strong>Categoría:</strong>  {product.categoria.length > 10 ? `${product.categoria.slice(0, 10)}...` : product.categoria}
-            </p>
+          <div className=" px-1 md:px-2 py-1 h-36">
+            <div className="h-1/2 ">
+              <h2 className="text-xs font-semibold text-gray-900 md:text-sm md:font-semibold lg:font-bold text-center h-15">{product.nombre}</h2>
+            </div>
+            <div className="h-1/2 flex flex-col justify-end py-2">
+              <p className="text-xs text-gray-700 md:text-sm "><strong>Marca:</strong> {product.marca}</p>
+              <p className="text-xs text-gray-700 md:text-sm ">
+                <strong>Categoría:</strong>  {product.categoria.length > 10 ? `${product.categoria.slice(0, 10)}...` : product.categoria}
+              </p>
+            </div>
           </div>
         </div>
-        <div className="px-2 pb-1 flex  gap-2 justify-center">
+        <div className="px-1 md:px-2 pb-1 flex  gap-2 justify-center">
           {false ? ( //modifique para que solo se vea el whatsapp
             <>
               {/* Para pantallas md (menos de xl) */}
@@ -166,18 +173,13 @@ const Card = ({ product, handleProductSelect }) => {
               </div>
             </>
           ) : (
-            <div className="flex flex-col md:flex-row gap-1">
+            <div className="flex flex-col md:flex-row gap-1 w-full">
               <button
                 onClick={handleConsult}
-                className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow transition duration-300 ${
-                  product.vendido
-                    ? 'bg-slate-500'
-                    : 'bg-primary-whats hover:bg-primary-whatsHover'
-                }`}
+                className={`flex items-center justify-center w-full md:w-1/2 px-2 py-1 gap-1 text-white rounded-md shadow bg-primary-whats hover:bg-primary-whatsHover transition duration-300`}
                 title="Consultar por WhatsApp"
                 aria-label="Consultar por WhatsApp"
                 type="button"
-                disabled={product.vendido}
               >
                 <RiWhatsappLine size={14} />
                 <span className="md:inline text-base">Consultar</span>
