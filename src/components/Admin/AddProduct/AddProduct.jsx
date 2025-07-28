@@ -7,6 +7,8 @@ import UploadImage from '../UploadImage'
 import Swal from 'sweetalert2';
 import Loading from '../../Loading/Loading';
 import { removeFromLocalStorage } from '../../../Hooks/localStorage';
+// import { Buttons } from '../../ui/Buttons';
+// import openCloudinaryWidget from '../UpdateProduct/openCloudinaryWidget';
 
 export default function AddProduct({
     isOpenModal,
@@ -580,7 +582,15 @@ const hasImageChanges = () => {
                   updateImages={handleUpdateImages}
                   handleRemoveImage={handleRemoveImage}
                 />
-  
+                {/* <Buttons
+                  onClick={openCloudinaryWidget}
+                  variant="outlined"
+                  color="secondary"
+                  className="ml-2"
+                >
+                  Editar Foto
+                </Buttons> */}
+                
                 {/* Guardar cambios */}
                 <div className="flex justify-center mt-6">
                   <button
