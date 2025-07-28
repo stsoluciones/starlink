@@ -12,9 +12,12 @@ const modalStyle = {
   maxWidth: 500,
   bgcolor: 'background.paper',
   boxShadow: 24,
-  p: 3,
   textAlign: 'center',
   borderRadius: '10px',
+  p: {
+    xs: 1,   // móviles: 8px
+    md: 3,   // desde 900px en adelante: 24px
+  },
 };
 
 export default function UploadImageEditor({ imageFile, open, onClose, onImageProcessed }) {
@@ -104,13 +107,25 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
             variant="contained"
             color="primary"
             onClick={() => handleProcess('padding')}
+              sx={{
+                fontSize: {
+                  xs: '0.75rem', // text-xs
+                  md: '1rem',    // text-base
+                  },
+                }}
           >
-            Agregar bandas blancas
+            bandas blancas
           </Button>
           <Button
             variant="contained"
             color="secondary"
             onClick={() => handleProcess('crop')}
+            sx={{
+                fontSize: {
+                  xs: '0.75rem', // text-xs
+                  md: '1rem',    // text-base
+                  },
+                }}
           >
             Recortar
           </Button>
