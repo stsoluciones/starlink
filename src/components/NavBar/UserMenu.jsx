@@ -46,8 +46,8 @@ const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
                     </button>
                     {isDropdownOpen && (
                         <div className="absolute right-0 mt-28 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-40">
-                            <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={()=>handleAdminRedirect('perfil')} aria-label="Perfil">Mi Perfil</button>
-                            <button className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100" onClick={handleLogOut} aria-label="cerrar sesion">Cerrar Sesión
+                            <button className="block w-full px-4 py-2 text-left text-primary hover:text-primary-hover" onClick={()=>handleAdminRedirect('perfil')} aria-label="Perfil">Mi Perfil</button>
+                            <button className="block w-full px-4 py-2 text-left text-primary hover:text-primary-hover" onClick={handleLogOut} aria-label="cerrar sesion">Cerrar Sesión
                             </button>
                         </div>
                     )}
@@ -55,7 +55,7 @@ const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
             ) : (
                 <div className="relative z-50 gap-2">
                     <button 
-                        className="hidden items-center justify-center text-normal uppercase md:inline-flex text-gray-900 md:text-base px-2" 
+                        className="hidden items-center justify-center text-normal uppercase md:inline-flex text-primary hover:text-primary-hover md:text-base px-2" 
                         onClick={handleGoToLogin} 
                         title="Login usuario" 
                         aria-label="Login usuario"
@@ -63,7 +63,7 @@ const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
                         Ingresar
                     </button>
                     <button 
-                        className="hidden items-center justify-center text-normal uppercase text-gray-900 md:inline-flex md:text-base px-2" 
+                        className="hidden items-center justify-center text-normal uppercase text-primary hover:text-primary-hover md:inline-flex md:text-base px-2" 
                         onClick={handleGoToRegister} 
                         title="registrar usuario" 
                         aria-label="registrar usuario"

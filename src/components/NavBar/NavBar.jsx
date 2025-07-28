@@ -85,7 +85,7 @@ const NavBar = () => {
           </div>
           <Link href='/Shopcart' className="relative block md:hidden" title="Shopcart">
             <div className={` absolute px-2 m-1 text-white rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
-            <IoCartOutline size={30} />
+            <IoCartOutline size={30} color="text-primary hover:text-primary-hover" />
           </Link>
           <button
             aria-label="menu"
@@ -107,15 +107,15 @@ const NavBar = () => {
           <ul className="flex flex-col p-4 md:p-0 mt-4 border items-center border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white text-sm md:text-md md:font-normal md:text-base">
             {Links?.map((link, key) => (
               <li key={key}>
-                <Link href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)} className={`block py-2 px-3 ${currentLink === link.href ? 'text-blue-700' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 text-sm md:text-md md:font-normal md:text-base`}     aria-current="page" onClick={() => handleLinkClick(link.href)} title={link.name.toUpperCase()}>
+                <Link href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)} className={`block py-2 px-3 font-semibold text-primary hover:text-primary-hover ${currentLink === link.href ? 'text-primary hover:text-primary-hover font-bold' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 `}     aria-current="page" onClick={() => handleLinkClick(link.href)} title={link.name.toUpperCase()}>
                   {link.name.toUpperCase()}
                 </Link>
               </li>
             ))}
-              <button className="md:hidden items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2" onClick={handleGoToLogin} title="Login usuario" aria-label="Login usuario">Ingresar</button>
+              <button className="hidden items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2" onClick={handleGoToLogin} title="Login usuario" aria-label="Login usuario">Ingresar</button>
               <Link href='/Shopcart' className='relative' title='Carrito de compras'>
                 <div className={`hidden md:block absolute text-white px-2 m-1 rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
-                <IoCartOutline size={30} className='hidden md:block' />
+                <IoCartOutline size={30} className='hidden md:block' color='text-primary hover:text-primary-hover' />
               </Link>
                 <div className="hidden md:block">
                   <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
