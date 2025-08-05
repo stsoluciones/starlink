@@ -56,7 +56,7 @@ const Card = ({ product, handleProductSelect }) => {
   
 
   return (
-    <div className="relative sm:w-48 md:w-64 lg:w-56 xl:w-72 lg:h-80 xl:h-96 md:min-h-[320px] min-w-[150px] lg:min-h-[410px] xl:min-h-[470px] list-none cursor-pointer shadow-md rounded-md hover:shadow-xl transition-shadow duration-300 bg-white border border-gray-200 ">
+    <div className={`${product.hide?'hidden':''}relative sm:w-48 md:w-64 lg:w-56 xl:w-72 lg:h-80 xl:h-96 md:min-h-[320px] min-w-[150px] lg:min-h-[410px] xl:min-h-[470px] list-none cursor-pointer shadow-md rounded-md hover:shadow-xl transition-shadow duration-300 bg-white border border-gray-200 `}>
       <div
         className="relative flex flex-col justify-between w-full h-full "
         onClick={() => handleProductSelect(product)}

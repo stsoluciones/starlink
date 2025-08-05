@@ -58,6 +58,7 @@ export default function UpdateProduct({
     foto_1_3: product.foto_1_3 || "",
     foto_1_4: product.foto_1_4 || "",
     descuento: product.descuento || '',
+    hide: product.hide || false,
   });
 
   const marcaDropdownRef = useRef(null);
@@ -542,6 +543,8 @@ export default function UpdateProduct({
                 {/* <label htmlFor="usadoUpdate" className="block  text-sm font-medium text-gray-900" >Usado?</label> */}
                 <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoUpdate" checked={producto.vendido}/> 
                 <label htmlFor="vendidoUpdate" className="block  text-sm font-medium text-gray-900" >Sin Stock</label>
+                <input onChange={handleChangeInput} type="checkbox" name="hide" id="hideAdd" checked={producto.hide}/>
+                <label htmlFor="hideAdd" className="block  text-sm font-medium text-gray-900" >Ocultar</label>
               </div>
                 
               {/* Subir Archivo */}

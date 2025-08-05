@@ -42,7 +42,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
 
 
   return (
-    <li className="relative bg-white border border-gray-200 rounded-lg shadow min-h-56 w-52 md:min-w-60 md:min-h-80 list-none">
+    <li className={`"relative bg-white border border-gray-200 rounded-lg shadow min-h-56 w-52 md:min-w-60 md:min-h-80 list-none" ${selectedProduct.hide ? 'hidden' : ''}`}>
       <div className="h-full flex flex-col">
         <div
           className="flex justify-center relative h-2/3"

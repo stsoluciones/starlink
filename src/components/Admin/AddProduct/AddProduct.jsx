@@ -58,7 +58,7 @@ export default function AddProduct({
       foto_1_3:  "",
       foto_1_4:  "",
       destacados:'',
-
+      hide: false,
     });
   
     const marcaDropdownRef = useRef(null);
@@ -573,6 +573,8 @@ const hasImageChanges = () => {
                     {/* <label htmlFor="usadoAdd" className="block  text-sm font-medium text-gray-900" >Usado?</label> */}
                     <input onChange={handleChangeInput} type="checkbox" name="vendido" id="vendidoAdd" checked={producto.vendido}/>
                     <label htmlFor="vendidoAdd" className="block  text-sm font-medium text-gray-900" >Sin Stock</label>
+                    <input onChange={handleChangeInput} type="checkbox" name="hide" id="hideAdd" checked={producto.hide}/>
+                    <label htmlFor="hideAdd" className="block  text-sm font-medium text-gray-900" >Ocultar</label>
                   </div>
                 </div>
   

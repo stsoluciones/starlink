@@ -90,6 +90,11 @@ const productoSchema = new mongoose.Schema({
         type: Number,
         required: false,
         default: 0
+    },
+    hide:{
+        type: Boolean,
+        default: false,
+        required: false
     }
 });
 

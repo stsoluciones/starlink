@@ -45,7 +45,7 @@ const Cards = ({
                     </>
                 ) : paginatedProducts.length > 0 ? ( // Solo renderiza las tarjetas si hay productos
                   paginatedProducts.map((product, i) => (
-                      <li key={i}>
+                      <li key={i} className={`${product.hide ? 'hidden' : ''}`}>
                         <Card key={product.cod_producto} product={product} handleProductSelect={handleProductSelect} />
                       </li>
                     ))
