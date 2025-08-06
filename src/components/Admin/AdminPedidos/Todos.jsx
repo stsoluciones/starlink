@@ -426,8 +426,12 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                             <p className="text-sm text-gray-700">{pedido.tipoFactura?.razonSocial || "Sin nombre"}</p>
                             <p className={`text-sm ${pedido.tipoFactura?.condicionIva === 'consumidorFinal'?'text-gray-500':'text-red-800 text-center px-1 rounded-md font-semibold bg-red-400'} `}>{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
                           </div>
+                          {console.log('pedido.usuarioInfo', pedido.usuarioInfo)}
+                          
                           <Link href={`mailto:${pedido.usuarioInfo?.correo}`} className="text-blue-600 hover:underline text-sm" >Enviar Correo</Link>
-                          {pedido.usuarioInfo?.telefono?<Link href={`https://wa.me/+54${pedido.direccionEnvio?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
+
+                          {pedido.direccionEnvio?.telefono?<Link href={`https://wa.me/+54${pedido.direccionEnvio?.telefono}`} className="text-blue-600 hover:underline text-sm" target='_blank' >WhatsApp</Link>:null}
+
                           <button onClick={() => abrirModalFactura(pedido)} className="bg-primary hover:bg-primary text-white text-sm px-3 py-1 my-1 rounded md:ml-2">
                             Ver datos de Factura
                           </button>
@@ -604,12 +608,9 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos para Factura</h2>
                                   <ul className="text-sm space-y-2">
-                                    <li><strong>Tipo:</strong> {pedidoSeleccionado.tipoFactura?.tipo}</li>
                                     <li><strong>Razón Social:</strong> {pedidoSeleccionado.tipoFactura?.razonSocial}</li>
                                     <li><strong>CUIT:</strong> {pedidoSeleccionado.tipoFactura?.cuit}</li>
                                     <li><strong>Condición IVA:</strong> {pedidoSeleccionado.tipoFactura?.condicionIva}</li>
-                                    <li><strong>Domicilio:</strong> {pedidoSeleccionado.tipoFactura?.domicilio}</li>
-                                    <li><strong>Código Postal:</strong> {pedidoSeleccionado.tipoFactura?.codigoPostal}</li>
                                     <li><strong>Fecha:</strong> {new Date(pedidoSeleccionado.tipoFactura?.fecha).toLocaleDateString('es-AR')}</li>
                                   </ul>
                                   <button onClick={cerrarModalFactura} className="mt-4 bg-gray-300 hover:bg-gray-400 text-black px-4 py-1 rounded" >Cerrar</button>

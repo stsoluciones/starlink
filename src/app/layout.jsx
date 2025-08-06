@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
           `,
         }}/>
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-7LRLRDC81W" strategy="afterInteractive"/>
+        <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="beforeInteractive" />
       </head>
       <body>
         <ShoppingCartProvider>

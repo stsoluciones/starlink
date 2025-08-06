@@ -5,33 +5,45 @@ export const infoWeb = {
     subtitle: 'Consulta por Whatsapp el producto que necesitas, somos de Wilde, Buenos Aires',
     contact:1136317470,
     codigoPais:54,
-    sobremi:`<strong class="text-text-danger font-bold">${userData.name}</strong>, es una Startup joven que nos dedicamos a la venta de insumos informaticos, trabajamos por whatsapp para entregas en persona y mercadoshops para quienes quieren envios.`,
+    sobremi:`<strong class="text-text-danger font-bold">${userData.name}</strong>, es una Startup joven que nos dedicamos a la venta de insumos informaticos, trabajamos por whatsapp para entregas en persona y mercadoshops para quienes quieren envíos  .`,
 };
 
 export const faqData = [
   {
     id: 1,
-    question: "¿Sirve para viajes largos?",
-    answer: "Si se puede usar varios dias conectado sin problema.",
+    question: "¿Puedo conectar mi antena Starlink Mini al encendedor del auto de 12 V?",
+    answer: "Sí. Con el adaptador elevador SL1230 de SL Soluciones podés conectar tu antena a cualquier toma tipo encendedor de 12 V o 24 V. Este adaptador eleva la tensión a 35 V, permitiendo que la antena funcione de manera estable, sin interrupciones y sin recalentar durante largos viajes.",
   },
   {
     id: 2,
-    question: "¿Cuanto consume?",
-    answer:"El cable en si mismo no consume nada la antena consume en promedio 30w (3 amperes).",
+    question: "¿Puedo conectar mi antena Starlink Mini directo a 12 V de la batería de mi vehículo?",
+    answer:" Sí. Con el adaptador elevador SL1230 de SL Soluciones podés conectarla directo a la batería de 12 V o 24 V, ya que este adaptador eleva la tensión a 35 V, garantizando que la antena funcione de manera estable y sin inconvenientes.",
   },
   {
     id: 3,
-    question: "¿Incluye el cable para conectar a la antena?",
-    answer:"Si incluye 4 mtr de cable.",
-    linkText: "Ver ubicación en el mapa",
-    linkUrl: "http://localhost:3000.com/#nosotros"
+    question: "¿Por qué mi antena Starlink Mini no funciona bien conectada al auto?",
+    answer:" Para que funcione correctamente necesitás colocar un elevador de tensión. El módulo SL1230 de SL Soluciones eleva la tensión a 35 V, asegurando que la antena funcione sin problemas, de manera estable y segura.",
   },
   {
     id: 4,
-    question: "¿La ficha es impermeable como la original ?",
-    answer: "Sí, la ficha trae sello contra agua y polvo",
-    linkText: "Consulta nuestras opciones de envío",
-    linkUrl: "http://localhost:3000.com/envios"
+    question: "¿Puedo conectar mi antena Starlink Mini a mis paneles solares?",
+    answer: "Sí. Para conectar tu antena a un sistema de paneles solares podés usar el módulo SL1230BAT o SL1230 de SL Soluciones. Estos módulos regulan y elevan la tensión de tu sistema a 35 V, asegurando que la antena funcione correctamente.",
+    // linkText: "Consulta nuestras opciones de envío",
+    // linkUrl: "http://localhost:3000.com/envíos  "
+  },
+  {
+    id: 5,
+    question: "¿Puedo conectar mi antena Starlink Mini a 24 V?",
+    answer: "Sí. Tanto el módulo SL1230BAT como el SL1230 de SL Soluciones funcionan sin problema con entradas de 12 V o 24 V, elevando la tensión a 35 V para que la antena opere de forma estable.",
+    // linkText: "Consulta nuestras opciones de envío",
+    // linkUrl: "http://localhost:3000.com/envíos  "
+  },
+  {
+    id: 6,
+    question: "¿Por qué mi antena Starlink Mini no funciona a 12 V?",
+    answer: "Si no utilizaste un adaptador con elevador de tensión, es muy probable que tu antena no funcione o funcione mal. Lo ideal es utilizar el módulo SL1230 o SL1230BAT de SL Soluciones, ya que eleva la tensión del vehículo a 35 V – 400 W, asegurando que a tu antena no le falte energía y funcione correctamente.",
+    // linkText: "Consulta nuestras opciones de envío",
+    // linkUrl: "http://localhost:3000.com/envíos  "
   },
   
 ];

@@ -5,9 +5,13 @@ import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import Swal from 'sweetalert2';
 import processImage from "../../Utils/proccesImage";
-import Image from "next/image";
+import NextImage from 'next/image';
+import Image from 'next/image';
+import UploadImageEditor from './UploadImageEditor';
 
 export default function UploadImage({ imagenes, updateImages, handleRemoveImage }) {
+    const [archivoNoValido, setArchivoNoValido] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
 // Inicializar el estado con URLs y archivos
   const [archivos, setArchivos] = useState(
     imagenes
@@ -32,12 +36,12 @@ export default function UploadImage({ imagenes, updateImages, handleRemoveImage 
   });
   
   // Verificar si la imagen tiene una relación de aspecto 1:1
-  const isAspectRatioOneToOne = (image) => {
-    const img2 = processImage(image)
+  const isAspectRatioOneToOne = (image, tolerance = 0.02) => {
     return new Promise((resolve, reject) => {
-      const img = document.createElement('img');
+      const img = new window.Image();
       img.onload = () => {
-        const isOneToOne = img.width === img.height;
+        const ratio = img.width / img.height;
+        const isOneToOne = Math.abs(ratio - 1) < tolerance;
         resolve(isOneToOne);
       };
       img.onerror = reject;
@@ -47,69 +51,95 @@ export default function UploadImage({ imagenes, updateImages, handleRemoveImage 
 
   // Manejar la selección de archivos
   const handleArchivoSeleccionado = async (e) => {
-    const nuevosArchivos = [...archivos];
-    const archivito = await processImage(e.target.files)
-    //console.log('archivito:', archivito);
-    
-    const filesToUpload = archivito;
+    const fileList = Array.from(e.target.files);
 
-    
-    // Verificar que no se superen los 4 archivos
-    if (archivos.length + filesToUpload.length > 4) {
-      toast.error("Solo se pueden cargar hasta 4 fotos.");
+    // Calcular cuántos espacios quedan
+    const espacioDisponible = 4 - archivos.length;
+
+    if (espacioDisponible <= 0) {
+      toast.error("Ya alcanzaste el límite de 4 fotos.");
       return;
     }
-    Swal.fire({
-      title: 'Cargando...',
-      text: 'Subiendo imagen(es), por favor espere.',
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-    for (let i = 0; i < filesToUpload.length; i++) {
-      let archivo = filesToUpload[i];
-  
-      // Verificar si el archivo es una imagen
-      if (!archivo.type.startsWith('image/')) {
+
+    if (fileList.length > espacioDisponible) {
+      toast.error(`Solo podés subir ${espacioDisponible} imagen${espacioDisponible === 1 ? '' : 'es'} más.`);
+      return;
+    }
+
+    const nuevosArchivos = [];
+
+    for (let i = 0; i < fileList.length; i++) {
+      let archivo = fileList[i];
+
+      if (!archivo.type.startsWith("image/")) {
         toast.error("Solo se pueden cargar archivos de imagen.");
         continue;
       }
-      // convertir archivs a webp y recortar para terner una relacion 1:1
+
       // Convertir HEIC a JPEG si es necesario
-      const isHEIC = archivo.type === 'image/heic' || archivo.type === 'image/heif' || archivo.name.endsWith('.heic') || archivo.name.endsWith('.heif');
+      const isHEIC =
+        archivo.type === "image/heic" ||
+        archivo.type === "image/heif" ||
+        archivo.name.endsWith(".heic") ||
+        archivo.name.endsWith(".heif");
+
       if (isHEIC) {
         try {
-          const heic2any = (await import("heic2any")).default; 
+          const heic2any = (await import("heic2any")).default;
           const convertedBlob = await heic2any({ blob: archivo, toType: "image/jpeg" });
-          archivo = new File([convertedBlob], archivo.name.replace(/\.[^/.]+$/, ".jpg"), { type: "image/jpeg" });
+          archivo = new File([convertedBlob], archivo.name.replace(/\.[^/.]+$/, ".jpg"), {
+            type: "image/jpeg",
+          });
         } catch (error) {
           console.error("Error al convertir HEIC a JPEG:", error);
           toast.error("Error al convertir archivo HEIC.");
           continue;
         }
       }
-  
-      // Verificar que el archivo no esté ya en la lista
-      const existe = archivos.some((a) => a.name === archivo.name);
-      if (!existe) {
-        // Verificar relación de aspecto 1:1
-        const isOneToOne = await isAspectRatioOneToOne(archivo);
-        if (isOneToOne) {
-          archivo.preview = URL.createObjectURL(archivo);
-          const res =await submitUpdateImage(archivo)
-          nuevosArchivos.push(res);
-        } else {
-          toast.error("La imagen debe tener una relación de aspecto 1:1.");
-        }
-      }
-    }
-  
-    setArchivos(nuevosArchivos);
-    updateImages(nuevosArchivos.map(archivo => archivo));
 
+      const yaExiste = archivos.some((a) => a.name === archivo.name);
+      if (yaExiste) continue;
+
+      const isOneToOne = await isAspectRatioOneToOne(archivo, 0.02);
+      if (!isOneToOne) {
+        Swal.close(); // cerrar loader si estaba abierto
+        setArchivoNoValido(archivo);
+        setModalOpen(true);
+        return; // detener la carga y esperar a que el usuario edite
+      }
+
+      Swal.fire({
+        title: "Cargando...",
+        text: "Subiendo imagen(es), por favor espere.",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const procesado = await processImage([archivo]);
+      const imagenFinal = procesado[0];
+      imagenFinal.preview = URL.createObjectURL(imagenFinal);
+      const res = await submitUpdateImage(imagenFinal);
+
+      if (res) nuevosArchivos.push(res);
+    }
+
+    const actualizados = [...archivos, ...nuevosArchivos];
+    setArchivos(actualizados);
+    updateImages(actualizados);
     Swal.close();
   };
+
+    const handleImageProcesada = async (imagenAjustada) => {
+      imagenAjustada.preview = URL.createObjectURL(imagenAjustada);
+      const res = await submitUpdateImage(imagenAjustada);
+      const nuevos = [...archivos, res];
+      setArchivos(nuevos);
+      updateImages(nuevos.map((a) => a));
+      setModalOpen(false);
+      setArchivoNoValido(null);
+    };
 
   // Manejar la eliminación de archivos
   const handleEliminarArchivo = async (index) => {
@@ -201,7 +231,15 @@ export default function UploadImage({ imagenes, updateImages, handleRemoveImage 
           <VisuallyHiddenInput type="file" multiple onChange={handleArchivoSeleccionado} />
         </Button>
       </div>
-
+      <UploadImageEditor
+        open={modalOpen}
+        imageFile={archivoNoValido}
+        onClose={() => {
+          setModalOpen(false);
+          setArchivoNoValido(null);
+        }}
+        onImageProcessed={handleImageProcesada}
+      />
       {archivos.length !== 0 && (
         <div className="relative pb-[50px] bg-white mt-[20px] rounded-md ">
           <div className="grid grid-cols-4 gap-4">

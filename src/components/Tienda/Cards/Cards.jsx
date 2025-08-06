@@ -34,7 +34,7 @@ const Cards = ({
                 title="Paginación de productos"
               />
             </nav>
-            <ul className="grid grid-cols-2 lg:grid-cols-3 gap-4 py-1 w-full mx-auto md:max-w-7xl px-2 sm:px-6 lg:px-8 justify-items-center">
+            <ul className="grid grid-cols-2 lg:grid-cols-3 gap-2 py-1 w-full mx-auto md:max-w-7xl px-2 sm:px-6 lg:px-8 justify-items-center">
               {isLoading ? (
                     <>
                         {[...Array(9)].map((_, i) => (
@@ -45,7 +45,7 @@ const Cards = ({
                     </>
                 ) : paginatedProducts.length > 0 ? ( // Solo renderiza las tarjetas si hay productos
                   paginatedProducts.map((product, i) => (
-                      <li key={i}>
+                      <li key={i} className={`${product.hide ? 'hidden' : ''}`}>
                         <Card key={product.cod_producto} product={product} handleProductSelect={handleProductSelect} />
                       </li>
                     ))
@@ -60,6 +60,8 @@ const Cards = ({
                 </li>
               )}
             </ul>
+            <div className="lg:pt-14 xl:pt-10">
+
             <nav aria-label="Paginación de productos" className="flex flex-col md:flex-row justify-center my-4 gap-4 items-center">
               <Pagination
                 count={Math.ceil(productos.length / itemsPerPage)}
@@ -72,8 +74,9 @@ const Cards = ({
                 shape="rounded"
                 aria-label="Paginación de productos"
                 title="Paginación de productos"
-              />
+                />
             </nav>
+                </div>
       </section>
   );
   

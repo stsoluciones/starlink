@@ -301,7 +301,7 @@ const handleFinalizarCompra = async () => {
   
   return (
     <section className="flex flex-col items-center md:items-start mb-6">
-        <article className="flex flex-col max-w-[1200px] m-2 self-center">
+        <article className="flex flex-col max-w-7xl m-2 self-center">
           <div className="flex items-end p-4">
             <Link href="/" title="Volver a la tienda" aria-label="Volver a la tienda" className="text-gray-500 bg-transparent hover:bg-gray-200 rounded-lg w-10 h-10 flex justify-center items-center">
               <svg className="w-5 h-5" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -309,20 +309,22 @@ const handleFinalizarCompra = async () => {
               </svg>
             </Link>
           </div>
-        <h1 className="md:text-3xl text-xl font-bold text-primary text-center mb-6 md:mb-10">CARRITO DE COMPRAS</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          <div className="flex flex-col m">
+        <h1 className="md:text-3xl text-xl font-bold text-primary text-center mb-6 md:mb-10 max-w-7xl mx-auto">CARRITO DE COMPRAS</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4  max-w-7xl mx-auto">
+          <div className="flex flex-col ">
             {cart.length ? (
               cart.map((item) => (
-                <div key={item.cod_producto} className="relative flex items-center shadow-xl rounded-lg bg-white border border-gray-50 gap-2 m-2 p-2">
+                <div key={item.cod_producto} className=" w-full relative flex items-center shadow-xl rounded-lg bg-white border border-gray-50 gap-2 m-2 p-2">
                   <Image src={item.foto_1_1 || producto.src} alt={item.nombre} title={item.nombre} width={112} height={112} className="m-2 max-h-28 max-w-28 min-h-28 min-w-28" loading="lazy" />
                   <div className="flex flex-col text-sm md:text-base p-2">
                     <p>{item.nombre}</p>
                     <p>{item.cod_producto}</p>
-                    <div className="flex items-center gap-2 mt-2 justify-end">
-                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleDelete(item)} title="Disminuir cantidad"  aria-label="Disminuir cantidad">−</button>
-                      <span className="text-blue-700 font-semibold">{item.quantity}</span>
-                      <button className='text-gray-700 cursor-pointer font-bold text-xl' onClick={() => handleAdd(item)} title="Aumentar cantidad"  aria-label="Aumentar cantidad">+</button>
+                    <div className="absolute bottom-2 right-2 flex justify-center items-center">
+                      <button className='text-gray-700 cursor-pointer font-bold text-2xl px-2' onClick={() => handleDelete(item)} title="Disminuir cantidad"  aria-label="Disminuir cantidad">−</button>
+                      <div className="px-2">
+                        <span className="text-blue-700 font-semibold text-3xl p">{item.quantity}</span>
+                      </div>
+                      <button className='text-gray-700 cursor-pointer font-bold text-2xl px-2' onClick={() => handleAdd(item)} title="Aumentar cantidad"  aria-label="Aumentar cantidad">+</button>
                     </div>
                     <button onClick={() => handleDelete(item)} className="absolute top-2 right-2 text-gray-500 bg-transparent hover:bg-red-400 rounded-lg w-6 h-6 flex justify-center items-center" title="Quitar del carrito" aria-label="Quitar del carrito">
                       <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -336,11 +338,11 @@ const handleFinalizarCompra = async () => {
               <EmptyCart />
             )}
             {cart.length > 0 && (
-              <div className="py-4 px-2 grid grid-cols-2">
-                <Link href="/#productos" className="h-10 w-full text-base p-2 text-white bg-secondary hover:bg-secondary-hover rounded-lg" title="Continuar seleccionando ITEMS">
-                  Continuar agregando ITEMS
+              <div className="py-4 px-2 flex flex-col md:flex-row justify-between items-center text-center uppercase">
+                <Link href="/#productos" className="h-10 w-full text-base p-2 text-white bg-secondary hover:bg-primary-hover rounded-lg" title="Continuar seleccionando ITEMS">
+                  Agregar + ITEMS
                 </Link>
-                <button onClick={handleDeleteAll} className="col-span-2 underline my-5 block text-sm"  title="Vaciar carrito" aria-label="Vaciar carrito">
+                <button onClick={handleDeleteAll} className="underline my-5 block text-sm hover:text-red-600 "  title="Vaciar carrito" aria-label="Vaciar carrito">
                   VACIAR CARRITO
                 </button>
               </div>
@@ -350,7 +352,7 @@ const handleFinalizarCompra = async () => {
           <div className="">
             <div id="resumen" className="bg-slate-100 rounded-lg shadow-xl p-7 relative flex flex-col justify-between" style={{ alignSelf: "start" }}>
               <h2 className="text-2xl mb-2">Resumen de Compra</h2>
-              <div className="grid grid-cols-1  flex-grow">
+              <div className="grid grid-cols-1  flex-grow-1 ">
                 <span ref={totalRef}>
                   <strong>Subtotal: </strong>
                   {cart.reduce((acc, item) => acc + item.precio * item.quantity, 0).toLocaleString('es-AR', {

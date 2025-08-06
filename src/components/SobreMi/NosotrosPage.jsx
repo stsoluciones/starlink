@@ -14,12 +14,12 @@ const NosotrosPage = () => {
         </header>
         <article className="mt-6 text-justify">
           <div title="Sobre SLS" aria-label="Sobre SLS">
-            <strong className="text-red-600 font-bold" title={infoWeb.title}>SLS</strong>, es una Startup joven que nos dedicamos a la venta de insumos informáticos. Trabajamos por WhatsApp para entregas en persona y MercadoShops para quienes quieren envíos.
+            <strong className="text-red-600 font-bold" title={infoWeb.title}>SLS</strong>, es una Startup joven que nos dedicamos a la venta de insumos informáticos. Trabajamos por WhatsApp para entregas en persona y Andreani para quienes quieren envíos.
           </div>
         </article>
         <article id="forma-de-trabajar" className="mt-6 text-justify">
           <h2 className="text-2xl font-semibold mb-4" title="Forma de Trabajar" >Forma de Trabajar</h2>
-          <p>
+          <p className='mt-2'>
             En <strong className="text-red-600 font-bold">SLS</strong> aceptamos productos electrónicos en consignación, tanto nuevos como usados,  para vender en nuestra web. Cada producto que recibimos es sometido a un riguroso proceso de chequeo para garantizar su funcionamiento y estado. Con base en esta evaluación, se determina una cotización justa que se publica en nuestra plataforma, permitiendo a nuestros clientes conocer y confiar en la calidad de los artículos ofrecidos.<br/>
             Actualmente aceptamos productos en Wilde, Don Bosco, Bernal y Quilmes.
           </p>

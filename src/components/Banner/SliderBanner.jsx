@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
+import SobreMi from '../SobreMi/SobreMi';
 
 
 const SliderBanner = () => {
@@ -41,49 +42,54 @@ const SliderBanner = () => {
   const currentSlides = isMobile ? SlidesMovil : slides;
 
   return (
-    <section id='inicio' className="bg-black">
-      <div className="relative w-full">
-        <div className="relative min-h-screen overflow-hidden rounded-lg md:h-96">
-        {currentSlides.map((slide, index) => {
-          const isActive = index === activeIndex;
-          const isVideo = slide.endsWith('.mp4'); // podés mejorar esto con una función más robusta si querés
+    <section id="inicio" className="w-full flex flex-col p-2 md:p-6 justify-center items-center">
+      {/* Columna Izquierda: SobreMi */}
+      <div className="flex flex-col-reverse md:flex-row items-center justify-center">
+        <div className="w-full md:w-1/2 flex justify-center items-center">
+          <SobreMi />
+        </div>
 
-          return (
-            <div key={index} className={`absolute inset-0 transition-opacity ${isVideo?'duration-1000':'duration-700'} ease-in-out ${isActive ? "opacity-100" : "opacity-0"}`} >
-              {isVideo ? (
-                <video
-                  src={slide}
-                  className="block w-full h-full object-cover opacity-30"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  title={`Video del Local ${index + 1}`}
-                  aria-label={`Video del Local ${index + 1}`}
-                />
-              ) : (
-                <img
-                  src={slide}
-                  className="block w-full h-full object-cover opacity-30"
-                  alt={`Slide ${index + 1}`}
-                  aria-label={`Imagen del Local ${index + 1}`}
-                  title={`Imagen del Local ${index + 1}`}
-                />
-              )}
-            </div>
-          );
-        })}
+        {/* Columna Derecha: Slider */}
+        <div className="w-full md:w-1/2 relative overflow-hidden shadow-lg md:shadow-none md:rounded-lg h-80 md:h-96">
+          {currentSlides.map((slide, index) => {
+            const isActive = index === activeIndex;
+            const isVideo = slide.endsWith('.mp4');
 
-          {/* Text overlay */}
-          <div className="absolute inset-0 flex justify-center items-center bottom-16 text-white z-10">
-            <div className="text-center">
-              <p className="text-[40px] md:text-[62px] text-primary leading-none font-oxanium tracking-wider"><strong>SLS</strong></p>
-              <p className="text-[20px] md:text-[22px] text-secondary tracking-wide text-customBeige font-aileron font-light">SL Soluciones, para tus actividades</p>
-            </div>
-          </div>
+            return (
+              <div key={index} className={`absolute inset-0 transition-opacity ${isVideo ? 'duration-1000' : 'duration-700'} ease-in-out ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+                {isVideo ? (
+                  <video
+                    src={slide}
+                    className="block w-full h-full object-cover"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    title={`Video del Local ${index + 1}`}
+                    aria-label={`Video del Local ${index + 1}`}
+                  />
+                ) : (
+                  <img
+                    src={slide}
+                    className="block w-full h-full object-cover"
+                    alt={`Slide ${index + 1}`}
+                    aria-label={`Imagen del Local ${index + 1}`}
+                    title={`Imagen del Local ${index + 1}`}
+                  />
+                )}
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 via-transparent to-black/20" />
+
+              </div>
+            );
+          })}
         </div>
       </div>
+      <h2 className="text-gray-700 border-2 shadow-xl rounded-lg border-primary sm:text-lg md:text-xl font-light md:max-w-7xl w-full p-2 text-justify">
+          Encuentra los mejores productos y servicios aquí: <strong>Elevadores de tensión, alargues, baterias</strong> y muchos accesorios como la <strong>fuente adaptador de STARLINK mini.</strong> Además contamos con Servicio de asesoramiento y envíos  .
+      </h2>
+
     </section>
+
   );
 };
 
