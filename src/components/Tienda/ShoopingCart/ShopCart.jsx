@@ -51,7 +51,7 @@ useEffect(() => {
             </p>
             <p><strong>CBU: </strong>${userBank.cbu}</p>
             <p><strong>Titular: </strong>${userBank.titular}</p>
-            <p><strong>Monto Total: </strong>${cart.reduce((acc, item) => (acc + item.precio * item.quantity) * 0.85, 0).toLocaleString('es-AR', {
+            <p><strong>Monto Total: </strong>${(nuevoDescuento).toLocaleString('es-AR', {
               style: 'currency',
               currency: 'ARS',
             })}</p>
