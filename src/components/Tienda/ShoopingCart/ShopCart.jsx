@@ -28,6 +28,9 @@ const ShopCart = () => {
   const preguntarRef = useRef(null);
   const totalRef = useRef(null)
 
+  const formatCurrency = (num) =>
+      num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
+
 useEffect(() => {
   if (typeof window !== "undefined") {
     const userFromStorage = getInLocalStorage('USER');
@@ -127,9 +130,6 @@ const handleComprar = async (nuevoDescuento) => {
     const transferenciaPrecio = subtotalNumber * (1 - (nuevoDescuento / 100));
     const mercadoPagoPrecio = subtotalNumber;
     setTransfer(transferenciaPrecio)
-
-    const formatCurrency = (num) =>
-      num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
 
     const result = await Swal.fire({
       title: '¿Cómo deseas pagar?',
