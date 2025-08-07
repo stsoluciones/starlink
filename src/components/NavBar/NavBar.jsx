@@ -83,7 +83,7 @@ const NavBar = () => {
               <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
             ) : (
               <button
-                className="text-gray-900 font-semibold uppercase text-sm px-2"
+                className="hidden text-primary font-semibold uppercase text-sm px-2"
                 onClick={handleGoToLogin}
                 title="Login usuario"
                 aria-label="Login usuario"
@@ -127,7 +127,7 @@ const NavBar = () => {
             {/* Desktop user buttons */}
             {!user ? (
               <button
-                className="hidden md:flex items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2"
+                className="md:flex items-center justify-center text-normal uppercase text-primary font-semibold pt-2 md:py-2 align-middle md:text-base px-2"
                 onClick={handleGoToLogin}
                 title="Login usuario"
                 aria-label="Login usuario"
