@@ -39,25 +39,6 @@ useEffect(() => {
   }
 }, []);
   
-  const transferInfo = `
-            <h2 class="text-lg font-bold mb-2">Información de Transferencia</h2>
-            <p>Por favor, realiza la transferencia a la siguiente cuenta:</p>
-            <p><strong>Banco: </strong>${userBank.banco}</p>
-            <p>
-              <strong>Alias: </strong>
-              <span id="aliasTexto">${userBank.alias}</span>
-              <button onclick="copiarAlias()" style="margin-left: 8px; background: none; border: none; cursor: pointer;" title="Copiar alias">
-                <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 24 24" width="18" fill="#F3781B">
-                  <path d="M0 0h24v24H0V0z" fill="none"/>
-                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
-                </svg>
-              </button>
-            </p>
-            <p><strong>CBU: </strong>${userBank.cbu}</p>
-            <p><strong>Titular: </strong>${userBank.titular}</p>
-            <p><strong>Monto Total: </strong>${formatCurrency(transferenciaPrecio)}</p>
-            <p class="mt-4">Una vez realizada la transferencia, por favor envíanos el comprobante a nuestro correo electrónico.</p>
-          `;
 
 const handleComprar = async (nuevoDescuento) => {
   if (cart.length === 0) {
@@ -128,8 +109,8 @@ const handleComprar = async (nuevoDescuento) => {
     const subtotalNumber = parseFloat(rawSubtotal);
 
     const transferenciaPrecio = subtotalNumber * (1 - (nuevoDescuento / 100));
+    setTransfer(transferenciaPrecio);
     const mercadoPagoPrecio = subtotalNumber;
-    setTransfer(transferenciaPrecio)
 
     const result = await Swal.fire({
       title: '¿Cómo deseas pagar?',
@@ -149,6 +130,28 @@ const handleComprar = async (nuevoDescuento) => {
         </div>
       `,
     });
+
+          const transferInfo = `
+            <h2 class="text-lg font-bold mb-2">Información de Transferencia</h2>
+            <p>Por favor, realiza la transferencia a la siguiente cuenta:</p>
+            <p><strong>Banco: </strong>${userBank.banco}</p>
+            <p>
+              <strong>Alias: </strong>
+              <span id="aliasTexto">${userBank.alias}</span>
+              <button id="btnCopiarAlias" style="margin-left: 8px; background: none; border: none; cursor: pointer;" title="Copiar alias">
+                <svg xmlns="http://www.w3.org/2000/svg" height="18" viewBox="0 0 24 24" width="18" fill="#F3781B">
+                  <path d="M0 0h24v24H0V0z" fill="none"/>
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </button>
+            </p>
+            <p><strong>CBU: </strong>${userBank.cbu}</p>
+            <p><strong>Titular: </strong>${userBank.titular}</p>
+            <p><strong>Monto Total: </strong>${formatCurrency(transferenciaPrecio)}</p>
+            <p class="mt-4">Una vez realizada la transferencia, por favor envíanos el comprobante a nuestro correo electrónico.</p>
+          `;
+          
+
     userCompleto.nombreCompleto = userCompleto.nombreCompleto || userCompleto.displayName || userCompleto.factura.razonSocial;
     userCompleto.dniOCuit = userCompleto.dniOCuit || userCompleto.factura.cuit || userCompleto.documento || ''; 
     userCompleto.telefono = userCompleto.telefono || userCompleto.direccionEnvio.telefono || userCompleto.telefono || '';
@@ -171,7 +174,37 @@ const handleComprar = async (nuevoDescuento) => {
       const guardarPedidoData = await handleGuardarPedido(userCompleto, cart, nuevoDescuento);
       if (!guardarPedidoData.success) throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
 
-      await Swal.fire({ title: 'Transferencia Bancaria', html: transferInfo, icon: 'info' });
+      await Swal.fire({
+          title: 'Transferencia Bancaria',
+          icon: 'info',
+          html: transferInfo,
+          didOpen: () => {
+            const btnCopiar = document.getElementById('btnCopiarAlias');
+            const aliasTexto = document.getElementById('aliasTexto')?.textContent;
+
+            btnCopiar?.addEventListener('click', () => {
+              if (aliasTexto) {
+                navigator.clipboard.writeText(aliasTexto.trim()).then(() => {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Alias copiado',
+                    text: `"${aliasTexto.trim()}" fue copiado al portapapeles`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                  });
+                }).catch(() => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error al copiar',
+                    text: 'No se pudo copiar el alias',
+                    timer: 2000,
+                    showConfirmButton: false,
+                  });
+                });
+              }
+            });
+          },
+        });
 
       const { isConfirmed: subirAhora } = await Swal.fire({
         title: '¿Quieres subir el comprobante ahora?',
