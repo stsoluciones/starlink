@@ -22,6 +22,7 @@ const ShopCart = () => {
   const router = useRouter();
   const [cart, setCart] = useContext(CartContext);
   const [descuento, setDescuento] = useState(0);
+  const [transfer, setTransfer] = useState(0);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const preguntarRef = useRef(null);
@@ -51,7 +52,7 @@ useEffect(() => {
             </p>
             <p><strong>CBU: </strong>${userBank.cbu}</p>
             <p><strong>Titular: </strong>${userBank.titular}</p>
-            <p><strong>Monto Total: </strong>${(nuevoDescuento).toLocaleString('es-AR', {
+            <p><strong>Monto Total: </strong>${(transfer).toLocaleString('es-AR', {
               style: 'currency',
               currency: 'ARS',
             })}</p>
@@ -128,6 +129,7 @@ const handleComprar = async (nuevoDescuento) => {
 
     const transferenciaPrecio = subtotalNumber * (1 - (nuevoDescuento / 100));
     const mercadoPagoPrecio = subtotalNumber;
+    setTransfer(transferenciaPrecio)
 
     const formatCurrency = (num) =>
       num.toLocaleString('es-AR', { style: 'currency', currency: 'ARS' });
@@ -229,9 +231,8 @@ const handleComprar = async (nuevoDescuento) => {
             text: 'Tu comprobante fue enviado correctamente.',
             icon: 'success',
           });
-          await notificador(guardarPedidoData.orderId)
         }
-
+        
       } else {
         await Swal.fire({
           title: 'Comprobante no subido',
@@ -239,6 +240,7 @@ const handleComprar = async (nuevoDescuento) => {
           icon: 'info',
         });
       }
+      await notificador(guardarPedidoData.orderId)
       setCart([]);
     }
   } catch (error) {

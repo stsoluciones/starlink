@@ -24,7 +24,9 @@ const actualizarEstado = async (
         reverseButtons: true
       });
 
-      if (!result.isConfirmed) return;
+      if (!result.isConfirmed) {
+        return { success: false, canceled: true }
+      };
     }
 
     setActualizandoId(id);
@@ -35,12 +37,19 @@ const actualizarEstado = async (
       body: JSON.stringify({ nuevoEstado }),
     });
 
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || `Error HTTP: ${res.status}`);
+    }
+
     const data = await res.json();
 
-    if (res.ok && data.success) { // Verificar res.ok también es una buena práctica
-      // No mostramos el Swal de éxito aquí si skipConfirmation es true,
-      // porque generarEtiquetas mostrará un Swal de éxito general.
-      // Sin embargo, para actualizaciones individuales (donde skipConfirmation sería false), sí es útil.
+    if (!data.success) {
+      throw new Error(data.message || 'La operación no fue exitosa');
+    }
+    
+    setPedidos(prev => prev.map(p => p._id === id ? data.pedido : p));
+
       if (!skipConfirmation) {
         await Swal.fire({
           title: '¡Actualizado!',
@@ -51,53 +60,35 @@ const actualizarEstado = async (
         });
       }
 
-      setPedidos((prev) =>
-        prev.map((p) => (p._id === id ? data.pedido : p))
-      );
       // 🔔 Notificación por correo después del cambio de estado
       try {
         const pedido = data.pedido;
-        // console.log('pedido:',pedido);
-        // console.log('estoy enviando la notificacion');
-        
-        
-        // Enviar SIEMPRE al cliente
-        // if (pedido.usuarioInfo.correo && pedido._id) {
-        //   await fetch('/api/notificador', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({
-        //       clienteEmail: pedido.usuarioInfo.correo,
-        //       clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
-        //       estadoPedido: pedido.estado,
-        //       adminEmail: pedido.estado === "pagado" && userData?.email ? userData.email : null, // solo si pagado
-        //       numeroPedido: pedido._id,
-        //       montoTotal: pedido.total ?? 0,
-        //     }),
-        //   });
-        // }
-        await notificador(pedido)
+        await notificador(pedido);
+   
       } catch (error) {
-        console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
+          console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
+          !skipConfirmation && Swal.fire({
+          title: 'Notificación fallida',
+          text: 'El estado se actualizó pero hubo un error enviando la notificación',
+          icon: 'warning',
+          timer: 3000
+        });
       }
 
       return { success: true, pedido: data.pedido }; // Devolver un resultado puede ser útil
-    } else {
-      await Swal.fire({
-        title: 'Error',
-        text: data.message || data.error || 'Error al actualizar estado', // data.error por si el backend lo envía así
-        icon: 'error'
-      });
-      return { success: false, message: data.message || data.error };
-    }
+
   } catch (err) {
     console.error("Error en actualizarEstado:", err); // Mejor log del error
+    const errorMessage = err.message.includes('HTTP') 
+      ? 'Error de conexión con el servidor' 
+      : err.message || 'Error al procesar la solicitud';
+
     await Swal.fire({
       title: 'Error de conexión',
-      text: 'No se pudo conectar con el servidor o procesar la solicitud.', // Mensaje más genérico
+      text: errorMessage, // Mensaje más genérico
       icon: 'error'
     });
-    return { success: false, message: err.message };
+    return { success: false, message: errorMessage};
   } finally {
     setActualizandoId(null);
   }

@@ -8,7 +8,6 @@ export async function POST(req: NextRequest) {
       clienteNombre,
       estadoPedido,
       adminEmail,
-      tracking,
       numeroPedido,
       montoTotal,
     } = await req.json();
@@ -56,10 +55,9 @@ export async function POST(req: NextRequest) {
     });
 
     // Enviar email al administrador si el estado es "pagado"
-    if (estadoPedido.toLowerCase() === 'pagado' || tracking !== "") {
       await sendEmail({
         to: adminEmail,
-        subject: `🔔 Pedido #${numeroPedido} pagado`,
+        subject: `🔔 Pedido #${numeroPedido} en estado ${estadoPedido}`,
         html: `
         <div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
@@ -87,7 +85,6 @@ export async function POST(req: NextRequest) {
         </div>
         `,
       });
-    }
 
     return NextResponse.json({ ok: true, message: 'Correos enviados' });
   } catch (error) {

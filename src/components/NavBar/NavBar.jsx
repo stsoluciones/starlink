@@ -9,10 +9,8 @@ import { IoCartOutline } from 'react-icons/io5';
 import { CartContext } from '../Context/ShoopingCartContext';
 import Swal from 'sweetalert2';
 import useLinks from '../../components/constants/Links';
-import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { logOutBack } from '../../lib/firebase';
-
 
 const NavBar = () => {
   const [cart, setCart] = useContext(CartContext);
@@ -51,11 +49,9 @@ const NavBar = () => {
       });
 
       if (result.isConfirmed) {
-        //console.log('Cerrando sesión en front...');
-        
-        await logOutBack(); // 🧹 Elimina cookie en el backend
-        removeFromLocalStorage('USER'); // 🧹 Elimina localStorage
-        setUser(null); // 🧹 Elimina el estado del usuario
+        await logOutBack();
+        removeFromLocalStorage('USER');
+        setUser(null);
         await Swal.fire('Sesión cerrada con éxito', '', 'success');
         router.push('/');
       }
@@ -69,7 +65,7 @@ const NavBar = () => {
   };
   
   const handleGoToLogin = () => {
-      router.push('/user/Login');
+    router.push('/user/Login');
   };
 
   return (
@@ -79,14 +75,29 @@ const NavBar = () => {
           <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-16 lg:w-20 m-2'/>
         </Link>
 
+        {/* Mobile menu and cart */}
         <div className="flex items-center gap-4 justify-between align-middle m-2">
+          {/* User menu for mobile */}
           <div className="block md:hidden align-middle items-center">
-            <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
+            {user ? (
+              <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
+            ) : (
+              <button
+                className="text-gray-900 font-semibold uppercase text-sm px-2"
+                onClick={handleGoToLogin}
+                title="Login usuario"
+                aria-label="Login usuario"
+              >
+                Ingresar
+              </button>
+            )}
           </div>
+          {/* Cart icon for mobile */}
           <Link href='/Shopcart' className="relative block md:hidden" title="Shopcart">
-            <div className={` absolute px-2 m-1 text-white rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
+            <div className={` absolute px-2 m-1 text-white rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-primary hover:bg-primary-hover active:bg-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
             <IoCartOutline size={30} color="text-primary hover:text-primary-hover" />
           </Link>
+          {/* Hamburger menu button */}
           <button
             aria-label="menu"
             data-collapse-toggle="navbar-default"
@@ -101,25 +112,38 @@ const NavBar = () => {
               <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
             </svg>
           </button>
-      </div>
+        </div>
 
+        {/* Main navigation menu */}
         <article className={`w-full md:block md:w-auto ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-default">
           <ul className="flex flex-col p-4 md:p-0 mt-4 border items-center border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-white text-sm md:text-md md:font-normal md:text-base">
             {Links?.map((link, key) => (
               <li key={key}>
-                <Link href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)} className={`block py-2 px-3 font-semibold text-primary hover:text-primary-hover ${currentLink === link.href ? 'text-primary hover:text-primary-hover font-bold' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 `}     aria-current="page" onClick={() => handleLinkClick(link.href)} title={link.name.toUpperCase()}>
+                <Link href={link.href.startsWith('/') ? link.href : (path !== '/' ? '/' + link.href : link.href)} className={`block py-2 px-3 font-semibold text-primary hover:text-primary-hover ${currentLink === link.href ? 'text-primary hover:text-primary-hover font-bold' : 'text-gray-900'} rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 `} aria-current="page" onClick={() => handleLinkClick(link.href)} title={link.name.toUpperCase()}>
                   {link.name.toUpperCase()}
                 </Link>
               </li>
             ))}
-              <button className="hidden items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2" onClick={handleGoToLogin} title="Login usuario" aria-label="Login usuario">Ingresar</button>
-              <Link href='/Shopcart' className='relative' title='Carrito de compras'>
-                <div className={`hidden md:block absolute text-white px-2 m-1 rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
-                <IoCartOutline size={30} className='hidden md:block' color='text-primary hover:text-primary-hover' />
-              </Link>
-                <div className="hidden md:block">
-                  <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
-                </div>
+            {/* Desktop user buttons */}
+            {!user ? (
+              <button
+                className="hidden md:flex items-center justify-center text-normal uppercase text-gray-900 md:text-base px-2"
+                onClick={handleGoToLogin}
+                title="Login usuario"
+                aria-label="Login usuario"
+              >
+                Ingresar
+              </button>
+            ) : (
+              <div className="hidden md:block">
+                <UserMenu user={user} toggleDropdown={toggleDropdown} isDropdownOpen={isDropdownOpen} handleLogOut={handleLogOut} />
+              </div>
+            )}
+            {/* Desktop cart icon */}
+            <Link href='/Shopcart' className='relative' title='Carrito de compras'>
+              <div className={`hidden md:block absolute text-white px-2 m-1 rounded-full right-[-10px] top-[-15px] ${quantity > 0 ? 'bg-primary hover:bg-primary-hover active:bg-primary-active block' : 'bg-transparent hidden'}`}>{quantity}</div>
+              <IoCartOutline size={30} className='hidden md:block' color='text-primary hover:text-primary-hover' />
+            </Link>
           </ul>
         </article>
       </div>
