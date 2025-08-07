@@ -11,12 +11,6 @@ export async function POST(req: NextRequest) {
       numeroPedido,
       montoTotal,
     } = await req.json();
-    // console.log('clienteEmail:',clienteEmail)
-    // console.log('clienteNombre:',clienteNombre)
-    // console.log('estadoPedido:', estadoPedido)
-    // console.log('adminEmail:',adminEmail)
-    // console.log('numeroPedido:',numeroPedido)
-    // console.log('montoTotal:',montoTotal)
 
     // Enviar email al cliente
     await sendEmail({
@@ -34,9 +28,8 @@ export async function POST(req: NextRequest) {
                 Te informamos que el estado de tu pedido <strong>#${numeroPedido}</strong> ${estadoPedido === 'pendiente' ? 'está consolidado como' : 'ha sido actualizado a'} 
                 <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
               </p>
-              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
-                Se actualizara a PAGADO cuando corroboremos el ingreso del pago.
-              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">${estadoPedido==='pendiente'? 'Se actualizara a PAGADO cuando corroboremos el ingreso del pago.':''}</p>
+
               <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
                 Gracias por confiar en nosotros. Si tenés alguna consulta, no dudes en responder a este correo.
               </p>

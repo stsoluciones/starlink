@@ -26,7 +26,6 @@ export default function SuccessPage() {
 
     return () => clearTimeout(timer); // limpieza del timeout
   }, [router]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 to-green-300 flex items-center justify-center">
       <div className="bg-primary-background shadow-xl rounded-2xl p-8 max-w-md text-center">

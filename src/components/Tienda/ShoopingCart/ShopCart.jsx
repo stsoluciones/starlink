@@ -52,10 +52,7 @@ useEffect(() => {
             </p>
             <p><strong>CBU: </strong>${userBank.cbu}</p>
             <p><strong>Titular: </strong>${userBank.titular}</p>
-            <p><strong>Monto Total: </strong>${(transfer).toLocaleString('es-AR', {
-              style: 'currency',
-              currency: 'ARS',
-            })}</p>
+            <p><strong>Monto Total: </strong>${formatCurrency(transferenciaPrecio)}</p>
             <p class="mt-4">Una vez realizada la transferencia, por favor envíanos el comprobante a nuestro correo electrónico.</p>
           `;
 

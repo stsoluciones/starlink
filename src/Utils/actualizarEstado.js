@@ -62,8 +62,8 @@ const actualizarEstado = async (
 
       // 🔔 Notificación por correo después del cambio de estado
       try {
-        const pedido = data.pedido;
-        await notificador(pedido);
+        const pedidoActualizado = data.pedido;
+        await notificador(pedidoActualizado);
    
       } catch (error) {
           console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);

@@ -1,35 +1,42 @@
+// utils/notificador.js
 import userData from "../components/constants/userData";
 
-const notificador = async (pedidoInput) => {
+
+export const notificador = async (pedidoInput) => {
+  let pedido = pedidoInput;
+
+  if (!pedido || !pedido.usuarioInfo?.correo || !pedido._id) {
+    console.error('⚠️ No se puede notificar: Faltan datos del pedido.');
+    return { success: false, error: 'Datos del pedido incompletos' };
+  }
+
   try {
-    let pedido = pedidoInput;
+    const response = await fetch('/api/notificador', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clienteEmail: pedido.usuarioInfo?.correo,
+        clienteNombre: pedido.usuarioInfo?.nombreCompleto || 'Cliente',
+        estadoPedido: pedido.estado,
+        adminEmail: userData.email,
+        numeroPedido: pedido._id,
+        montoTotal: pedido.total ?? 0,
+      }),
+    });
 
-    // Si lo que recibimos NO es un objeto completo (ej: solo el ID), hacemos fetch al backend
-    if (!pedido?.usuarioInfo || !pedido?.estado) {
-      const res = await fetch(`/api/pedidos/obtener-pedido/${pedidoInput}`);
-      const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'No se pudo obtener el pedido');
-      pedido = data.pedido;
+    const data = await response.json();
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error HTTP: ${response.status}`);
     }
 
-    // Ahora que tenemos el objeto completo del pedido, enviamos la notificación
-    if (pedido.usuarioInfo?.correo && pedido._id) {
-      await fetch('/api/notificador', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clienteEmail: pedido.usuarioInfo.correo,
-          clienteNombre: pedido.usuarioInfo.nombreCompleto || 'Cliente',
-          estadoPedido: pedido.estado,
-          adminEmail: userData?.email || null, // solo si pagado
-          tracking: pedido.trackingCode !== "",
-          numeroPedido: pedido._id,
-          montoTotal: pedido.total ?? 0,
-        }),
-      });
-    }
+    console.log(`✅ Notificación enviada para #${pedido._id}`);
+
+    return data;
   } catch (error) {
-    console.error(`Error al enviar notificación del pedido:`, error);
+    console.error(`❌ Error al notificar pedido #${pedido._id}:`, error);
+    return { success: false, error: error.message };
   }
 };
 

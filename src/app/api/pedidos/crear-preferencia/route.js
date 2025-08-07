@@ -38,6 +38,7 @@ export async function POST(req) {
           // failure: `http://localhost:3000/mp/failure`,
           success: `${userData.urlHttps}/mp/success`,
           failure: `${userData.urlHttps}/mp/failure`,
+          pending: `${userData.urlHttps}/mp/pending`,
         },
         auto_return: "approved",
       }

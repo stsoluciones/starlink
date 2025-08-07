@@ -7,9 +7,9 @@ const userData = {
     direccion:'Quilmes',
     email:'infostarlinksoluciones@gmail.com',
     textoPredefinido:'Hola, me gustaria consultar sobre, ',
-    cuil:'23xxxxxxxxxx3',
-    urlWWW:'www.starlink-beta.vercel.app',
-    urlHttps:'https://starlink-beta.vercel.app',
+    cuil:'27-33714169-8',
+    urlWWW:'www.slsoluciones.com.ar',
+    urlHttps:'https://slsoluciones.com',
     
 };
 

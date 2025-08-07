@@ -128,6 +128,12 @@ export async function POST(req) {
         message: responseMessage,
         orderId: nuevaOrden._id,
         paymentId: nuevaOrden.paymentId,
+        order: {
+          _id: nuevaOrden._id,
+          estado: nuevaOrden.estado,
+          total: nuevaOrden.total,
+          usuarioInfo: nuevaOrden.usuarioInfo,
+        },
       }),
       { status: 200, headers: { "Content-Type": "application/json" } }
     );

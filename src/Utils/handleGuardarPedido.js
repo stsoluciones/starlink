@@ -1,3 +1,5 @@
+import notificador from "./notificador";
+
 const handleGuardarPedido = async (user, cart,nuevoDescuento) => {
   // Validaciones iniciales
   if (!user?.uid) {
@@ -86,6 +88,7 @@ const handleGuardarPedido = async (user, cart,nuevoDescuento) => {
     }
 
     const result = await response.json();
+    notificador(result.order)
     return { success: true, orderId: result.orderId };
 
   } catch (error) {

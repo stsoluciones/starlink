@@ -1,5 +1,7 @@
 //app/Utils/handleGuardarPedidoMercado.js
 
+import notificador from "./notificador";
+
 const handleGuardarPedidoMercado = async (user, cart, compraData) => {
   // Validaciones iniciales
   if (!user?.uid) {
@@ -90,6 +92,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
     }
 
     const result = await response.json();
+    notificador(result.order)
     return { success: true, orderId: result.orderId };
 
   } catch (error) {
