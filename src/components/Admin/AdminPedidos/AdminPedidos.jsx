@@ -4,6 +4,7 @@ import Loading from "../../Loading/Loading";
 import EnTransito from "./EnTransito";
 import Pagados from "./Pagados";
 import Estadisticas from "./Estadisticas";
+import Cancelados from "./Cancelados";
 import Entregado from "./Entregado";
 import Todos from "./Todos";
 import cargarPedidos from "../../../Utils/cargarPedidos";
@@ -30,7 +31,8 @@ export default function AdminPedidos() {
     ESTADISTICAS: "ESTADISTICAS",
     TRANSITO: "TRANSITO",
     ENTREGADO: "ENTREGADO",
-    ENVIAR: "ENVIAR"
+    ENVIAR: "ENVIAR",
+    CANCELADOS: "CANCELADOS"
   };
 
     useEffect(() => {
@@ -86,6 +88,7 @@ const handleStados = (id, nuevoEstado) => {
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.TRANSITO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.TRANSITO)}>EN TRANSITO</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ENTREGADO ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ENTREGADO)}>ENTREGADO</button>
         <button className={`px-4 py-2 font-medium ${tabActivo === TABS.ESTADISTICAS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.ESTADISTICAS)}>ESTADISTICAS</button>
+        <button className={`px-4 py-2 font-medium ${tabActivo === TABS.CANCELADOS ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`} onClick={() => setTabActivo(TABS.CANCELADOS)}>CANCELADOS</button>
       </div>
 
       {/* Contenido de los tabs */}
@@ -100,6 +103,9 @@ const handleStados = (id, nuevoEstado) => {
       )}
       {tabActivo === TABS.ENTREGADO && (
         <Entregado />
+      )}
+      {tabActivo === TABS.CANCELADOS && (
+        <Cancelados />
       )}
       {tabActivo === TABS.ESTADISTICAS && (
         <Estadisticas />

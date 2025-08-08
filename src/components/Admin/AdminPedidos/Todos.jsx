@@ -375,6 +375,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                   </tr>
                 ) : (
                 pedidosPaginados
+                .filter(p => p.estado !== 'cancelado') 
                 .slice()
                 .sort((a, b) => new Date(b.fechaPedido) - new Date(a.fechaPedido))
                 .map((pedido) => (
