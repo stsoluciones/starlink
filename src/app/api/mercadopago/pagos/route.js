@@ -1,53 +1,43 @@
+"use server"
+// app/api/mercadopago/pagos/route.js
 import { NextResponse } from "next/server";
-import { connectDB } from "../../../../lib/mongodb";
+import { MercadoPagoConfig, Payment } from "mercadopago";
 import Order from "../../../../models/Order";
-import mercadopago from "mercadopago";
+import { connectDB } from "../../../../lib/mongodb";
 import notificador from "../../../../Utils/notificador";
 
-// Configuración MercadoPago (usar variable de entorno)
-mercadopago.configure({
-  access_token: process.env.MP_ACCESS_TOKEN,
+const client = new MercadoPagoConfig({
+  accessToken: process.env.MP_ACCESS_TOKEN,
 });
 
-export async function GET(req) {
-  await connectDB();
-
+export async function POST(req) {
   try {
-    const { searchParams } = new URL(req.url);
-    const orderId = searchParams.get("orderId");
-
-    // Validar orderId
-    if (!orderId || !orderId.match(/^[0-9a-fA-F]{24}$/)) {
-      return NextResponse.json({ success: false, message: "orderId inválido" }, { status: 400 });
-    }
-
-    // Buscar orden
+    await connectDB();
+    
+    const { orderId } = await req.json();
+    
+    // Buscar la orden en la base de datos
     const order = await Order.findById(orderId);
+    
     if (!order) {
       return NextResponse.json({ success: false, message: "Orden no encontrada" }, { status: 404 });
     }
 
-    // Si ya está pagada y aprobada en MP, no seguimos
     if (order.estado === "pagado") {
       return NextResponse.json({ success: true, message: "Orden ya está pagada", order });
     }
 
-    // Validar paymentId
     if (!order.paymentId) {
       return NextResponse.json({ success: false, message: "Orden sin paymentId" }, { status: 400 });
     }
 
-    // Consultar a MercadoPago
-    let paymentDetails;
-    try {
-      const mpResponse = await mercadopago.payment.findById(order.paymentId);
-      paymentDetails = mpResponse.body;
-    } catch (err) {
-      console.error("Error consultando MercadoPago:", err);
-      return NextResponse.json({ success: false, message: "Error consultando MercadoPago" }, { status: 500 });
-    }
+    // Obtener los detalles del pago desde MercadoPago
+    const payment = new Payment(client);
+    const paymentDetails = await payment.get({ id: order.paymentId });
+    
+    //console.log("Detalles del pago:", paymentDetails);
 
-    // Mapear estado de MP a estado interno
+    // Actualizar el estado según el estado del pago
     const statusMap = {
       approved: "pagado",
       pending: "pendiente",
@@ -60,12 +50,16 @@ export async function GET(req) {
     const mpStatus = paymentDetails.status?.toLowerCase() || "pendiente";
     const newStatus = statusMap[mpStatus] || order.estado;
 
-    // Actualizar solo si hay cambios
+    // Actualizar la orden en la base de datos
     const updatedOrder = await Order.findByIdAndUpdate(
-      orderId,
+      order._id,
       {
         estado: newStatus,
-        paymentMetadata: {
+        collectionStatus: paymentDetails.status,
+        paymentType: paymentDetails.payment_type_id,
+        merchantOrderId: paymentDetails.order?.id,
+        payerEmail: paymentDetails.payer?.email,
+        metadata: {
           id: paymentDetails.id,
           status: mpStatus,
           status_detail: paymentDetails.status_detail,
@@ -77,16 +71,25 @@ export async function GET(req) {
       },
       { new: true }
     );
-
-    // Notificar si pasó a pagado
+    // 📨 Enviar notificación solo si el nuevo estado es "pagado"
     if (newStatus === "pagado" && order.estado !== "pagado") {
-      await notificador(updatedOrder);
+      try {
+        await notificador(updatedOrder);
+      } catch (error) {
+        console.error(`⚠️ Error al notificar al cliente/admin por el pago del pedido #${updatedOrder._id}:`, error);
+      }
     }
 
-    return NextResponse.json({ success: true, order: updatedOrder });
-
+    return NextResponse.json({ 
+      success: true, 
+      order: updatedOrder,
+      paymentStatus: paymentDetails.status
+    });
   } catch (error) {
-    console.error("Error en verificación de pago:", error);
-    return NextResponse.json({ success: false, message: "Error interno" }, { status: 500 });
+    console.error("Error al verificar el pago:", error);
+    return NextResponse.json(
+      { success: false, message: "Error al verificar el pago" },
+      { status: 500 }
+    );
   }
 }
