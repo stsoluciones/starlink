@@ -1,6 +1,7 @@
 // app/api/pedidos/webhook/route.js
 import { connectDB } from '../../../../lib/mongodb';
 import Order from '../../../../models/Order'; // Asegúrate que este modelo incluye 'external_reference'
+import notificador from '../../../../Utils/notificador';
 
 function mapEstadoMP(status) {
   switch (status) {
@@ -22,8 +23,6 @@ function mapEstadoMP(status) {
 export async function POST(req) {
   try {
     const body = await req.json();
-    //console.log('📥 Webhook recibido:', body);
-
     const topic = body.type;
     const paymentId = body.data?.id;
 
@@ -73,6 +72,9 @@ export async function POST(req) {
 
     //console.log(`🔄 Actualizando orden ${order._id} (ExtRef: ${externalRefFromPayment}) con estado de MP "${mpPaymentStatus}" a estado interno "${mappedInternalStatus}"`);
 
+    const estadoAnterior = order.estado;
+    const pasaAPagado = estadoAnterior !== 'pagado' && mappedInternalStatus === 'pagado';
+
     // Actualizar pedido
     order.estado = mappedInternalStatus;
     order.paymentId = payment.id; // El ID del pago actual
@@ -104,6 +106,21 @@ export async function POST(req) {
     //console.log(`✅ Pedido ${order._id} actualizado a estado: ${mappedInternalStatus}. Payment ID: ${payment.id}`);
 
     // Aquí podrías disparar otras acciones (ej: enviar email de confirmación si 'pagado')
+
+    if (pasaAPagado && !order.pagoNotificado) {
+      try {
+        const pedidoPlano = order.toObject ? order.toObject() : JSON.parse(JSON.stringify(order));
+        const resNotif = await notificador(pedidoPlano);
+        if (!resNotif?.success) {
+          console.error('❌ Falló notificador:', resNotif?.error || resNotif);
+        } else {
+          order.pagoNotificado = true;          // ✅ marcar como notificado
+          await order.save();                   // guardar flag
+        }
+      } catch (e) {
+        console.error('❌ Error ejecutando notificador:', e);
+      }
+    }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
 
