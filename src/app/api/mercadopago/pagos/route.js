@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "../../../../lib/mongodb";
 import Order from "../../../../models/Order";
 import mercadopago from "mercadopago";
-import { notificador } from "../../../../lib/notificador";
+import notificador from "../../../../Utils/notificador";
 
 // Configuración MercadoPago (usar variable de entorno)
 mercadopago.configure({
