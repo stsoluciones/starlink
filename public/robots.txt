@@ -1,6 +1,5 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow: /user/Login
 Disallow: /Admin
-Sitemap: https://starlinksoluciones.com/sitemap.xml
+Sitemap: https://slsoluciones.com.ar/sitemap.xml
 

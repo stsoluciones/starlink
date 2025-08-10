@@ -8,44 +8,25 @@
 
 
 <url>
-  <loc>https://starlinksoluciones.com/</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
+  <loc>https://slsoluciones.com.ar/</loc>
+  <lastmod>2025-08-10T05:10:21+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
-  <loc>https://starlinksoluciones.com/nosotros</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
+  <loc>https://slsoluciones.com.ar/Shopcart</loc>
+  <lastmod>2025-08-10T05:10:21+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://starlinksoluciones.com/envíos  </loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
+  <loc>https://slsoluciones.com.ar/user/Login</loc>
+  <lastmod>2025-08-10T05:10:21+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
-  <loc>https://starlinksoluciones.com/comparativa/memoria</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
+  <loc>https://slsoluciones.com.ar/user/Register</loc>
+  <lastmod>2025-08-10T05:10:21+00:00</lastmod>
   <priority>0.80</priority>
 </url>
-<url>
-  <loc>https://starlinksoluciones.com/comparativa/fuente</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://starlinksoluciones.com/comparativa/almacenamiento</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://starlinksoluciones.com/comparativas/mothers</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
-  <priority>0.80</priority>
-</url>
-<url>
-  <loc>https://starlinksoluciones.com/productos/StarLinkmini</loc>
-  <lastmod>2025-02-10T15:07:39+00:00</lastmod>
-  <priority>0.90</priority>
-</url>
+
 
 </urlset>

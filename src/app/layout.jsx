@@ -9,7 +9,7 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no, viewport-fit=cover" />
-        <meta name="theme-color" content="#007BC7" />
+        <meta name="theme-color" content="#ffffff" />
         
         {/* ✅ Solo mantenemos los íconos y manifest */}
         <link rel="icon" href="/favicon.ico" sizes="any" type="image/x-icon" />
@@ -22,12 +22,12 @@ export default function RootLayout({ children }) {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-7LRLRDC81W', {
+              gtag('config', 'G-JCX658JJ06', {
                 page_path: window.location.pathname,
               });
           `,
         }}/>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-7LRLRDC81W" strategy="afterInteractive"/>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-JCX658JJ06" strategy="afterInteractive"/>
         <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="beforeInteractive" />
       </head>
       <body>
