@@ -2,7 +2,7 @@
 export const defaultMetadata = {
   title: 'SLSoluciones | Fuente elevadora para Starlink Mini en Argentina',
   description:
-    'Fuente elevadora para Starlink Mini: alimentación estable y portable para internet satelital. Ideal para viajes y zonas rurales. Envíos gratis a todo el país.',
+    ' En SL Soluciones existen accesorios para StarLink como: Fuente elevadora para Starlink Mini: alimentación estable y portable para internet satelital. Ideal para viajes y zonas rurales. Envíos gratis a todo el país.',
   keywords: [
     'Starlink Mini',
     'fuente elevadora',
@@ -74,7 +74,4 @@ export const defaultMetadata = {
       'Fuente elevadora para Starlink Mini. Compacta, eficiente y perfecta para zonas sin conectividad fija.',
     images: ['https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg']
   },
-
-  // Opcional pero útil para mobile/brand color en navegadores
-  themeColor: '#F3781B'
 };
