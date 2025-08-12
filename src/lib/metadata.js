@@ -1,29 +1,80 @@
 // src/lib/metadata.js
 export const defaultMetadata = {
-  title: 'Starlink Mini | Fuente elevadora de tensión - SLS',
-  description: 'Adquirí la nueva fuente elevadora de tensión para Starlink Mini: internet satelital portátil, compacto y potente. Ideal para viajes, zonas rurales o lugares sin conexión. Envíos a todo el país.',
-  keywords: 'Starlink Mini, internet satelital, internet portátil, Starlink Argentina, conexión rural, SLS, WiFi portátil, antena Starlink, conexion estable, internet de alta velocidad, Starlink, internet satelital, Starlink Mini, Starlink Argentina, Starlink SLS, Starlink Soluciones, Starlink portatil, internet rural, internet en movimiento, internet en viajes, internet en zonas rurales, internet sin limite de datos, fuente elevadora de tensión, Starlink Mini fuente elevadora de tensión, Starlink Mini Argentina, Starlink Mini SLS, Starlink Mini Soluciones, Starlink Mini portatil, Starlink Mini internet rural, Starlink Mini internet en movimiento, Starlink Mini internet en viajes, Starlink Mini internet en zonas rurales, Starlink Mini internet sin limite de datos',
+  title: 'SLSoluciones | Fuente elevadora para Starlink Mini en Argentina',
+  description:
+    'Fuente elevadora para Starlink Mini: alimentación estable y portable para internet satelital. Ideal para viajes y zonas rurales. Envíos gratis a todo el país.',
+  keywords: [
+    'Starlink Mini',
+    'fuente elevadora',
+    'internet satelital',
+    'Argentina',
+    'WiFi portátil',
+    'conexión rural',
+    'SLS Soluciones'
+  ].join(', '),
   charSet: 'UTF-8',
-  icons: '/favicon.ico',
+
+  // Si usás Next 13/14 con "metadataBase", aprovechá URLs absolutas:
+  // metadataBase: new URL('https://slsoluciones.com.ar'),
+
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png' // ideal 180x180
+  },
+
   manifest: '/manifest.json',
-  robots: '/robots.txt',
-  authors: [{ name: 'SLS', url: 'slsoluciones.com.ar' }],
-  publisher: 'SLS | Internet Satelital y Tecnología de Conectividad',
-  openGraph: {
-    title: 'Starlink Mini | Internet satelital portátil de alta velocidad - SLS',
-    description: 'Adquirí el nuevo Starlink Mini: internet satelital portátil, compacto y potente. Ideal para viajes, zonas rurales o lugares sin conexión. Envíos a todo el país.',
-    type: 'website',
-    url: 'https://slsoluciones.com.ar/',
-    image: 'https://slsoluciones.com.ar/logos/logoSLS.webp',
+
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1
+    }
   },
-  twitter: {
-    card: 'summary_large_image',
-    site: '@starlinksoluciones',
-    title: 'Starlink Mini | Internet satelital portátil de alta velocidad - SLS',
-    description: 'Adquirí el nuevo Starlink Mini: internet satelital portátil, compacto y potente. Ideal para viajes, zonas rurales o lugares sin conexión. Envíos a todo el país.',
-    images: [{ url: 'https://slsoluciones.com.ar/logos/logoSLS.webp' }],
-  },
+
+  authors: [{ name: 'SLS', url: 'https://slsoluciones.com.ar' }, {name:'Gonzalo Torres Grau', url: 'https://gonzalotorresgrau.com'}],
+  publisher: 'SLSoluciones | Internet Satelital y Conectividad',
+
   alternates: {
     canonical: 'https://slsoluciones.com.ar/',
-  }
+    languages: {
+      'es-AR': 'https://slsoluciones.com.ar/'
+    }
+  },
+
+  openGraph: {
+    title: 'SLSoluciones | Fuente elevadora para Starlink Mini en Argentina',
+    description:
+      'Alimentación confiable para Starlink Mini. Compacta, eficiente y lista para tus viajes. Envíos gratis a todo el país.',
+    type: 'website',
+    url: 'https://slsoluciones.com.ar/',
+    siteName: 'SLS Soluciones',
+    locale: 'es_AR',
+    images: [
+      {
+        url: 'https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg', // 1200x630 recomendado
+        width: 1200,
+        height: 630,
+        alt: 'Fuente elevadora para Starlink Mini - SLSoluciones'
+      }
+    ]
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    site: '@slsoluciones',
+    title: 'SLSoluciones | Fuente para Starlink Mini en Argentina',
+    description:
+      'Fuente elevadora para Starlink Mini. Compacta, eficiente y perfecta para zonas sin conectividad fija.',
+    images: ['https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg']
+  },
+
+  // Opcional pero útil para mobile/brand color en navegadores
+  themeColor: '#F3781B'
 };

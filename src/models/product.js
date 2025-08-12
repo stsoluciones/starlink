@@ -96,6 +96,9 @@ const productoSchema = new mongoose.Schema({
         default: false,
         required: false
     }
+    },
+    { 
+        timestamps: true
 });
 
 const producto = mongoose.models.producto || mongoose.model('producto', productoSchema);
