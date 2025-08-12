@@ -35,9 +35,9 @@ export async function generateMetadata({ params }) {
   } catch (_) {}
 
   // Base para URLs absolutas (mejora OG/Twitter/canonical)
-  const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar/';
   const metadataBase = new URL(SITE);
-  const canonical = `${SITE}/productos/${encodeURIComponent(rawSlug)}`;
+  const canonical = `${SITE}productos/${encodeURIComponent(rawSlug)}`;
 
   // Datos del producto (con fallbacks)
   const nombre   = clean(pick(product?.nombre, nameFromSlug));

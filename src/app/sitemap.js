@@ -5,7 +5,7 @@ export const revalidate = 60 * 60 * 24;
 import { connectDB } from '../lib/mongodb';
 import Producto from '../models/product';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar/';
 
 // Helpers
 const toSlug = (nombre = '') =>

@@ -7,7 +7,7 @@ import Productos from '../../../components/Tienda/Productos';
 const Modal = dynamic(() => import('../../../components/Tienda/Modal/Modals'));
 const ClientLayout = dynamic(() => import('../../ClientLayout'));
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar/';
 
 // Helpers
 const clean = (s = '') => String(s).replace(/\s+/g, ' ').trim();
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }) {
 
   if (!product) {
     const metadataBase = new URL(SITE);
-    const canonical = `${SITE}/productos/${encodeURIComponent(rawSlug)}`;
+    const canonical = `${SITE}productos/${encodeURIComponent(rawSlug)}`;
 
     return {
       ...defaultMetadata,
