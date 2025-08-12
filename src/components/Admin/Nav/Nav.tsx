@@ -74,6 +74,8 @@ export default function Nav({ handleSelectSection }) {
             className="rounded-full"
             alt="Logo sls device"
             loading="lazy"
+            title="Logo sls device"
+            aria-label="Logo sls device"
           />
         </Link>
 

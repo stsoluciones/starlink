@@ -284,7 +284,7 @@ export default function UpdateProduct({
                   <div className="flex">
                     <input onChange={handleChangeInput} type="text" name="nombre" id="nombreUpdate" value={producto.nombre} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Nombre del producto"/>
                     {producto.destacados
-                      ?<Image src="/images/FotoDestacados.webp" alt={producto.nombre} width={30} height={20} className="m-1" loading='lazy' title={producto.nombre}/>
+                      ?<Image src="/images/FotoDestacados.webp" alt={producto.nombre} width={30} height={20} className="m-1" loading='lazy' title={producto.nombre} unoptimized={true}/>
                       :null}
                   </div>
                 </div>

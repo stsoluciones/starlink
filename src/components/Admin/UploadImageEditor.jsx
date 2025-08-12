@@ -102,6 +102,8 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
             style={{ maxWidth: '100%', maxHeight: 300, marginBottom: 16 }}
             className='rounded-lg shadow-md self-center'
             unoptimized={true}
+            width={400}
+            height={400}
           />
         )}
         <Box display="flex" justifyContent="space-around" m={2} p={1} gap={2}>

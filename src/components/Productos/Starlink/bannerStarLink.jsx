@@ -25,6 +25,8 @@ export default function StarlinkMiniBanner() {
               className="rounded w-48 h-48"
               placeholder="blur"
               blurDataURL="/icons/icon-512x512.png"
+              unoptimized={true}
+              
             />
           </div>
         </div>

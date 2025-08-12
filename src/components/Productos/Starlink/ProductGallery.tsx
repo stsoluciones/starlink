@@ -18,6 +18,10 @@ export default function ProductGallery() {
           width={800}
           height={500}
           className="w-full object-contain"
+          unoptimized={true}
+          loading="lazy"
+          placeholder="blur"
+          blurDataURL="/icons/icon-512x512.png"
         />
       </div>
       <div className="flex gap-4 justify-center">
@@ -29,7 +33,19 @@ export default function ProductGallery() {
               img.src === selectedImage.src ? 'border-blue-500' : 'border-gray-300'
             }`}
           >
-            <Image src={img.src} alt={img.alt} title={img.alt} aria-label={img.alt} width={100} height={70} className="object-contain"/>
+            <Image 
+              src={img.src} 
+              alt={img.alt} 
+              title={img.alt} 
+              aria-label={img.alt} 
+              width={100} 
+              height={70} 
+              className="object-contain"
+              unoptimized={true}
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="/icons/icon-512x512.png"
+            />
           </button>
         ))}
       </div>

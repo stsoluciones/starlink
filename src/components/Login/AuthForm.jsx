@@ -111,7 +111,7 @@ const loginWithGoogle = async () => {
                             <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                                     <Link href="/" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 justify-center">
-                                        <Image src="/logos/logoSLS.webp" width={100} height={100} alt="SLS logo" />
+                                        <Image src="/logos/logoSLS.webp" width={100} height={100} alt="SLS logo" unoptimized={true} title='SLS Logo' aria-label='SLS logo'/>
                                     </Link>
 
                                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">

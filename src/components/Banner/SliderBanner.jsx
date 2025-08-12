@@ -72,6 +72,8 @@ const SliderBanner = () => {
                 ) : (
                   <Image
                     unoptimized={true}
+                    width={800}
+                    height={600}
                     src={slide}
                     className="block w-full h-full object-cover"
                     alt={`Slide ${index + 1}`}

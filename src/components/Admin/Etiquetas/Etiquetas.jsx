@@ -18,7 +18,16 @@ function Etiqueta({ data }) {
       {/* Encabezado */}
       <div className="bg-orange-500 text-white text-lg font-bold p-1 flex justify-between items-center uppercase rounded-md">
         <span>ENVÍO</span>
-        <Image src="/logos/logo.webp" className="h-10" unoptimized={true} title='Logo Web' alt='Logo Web' aria-label='logo Web' />
+        <Image 
+          src="/logos/logo.webp" 
+          className="h-10" 
+          unoptimized={true}
+          width={40}
+          height={40} 
+          title='Logo Web' 
+          alt='Logo Web' 
+          aria-label='logo Web' 
+        />
       </div>
 
       {/* Cuerpo */}

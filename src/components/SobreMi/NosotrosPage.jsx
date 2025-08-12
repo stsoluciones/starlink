@@ -46,6 +46,7 @@ const NosotrosPage = () => {
                       className="w-full h-auto mb-4 rounded"
                       width={200}
                       height={200}
+                      unoptimized={true}
                     />
                   )}
                   <h3 className="text-xl font-semibold text-gray-700 mb-2" title={prod.nombre}>{prod.nombre}</h3>

@@ -65,6 +65,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
             alt="Producto destacado"
             loading="lazy"
             title="Producto destacado"
+            unoptimized={true}
           />
 
           <div className="rounded-lg overflow-hidden p-1">
@@ -76,6 +77,7 @@ const CardDestacado = ({ selectedProduct, handleProductSelect }) => {
               height={150}
               loading="lazy"
               title={selectedProduct.nombre}
+              unoptimized={true}
             />
           </div>
         </div>

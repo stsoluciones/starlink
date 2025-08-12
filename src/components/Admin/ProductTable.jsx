@@ -102,6 +102,7 @@ const ProductTable = ({ handleEliminarArchivos }) => {
                 <td className="px-4 py-3">
                   {producto.foto_1 ? (
                     <Image
+                      unoptimized={true}
                       src={producto.foto_1}
                       alt={producto.nombre}
                       width={50}

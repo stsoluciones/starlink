@@ -39,6 +39,8 @@ const UserMenu = ({ user, toggleDropdown, isDropdownOpen, handleLogOut }) => {
                                 height={32} 
                                 title={user.displayName} 
                                 loading='lazy'
+                                unoptimized={true}
+                                aria-label={user.displayName}
                             />
                         ) : (
                             <FaUser />

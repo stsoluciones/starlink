@@ -329,7 +329,7 @@ const hasImageChanges = () => {
                       placeholder="Nombre del producto"
                       />
                       {producto.destacados
-                        ?<Image src="/images/FotoDestacados.webp" alt={producto.nombre} width={30} height={20} className="m-1" loading='lazy' title={producto.nombre}/>
+                        ?<Image src="/images/FotoDestacados.webp" alt={producto.nombre} width={30} height={20} className="m-1" loading='lazy' title={producto.nombre} unoptimized={true}/>
                         :null}
                         </div>
                   </div>

@@ -24,6 +24,8 @@ export default function StatsProducts({ data, timeRange }) {
                     src={product.productImage} 
                     alt={product.productName} 
                     className="w-12 h-12 object-cover rounded-md"
+                    title={product.productName}
+                    aria-label={product.productName}
                   />
                 )}
                 <span>{product.productName}</span>

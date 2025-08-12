@@ -411,7 +411,13 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         <div className="flex flex-wrap gap-4">
                           {pedido.metadata?.cart?.map((item, index) => (
                             <div key={index} className="flex items-center border rounded p-2 w-full md:w-auto md:min-w-[250px]">
-                              <Image src={item.foto_1_1 || '/images/sinFoto.webp'} alt={item.nombre} title={item.nombre}  className="w-16 h-16 object-contain mr-4" unoptimized={true}/>
+                              <Image 
+                                src={item.foto_1_1 || '/images/sinFoto.webp'} 
+                                alt={item.nombre} title={item.nombre} 
+                                width={64} height={64}
+                                className="w-16 h-16 object-contain mr-4" 
+                                unoptimized={true}
+                              />
                               <div>
                                 <p className="text-sm font-semibold">{item.titulo_de_producto}</p>
                                 <p className="text-xs text-gray-600">

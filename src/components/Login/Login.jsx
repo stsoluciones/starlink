@@ -101,7 +101,7 @@ const Login = () => {
                             <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
                                 <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                                     <Link href="/" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 justify-center" title="SLS Logo">
-                                        <Image className="mr-2 h-auto" src="/logos/logoSLS.webp" width={150} height={150} alt="SLS logo" title="SLS Logo" loading="lazy" />
+                                        <Image className="mr-2 h-auto" src="/logos/logoSLS.webp" width={150} height={150} alt="SLS logo" title="SLS Logo" loading="lazy" unoptimized={true}/>
                                     </Link>
                                     <form id='formLogin' className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
                                         <div>

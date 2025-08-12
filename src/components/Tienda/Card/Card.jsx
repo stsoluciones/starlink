@@ -89,6 +89,9 @@ const Card = ({ product, handleProductSelect }) => {
               height={300}
               loading="lazy"
               title='Imagen del producto'
+              unoptimized={true}
+              placeholder="blur"
+              blurDataURL="/icons/icon-512x512.png"
             />
             <div className="absolute top-1 left-1 text-sm bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-tr-lg rounded-bl-lg shadow-md">
               {Number(product.precio).toLocaleString('es-AR', {

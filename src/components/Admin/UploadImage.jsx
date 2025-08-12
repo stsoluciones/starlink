@@ -248,6 +248,7 @@ export default function UploadImage({ imagenes, updateImages, handleRemoveImage 
                 {/* Vista previa de la imagen */}
                 <Image
                   src={archivo.preview || URL.createObjectURL(archivo)}
+                  unoptimized={true}
                   alt={archivo.name}
                   className="w-full object-cover cursor-pointer h-36 max-w-full rounded-lg"
                   onClick={() => handleVerArchivo(archivo)}

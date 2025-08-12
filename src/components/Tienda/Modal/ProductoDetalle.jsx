@@ -59,6 +59,9 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                         height={220}
                         className="rounded-lg md:w-96 md:h-96"
                         loading="lazy"
+                        unoptimized={true}
+                        placeholder="blur"
+                        blurDataURL="/icons/icon-512x512.png"
                     />
                     ) : (
                     <Image
@@ -69,6 +72,9 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                         height={220}
                         className="rounded-lg md:w-96 md:h-96"
                         loading="lazy"
+                        unoptimized={true}
+                        placeholder="blur"
+                        blurDataURL="/icons/icon-512x512.png"
                     />
                     )}
                     <div className="absolute top-1 left-1 text-sm md:text-base bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-tr-lg rounded-bl-lg shadow-md shadow-orange-300 hover:scale-105 hover:cursor-pointer">
@@ -93,13 +99,16 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                         title={`Mostrar imagen ${index + 1} de ${selectedProduct.nombre}`}
                     >
                         <Image
-                        src={thumb.src}
-                        alt={thumb.alt}
-                        title={thumb.alt}
-                        width={64}
-                        height={64}
-                        className="rounded-lg"
-                        loading="lazy"
+                            src={thumb.src}
+                            alt={thumb.alt}
+                            title={thumb.alt}
+                            width={64}
+                            height={64}
+                            className="rounded-lg"
+                            loading="lazy"
+                            unoptimized={true}
+                            placeholder="blur"
+                            blurDataURL="/icons/icon-512x512.png"
                         />
                     </button>
                     ))}

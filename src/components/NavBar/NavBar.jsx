@@ -72,7 +72,7 @@ const NavBar = () => {
     <section className="bg-white border-gray-200">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-2 py-1">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse rounded-full" title="starlinksoluciones Logo">
-          <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-16 lg:w-20 m-2'/>
+          <Image src={Logo.src} width={100} height={100} alt="starlinksolucionesLogo" title="starlinksoluciones Logo" loading='lazy' className='rounded-full w-16 lg:w-20 m-2' unoptimized={true}/>
         </Link>
 
         {/* Mobile menu and cart */}
