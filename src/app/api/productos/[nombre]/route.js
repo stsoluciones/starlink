@@ -1,6 +1,6 @@
 // pages/api/productos/[slug].js
-import { connectDB } from '../../../src/lib/mongodb';
-import Producto from '../../../src/models/product';
+import { connectDB } from '../../../../lib/mongodb';
+import Producto from '../../../../models/product';
 
 // Escapa caracteres especiales de RegExp
 const escapeRegex = (s = '') => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
