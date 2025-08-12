@@ -5,6 +5,7 @@ import addToCart from '../../../Utils/addToCart';
 import userData from '../../../components/constants/userData';
 import ProductoDetalle from './ProductoDetalle';
 import handleShare from '../../../Utils/handleShare';
+import Destacados from '../../Destacados/Destacados';
 
 
 const Modal = ({ selectedProduct, closeModal, isDialog = true }) => {
@@ -80,6 +81,7 @@ const Modal = ({ selectedProduct, closeModal, isDialog = true }) => {
               handleAddToCart={handleAddToCart}
           />
           </div>
+          <Destacados />
         </section>
       ) : (
         <div className="max-w-6xl w-full mx-auto my-10">
