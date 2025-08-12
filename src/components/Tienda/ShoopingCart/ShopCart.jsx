@@ -16,7 +16,7 @@ import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercado';
 import FormularioFactura from '../../Perfil/FormularioFactura';
 import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
-import notificador from '../../..//Utils/notificador';
+import notificador from '../../../Utils/notificador';
 
 const ShopCart = () => {
   const router = useRouter();

@@ -44,7 +44,6 @@ export default function UpdateProduct({
     modelo: product.modelo,
     n_serie: product.n_serie || "",
     titulo_de_producto: product.titulo_de_producto,
-    _id: product._id,
     destacados:product.destacados,
     descripcion: product.descripcion,
     n_electronica:product.n_electronica || '',

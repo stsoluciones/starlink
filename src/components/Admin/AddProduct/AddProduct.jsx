@@ -24,7 +24,7 @@ export default function AddProduct({
     const [categorias, setCategorias] = useState(categoria);
     const [marcaNueva, setMarcaNueva] = useState('');
     const [categoriaNueva, setCategoriaNueva] = useState('');
-    // const [vehiculos, setVehiculos] = useState(vehiculo);
+    // const [vehiculos, setVehiculos] = useState(vehiculo);  
 
   
     // Estado para mantener las imágenes originales
