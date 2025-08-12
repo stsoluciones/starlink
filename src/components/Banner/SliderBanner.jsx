@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react';
 import SobreMi from '../SobreMi/SobreMi';
+import Image from 'next/image';
 
 
 const SliderBanner = () => {
@@ -69,7 +70,8 @@ const SliderBanner = () => {
                     aria-label={`Video del Local ${index + 1}`}
                   />
                 ) : (
-                  <img
+                  <Image
+                    unoptimized={true}
                     src={slide}
                     className="block w-full h-full object-cover"
                     alt={`Slide ${index + 1}`}

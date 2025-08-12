@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^15.2.0",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",

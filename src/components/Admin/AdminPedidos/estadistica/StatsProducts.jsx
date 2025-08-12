@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function StatsProducts({ data, timeRange }) {
   const rangeText = {
     'mes': 'este mes',
@@ -15,7 +17,10 @@ export default function StatsProducts({ data, timeRange }) {
             <div key={product.productId} className="flex items-center justify-between p-3 border-b">
               <div className="flex items-center space-x-3">
                 {product.productImage && (
-                  <img 
+                  <Image
+                    width={48}
+                    height={48}
+                    unoptimized={true} 
                     src={product.productImage} 
                     alt={product.productName} 
                     className="w-12 h-12 object-cover rounded-md"

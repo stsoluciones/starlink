@@ -6,6 +6,7 @@ import userData from '../../constants/userData';
 import CargarEmpresaModal from '../Comprobantes/CargarEmpresa';
 import useEmpresas from '../../../Hooks/useEmpresas';
 import { Buttons } from '../../ui/Buttons';
+import Image from 'next/image';
 
 // Etiqueta individual
 function Etiqueta({ data }) {
@@ -17,7 +18,7 @@ function Etiqueta({ data }) {
       {/* Encabezado */}
       <div className="bg-orange-500 text-white text-lg font-bold p-1 flex justify-between items-center uppercase rounded-md">
         <span>ENVÍO</span>
-        <img src="/logos/logo.webp" className="h-10" />
+        <Image src="/logos/logo.webp" className="h-10" unoptimized={true} title='Logo Web' alt='Logo Web' aria-label='logo Web' />
       </div>
 
       {/* Cuerpo */}

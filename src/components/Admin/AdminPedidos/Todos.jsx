@@ -7,6 +7,7 @@ import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import userData from '../../constants/userData';
+import Image from 'next/image';
 
 
 const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina, setPedidosProcesando }) => {
@@ -410,7 +411,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         <div className="flex flex-wrap gap-4">
                           {pedido.metadata?.cart?.map((item, index) => (
                             <div key={index} className="flex items-center border rounded p-2 w-full md:w-auto md:min-w-[250px]">
-                              <img src={item.foto_1_1 || '/images/sinFoto.webp'} alt={item.nombre} title={item.nombre} className="w-16 h-16 object-contain mr-4" />
+                              <Image src={item.foto_1_1 || '/images/sinFoto.webp'} alt={item.nombre} title={item.nombre}  className="w-16 h-16 object-contain mr-4" unoptimized={true}/>
                               <div>
                                 <p className="text-sm font-semibold">{item.titulo_de_producto}</p>
                                 <p className="text-xs text-gray-600">

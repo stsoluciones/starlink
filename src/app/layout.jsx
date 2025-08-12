@@ -16,7 +16,6 @@ export const metadata = {
     apple: [{ url: '/apple-touch-icon.png' }], // 180x180 recomendado
   },
   manifest: '/manifest.json',
-  themeColor: '#ffffff',
   alternates: {
     canonical: SITE,
   },
@@ -25,8 +24,10 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 3,
   viewportFit: 'cover',
+  themeColor: '#ffffff',
+
 };
 
 export default function RootLayout({ children }) {
@@ -46,11 +47,11 @@ export default function RootLayout({ children }) {
         {/* GA4: cargar la librería primero */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-JCX658JJ06"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <Script
           id="ga4-config"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -62,7 +63,7 @@ export default function RootLayout({ children }) {
         />
 
         {/* Cloudinary (como tenías) */}
-        <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="beforeInteractive" />
+        <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="afterInteractive" />
 
         <ShoppingCartProvider>
           {children}

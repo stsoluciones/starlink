@@ -3,7 +3,7 @@ import React from 'react';
 // import Banner from '../../components/Banner/Banner';
 import SliderBanner from '../../components/Banner/SliderBanner';
 import Contact from '../../components/Contact/Contact';
-import Sobre from '../../components/SobreMi/Sobre';
+//import Sobre from '../../components/SobreMi/Sobre';
 import SearchBase from '../../components/Search/SearchBase';
 import PreguntasFrecuentes from '../../components/PreguntasFrecuentas/PreguntasFrecuentas';
 import Productos from '../../components/Tienda/Productos';

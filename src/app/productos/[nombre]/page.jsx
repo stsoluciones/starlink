@@ -1,4 +1,3 @@
-// src/app/productos/[nombre]/page.jsx
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { defaultMetadata } from '../../../lib/metadata';
@@ -26,19 +25,25 @@ const absUrl = (u) => {
 export async function generateMetadata({ params }) {
   if (!params?.nombre) return defaultMetadata;
 
-  const rawSlug = decodeURIComponent(params.nombre);
-  const nameFromSlug = clean(rawSlug.replace(/_/g, ' '));
+  const rawSlug = params.nombre;
+  if (!rawSlug) return notFound();
+
+  const decodedSlug = decodeURIComponent(rawSlug);
+  const nameFromSlug = clean(decodedSlug.replace(/_/g, ' '));
+
+  if (!nameFromSlug) return notFound();
 
   let product = null;
   try {
     product = await fetchProduct(nameFromSlug);
-  } catch {}
+  } catch {
+    // Puedes loguear el error si quieres
+  }
 
-  const metadataBase = new URL(SITE);
-  const canonical = `${SITE}/productos/${encodeURIComponent(rawSlug)}`;
-
-  // Si no existe producto → metadata 404/noindex
   if (!product) {
+    const metadataBase = new URL(SITE);
+    const canonical = `${SITE}/productos/${encodeURIComponent(rawSlug)}`;
+
     return {
       ...defaultMetadata,
       metadataBase,
@@ -51,10 +56,13 @@ export async function generateMetadata({ params }) {
         title: 'Producto no encontrado | SLS',
         description: 'No se encontró el producto solicitado.',
         url: canonical,
-        type: 'website'
-      }
+        type: 'website',
+      },
     };
   }
+
+  const metadataBase = new URL(SITE);
+  const canonical = `${SITE}/productos/${encodeURIComponent(rawSlug)}`;
 
   const nombre = clean(product.nombre || nameFromSlug);
   const modelo = clean(product.modelo || '');
@@ -87,8 +95,6 @@ export async function generateMetadata({ params }) {
     title,
     description,
     keywords,
-    // icons: no hace falta redefinir por página, dejalo global en layout si querés
-
     openGraph: {
       ...(defaultMetadata.openGraph || {}),
       title,
