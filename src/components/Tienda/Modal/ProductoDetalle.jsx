@@ -151,10 +151,12 @@ const ProductoDetalle = ({ selectedProduct, mainImage, handleThumbnailClick, thu
                             </p>
                         </div>
                     {/* Columna del precio (ocupa 1/3 en escritorio, debajo en mobile) */}
-                    <div className="md:col-span-1 flex items-start justify-start md:justify-start px-2">
+                    <div className="md:col-span-1 flex flex-col items-start justify-start md:justify-start px-2">
                         <p className="text-2xl xl:text-3xl font-bold text-primary">
                         {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(selectedProduct.precio)}
                         </p>
+                        <p className="text-gray-500 text-sm md:text-base ml-2 hidden md:block border border-1 border-primary px-2 py-1 mt-1 rounded-md shadow-xl">Envio <span className="text-primary-active font-semibold">GRATIS</span><br/> a todo el país</p>
+                        <p className="text-gray-500  text-sm md:text-base md:hidden border border-1 border-primary px-2 py-1 mt-1 rounded-md shadow-xl">Envio <span className="text-primary-active font-semibold">GRATIS</span> a todo el país</p>
                     </div>
                     </div>
 
