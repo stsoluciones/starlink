@@ -1,8 +1,13 @@
 // src/lib/metadata.js
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
+
 export const defaultMetadata = {
+  // Hace que los paths relativos se resuelvan como URLs absolutas en Next
+  metadataBase: new URL(SITE),
+
   title: 'SLSoluciones | Fuente elevadora para Starlink Mini en Argentina',
   description:
-    ' En SL Soluciones existen accesorios para StarLink como: Fuente elevadora para Starlink Mini: alimentación estable y portable para internet satelital. Ideal para viajes y zonas rurales. Envíos gratis a todo el país.',
+    ' En SL Soluciones existen accesorios para StarLink como: Fuente elevadora para Starlink Mini: alimentación estable y portable para internet satelital. Ideal para viajes y zonas rurales. Envíos gratis a todo el país. ',
   keywords: [
     'Starlink Mini',
     'fuente elevadora',
@@ -13,9 +18,6 @@ export const defaultMetadata = {
     'SLS Soluciones'
   ].join(', '),
   charSet: 'UTF-8',
-
-  // Si usás Next 13/14 con "metadataBase", aprovechá URLs absolutas:
-  // metadataBase: new URL('https://slsoluciones.com.ar'),
 
   icons: {
     icon: '/favicon.ico',
@@ -38,13 +40,16 @@ export const defaultMetadata = {
     }
   },
 
-  authors: [{ name: 'SLS', url: 'https://slsoluciones.com.ar' }, {name:'Gonzalo Torres Grau', url: 'https://gonzalotorresgrau.com'}],
+  authors: [
+    { name: 'SLS', url: SITE },
+    { name: 'Gonzalo Torres Grau', url: 'https://gonzalotorresgrau.com' }
+  ],
   publisher: 'SLSoluciones | Internet Satelital y Conectividad',
 
   alternates: {
-    canonical: 'https://slsoluciones.com.ar/',
+    canonical: SITE + '/',
     languages: {
-      'es-AR': 'https://slsoluciones.com.ar/'
+      'es-AR': SITE + '/'
     }
   },
 
@@ -53,12 +58,12 @@ export const defaultMetadata = {
     description:
       'Alimentación confiable para Starlink Mini. Compacta, eficiente y lista para tus viajes. Envíos gratis a todo el país.',
     type: 'website',
-    url: 'https://slsoluciones.com.ar/',
+    url: SITE + '/',
     siteName: 'SLS Soluciones',
     locale: 'es_AR',
     images: [
       {
-        url: 'https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg', // 1200x630 recomendado
+        url: SITE + '/og/og-sls-starlink-mini.jpg', // 1200x630 recomendado
         width: 1200,
         height: 630,
         alt: 'Fuente elevadora para Starlink Mini - SLSoluciones'
@@ -72,6 +77,29 @@ export const defaultMetadata = {
     title: 'SLSoluciones | Fuente para Starlink Mini en Argentina',
     description:
       'Fuente elevadora para Starlink Mini. Compacta, eficiente y perfecta para zonas sin conectividad fija.',
-    images: ['https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg']
+    images: [SITE + '/og/og-sls-starlink-mini.jpg']
   },
+
+  // Structured Data base (Organization + WebSite). Esto ayuda a Google entender entidad y marca.
+  other: {
+    'script:ld+json': JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': SITE + '#org',
+          name: 'SLSoluciones',
+          url: SITE,
+          logo: SITE + '/logos/logo.webp'
+        },
+        {
+          '@type': 'WebSite',
+          '@id': SITE + '#website',
+          url: SITE,
+          name: 'SLSoluciones',
+          publisher: { '@id': SITE + '#org' }
+        }
+      ]
+    })
+  }
 };

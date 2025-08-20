@@ -4,7 +4,7 @@ import ClientLayout from './ClientLayout';
 import { defaultMetadata } from '../lib/metadata';
 import fetchProduct from '../Utils/fetchProduct';
 
-const MainContent = dynamic(() => import('./home/MainContent'), { ssr: false });
+const MainContent = dynamic(() => import('./home/MainContent'));
 
 // --- utils locales ---
 const pick = (v, fb) => (v ?? v === 0 ? v : fb);

@@ -16,10 +16,11 @@ const SobreMi = () => {
               <p className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">
                 Contamos con amplia experiencia en la producción de cables inyectados, fichas y adaptadores, desarrollados con altos estándares de calidad. Además, incorporamos constantemente productos innovadores y vanguardistas para ofrecerte soluciones prácticas y modernas.
               </p>
-              <h1 className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">
-                Uno de nuestros productos más destacados es el <strong>adaptador Starlink Mini para vehículos</strong>
-                , compatible con sistemas de 12 y 24 voltios, ideal para que puedas llevar tu conexión a donde vayas. Te invitamos a descubrir todo lo que tenemos para ofrecerte y a ser parte de nuestras soluciones tecnológicas.
-              </h1>
+
+
+              <p className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">
+                Uno de nuestros productos más destacados es el <strong>adaptador Starlink Mini para vehículos</strong>, compatible con sistemas de 12 y 24 voltios. Ideal para llevar tu conexión a donde vayas. Descubrí nuestros elevadores de tensión, alargues, baterías y servicios de asesoramiento y envíos.
+              </p>
             {/* <div className="flex flex-col md:flex-row items-center justify-items-center justify-between mb-8">
               <Link href="/nosotros" title="Consulta">
                 <p className="mt-4 md:mt-0 text-white font-medium rounded-lg text-sm px-3 py-2 uppercase text-center bg-boton-primary hover:bg-boton-primary-hover active:bg-boton-primary-active">
@@ -28,6 +29,7 @@ const SobreMi = () => {
               </Link> 
             </div>*/}
           </div>
+        <h1 className="text-gray-500 sm:text-lg md:text-xl font-light md:max-w-7xl w-full text-justify mb-8">Adaptador y fuente elevadora para Starlink Mini — 12/24 V | SLSoluciones Argentina</h1>
         <h2 className="text-gray-500 sm:text-lg md:text-xl md:hidden font-light md:max-w-7xl w-full text-justify mb-8">
           Encuentra los mejores productos y servicios aquí: <strong>elevadores de tensión, alargues, baterías</strong> y muchos accesorios como la <strong>fuente adaptadora para Starlink Mini.</strong> Además, contamos con servicio de asesoramiento y envíos.
         </h2>
