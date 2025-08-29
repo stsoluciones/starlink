@@ -37,6 +37,9 @@ export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid
     mode: 'onChange' // Validar en cada cambio
   })
 
+  // Campos obligatorios según el esquema
+  const requiredFields = ['razonSocial', 'cuit', 'telefono', 'email', 'condicionIva']
+
   const condicionIva = watch('condicionIva')
   const tipoFactura = condicionIva === 'responsableInscripto' ? 'A' : 'B'
 
@@ -95,31 +98,31 @@ export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid
       <h2 className="text-xl font-semibold mb-4 uppercase">Datos del Cliente</h2>
       <form className="space-y-4" onSubmit={handleSubmit(enviar)}>
         <div>
-          <label className="block text-sm uppercase">{esConsumidorFinal?'Nombre y Apellido':'Razón Social'}</label>
+          <label className="block text-sm uppercase">{requiredFields.includes('razonSocial') && <span className="text-red-500 mr-1">*</span>}{esConsumidorFinal?'Nombre y Apellido':'Razón Social'}</label>
           <input placeholder="Ej: Mi empresa S.A." {...register('razonSocial')} className="w-full border rounded p-2" />
           {errors.razonSocial && <p className="text-red-500 text-sm">{errors.razonSocial.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm uppercase">{esConsumidorFinal?'DNI':'CUIT'}</label>
+          <label className="block text-sm uppercase">{requiredFields.includes('cuit') && <span className="text-red-500 mr-1">*</span>}{esConsumidorFinal?'DNI':'CUIT'}</label>
           <input placeholder="Ej: 20304050607" {...register('cuit')} className="w-full border rounded p-2" />
           {errors.cuit && <p className="text-red-500 text-sm">{errors.cuit.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm uppercase">Telefono</label>
+          <label className="block text-sm uppercase">{requiredFields.includes('telefono') && <span className="text-red-500 mr-1">*</span>}Telefono</label>
           <input placeholder="Ej: 1136317444" {...register('telefono')} className="w-full border rounded p-2" />
           {errors.telefono && <p className="text-red-500 text-sm">{errors.telefono.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm uppercase">email</label>
+          <label className="block text-sm uppercase">{requiredFields.includes('email') && <span className="text-red-500 mr-1">*</span>}email</label>
           <input placeholder="Ej: empresa@empresa.com" {...register('email')} className="w-full border rounded p-2" />
           {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm uppercase">Condición frente al IVA</label>
+          <label className="block text-sm uppercase">{requiredFields.includes('condicionIva') && <span className="text-red-500 mr-1">*</span>}Condición frente al IVA</label>
           <select {...register('condicionIva')} className="w-full border rounded p-2">
             <option value="">Seleccionar</option>
             <option value="Consumidor Final">Consumidor Final</option>
