@@ -20,7 +20,7 @@ export default async function contactHandler(req, res) {
                 <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS,</h2>
                 <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
                 <p style="font-size: 16px; color: #374151; margin-bottom: 24px;"><span style="font-weight: bold; color: #F3781B;">${name} </span> se contacto desde la web: </p>
-                <p style="font-size: 16px; color: #374151; margin-bottom: 24px;"> Te dejo este mensaje:<br/>  ${message} <br/><br/>
+                <p style="font-size: 16px; color: #374151; margin-bottom: 24px;"> Te dejo este mensaje:<br/><span style="font-size: 16px; color: #374151; margin-bottom: 24px;"><span style="font-weight: bold; color: #F3781B;">${message}</span> <br/><br/>
                 Para responderle hace click en este correo: ${email}.</p>
                 <a href="https://slsoluciones.com.ar/Dashboard" style="display: inline-block; background-color: #F3781B; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px;">
                 Ver Panel de ADM
