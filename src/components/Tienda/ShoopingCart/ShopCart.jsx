@@ -17,6 +17,7 @@ import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercad
 import FormularioFactura from '../../Perfil/FormularioFactura';
 import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
 import notificador from '../../../Utils/notificador';
+import notificarError from '../../../Utils/notificarError';
 
 const ShopCart = () => {
   const router = useRouter();
@@ -275,6 +276,20 @@ const handleComprar = async (nuevoDescuento) => {
     }
   } catch (error) {
     console.error("Error en el proceso de compra:", error);
+    try {
+      // enviar notificación al admin con detalle del error
+      await notificarError({
+        subject: 'Error en proceso de compra (ShopCart)',
+        message: error.message || String(error),
+        stack: error.stack || null,
+        component: 'ShopCart.handleComprar',
+        extra: { cart: cart || [], user: user || null },
+      });
+    } catch (notifyErr) {
+      // no bloquear el flujo si falla la notificación
+      console.error('Error al notificar al admin:', notifyErr);
+    }
+
     Swal.fire({
       icon: 'error',
       title: 'Error en la compra',
