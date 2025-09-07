@@ -346,6 +346,18 @@ const generarEtiquetas = async (pedidoUnico = null) => {
     }
   };
 
+  const getUltimos6 = (numero = "") => {
+    if (typeof numero !== "string") numero = String(numero ?? "");
+    const parte = numero.includes("-") ? numero.split("-").pop() : numero;
+    return (parte || "").slice(-6)
+  };
+
+  // opcional: formatear fecha seguro
+  const fmtFecha = (f) => {
+    const d = new Date(f);
+    return isNaN(d) ? "-" : d.toLocaleString("es-AR");
+  };
+
   return (
           <section>
           {/* Filtros */}
@@ -386,14 +398,14 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
                         {/* Encabezado: Estado, Fecha y Botón de etiqueta */}
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                          <p className="text-xs text-gray-500 p-2 my-2">{new Date(pedido.fechaPedido).toLocaleString('es-AR')}</p>
-                          <p className="text-sm text-gray-700 p-2 my-2">Pedido N°: <span className="font-bold">{pedido.numeroPedido.split('-')[1].slice(-6)}</span></p>
+                          <p className="text-xs text-gray-500 p-2 my-2">{fmtFecha(pedido?.fechaPedido)}</p>
+                          <p className="text-sm text-gray-700 p-2 my-2">Pedido N°: <span className="font-bold">{getUltimos6(pedido?.numeroPedido)}</span></p>
                           <div className=' flex gap-2 align-middle'>
-                            {pedido.estado !== 'pendiente' && pedido.estado !== 'cancelado' && (
-                              <button onClick={() => generarEtiquetas(pedido)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-2 my-2 rounded-md" >{pedido.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
+                            {pedido?.estado !== 'pendiente' && pedido?.estado !== 'cancelado' && (
+                              <button onClick={() => generarEtiquetas(pedido)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-2 my-2 rounded-md" >{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
                             {/* Botón imprimir etiqueta */}
-                            {pedido.metadata?.ticketUrl && pedido.paymentMethod === 'transferencia' && (
-                              <a href={pedido.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm p-2 my-2 rounded`}> ver ticket</a> )}
+                            {pedido?.metadata?.ticketUrl && pedido?.paymentMethod === 'transferencia' && (
+                              <a href={pedido?.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm p-2 my-2 rounded`}> ver ticket</a> )}
                           </div>
 
                           {/* Selector de estado */}
