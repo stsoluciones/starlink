@@ -30,7 +30,7 @@ const empresaSchema = new mongoose.Schema({
   tipo: {
     type: String,
     trim: true,
-    enum: ['Consumidor Final', 'Monotributo Social', 'Monotributo', 'Exento', 'No Responsable', 'Responsable inscripto'], // Opcional: si querés limitar los valores posibles
+    enum: ['consumidorFinal', 'Monotributo Social', 'Monotributo', 'Exento', 'No Responsable', 'Responsable inscripto'], // Opcional: si querés limitar los valores posibles
   }
 }, {
   timestamps: true, // Para guardar createdAt y updatedAt automáticamente

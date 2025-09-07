@@ -95,7 +95,17 @@ const handleGuardarPedido = async (user, cart, nuevoDescuento = 0) => {
       cuit: normalized.factura?.cuit,
       domicilio: normalized.factura?.domicilio,
       codigoPostal: normalized.factura?.codigoPostal,
-      condicionIva: normalized.factura?.condicionIva,
+      condicionIva: (function(val){
+        // map internal keys to Order schema labels
+        const map = {
+          'consumidorFinal': 'consumidorFinal',
+          'responsableInscripto': 'Responsable Inscripto',
+          'monotributista': 'Monotributista',
+          'exento': 'IVA Exento'
+        }
+        if (!val) return val
+        return map[val] || val
+      })(normalized.factura?.condicionIva),
       fecha: new Date(),
     },
     etiquetaEnvio: normalized.etiquetaEnvio || '',

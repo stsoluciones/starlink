@@ -314,7 +314,7 @@ const Comprobantes = () => {
             <option value="Exento">Exento</option>
             <option value="Monotributo">Monotributo</option>
             <option value="Monotributo Social">Monotributo Social</option>
-            <option value="Consumidor Final">Consumidor Final</option>
+            <option value="consumidorFinal">consumidorFinal</option>
           </select>
         </div>
       </div>

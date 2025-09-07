@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect, useContext } from 'react';
+import { useState, useRef, useEffect, useContext, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -69,7 +69,7 @@ const handleComprar = async (nuevoDescuento) => {
       title: '¿Es consumidor final?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Consumidor Final',
+      confirmButtonText: 'consumidorFinal',
       cancelButtonText: 'Empresa',
       reverseButtons: true,
       allowOutsideClick: true,
@@ -88,7 +88,9 @@ const handleComprar = async (nuevoDescuento) => {
           root.appendChild(container);
           const rootReact = createRoot(container);
           rootReact.render(
-            <FormularioFactura tipo={tipoFactura} esConsumidorFinal={esConsumidorFinal} onSubmit={(data) => resolve(data)} onCancel={() => resolve(null)} />
+            <Suspense fallback={<Loading />}>
+              <FormularioFactura tipo={tipoFactura} esConsumidorFinal={esConsumidorFinal} onSubmit={(data) => resolve(data)} onCancel={() => resolve(null)} />
+            </Suspense>
           );
         },
       });

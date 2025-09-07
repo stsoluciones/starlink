@@ -125,10 +125,10 @@ export default function FormularioFactura({ tipo, onSubmit, onCancel, usuarioUid
           <label className="block text-sm uppercase">{requiredFields.includes('condicionIva') && <span className="text-red-500 mr-1">*</span>}Condición frente al IVA</label>
           <select {...register('condicionIva')} className="w-full border rounded p-2">
             <option value="">Seleccionar</option>
-            <option value="Consumidor Final">Consumidor Final</option>
-            <option value="Responsable Inscripto">Responsable Inscripto</option>
-            <option value="Monotributista">Monotributista</option>
-            <option value="IVA Exento">IVA Exento</option>
+            <option value="consumidorFinal">consumidorFinal</option>
+            <option value="responsableInscripto">Responsable Inscripto</option>
+            <option value="monotributista">Monotributista</option>
+            <option value="exento">IVA Exento</option>
           </select>
           {errors.condicionIva && <p className="text-red-500 text-sm">{errors.condicionIva.message}</p>}
         </div>

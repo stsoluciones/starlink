@@ -13,6 +13,25 @@ export async function PUT(request: Request) {
   try {
     await connectDB()
 
+    // Normalizar condicionIva entrante para aceptar tanto labels (e.g. 'consumidorFinal')
+    // como las claves internas (e.g. 'consumidorFinal') y guardarlo en el formato interno
+    const mapCondicion = (val: any) => {
+      if (!val || typeof val !== 'string') return val
+      const m = val.trim()
+      const map: Record<string, string> = {
+        'consumidorFinal': 'consumidorFinal',
+        'responsableInscripto': 'responsableInscripto',
+        'monotributista': 'monotributista',
+        'exento': 'exento'
+      }
+      return map[m] || val
+    }
+
+    if (datosFactura && typeof datosFactura === 'object' && 'condicionIva' in datosFactura) {
+      // @ts-ignore
+      datosFactura.condicionIva = mapCondicion(datosFactura.condicionIva)
+    }
+
     const user = await User.findOneAndUpdate(
       { uid: usuarioUid },
       { factura: datosFactura },
@@ -41,6 +60,24 @@ export async function POST(request: Request) {
 
   try {
     await connectDB()
+
+    // Normalizar condicionIva para POST también
+    const mapCondicion = (val: any) => {
+      if (!val || typeof val !== 'string') return val
+      const m = val.trim()
+      const map: Record<string, string> = {
+        'consumidorFinal': 'consumidorFinal',
+        'responsableInscripto': 'responsableInscripto',
+        'monotributista': 'monotributista',
+        'exento': 'exento'
+      }
+      return map[m] || val
+    }
+
+    if (datosFactura && typeof datosFactura === 'object' && 'condicionIva' in datosFactura) {
+      // @ts-ignore
+      datosFactura.condicionIva = mapCondicion(datosFactura.condicionIva)
+    }
 
     // Aquí puedes decidir si quieres crear o actualizar, por ejemplo:
     const user = await User.findOneAndUpdate(

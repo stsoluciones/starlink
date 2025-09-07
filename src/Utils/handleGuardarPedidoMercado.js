@@ -69,7 +69,16 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           cuit: user.factura.cuit,
           domicilio: user.factura.domicilio,
           codigoPostal: user.factura.codigoPostal,
-          condicionIva: user.factura.condicionIva,
+          condicionIva: (function(val){
+            const map = {
+              'consumidorFinal': 'consumidorFinal',
+              'responsableInscripto': 'Responsable Inscripto',
+              'monotributista': 'Monotributista',
+              'exento': 'IVA Exento'
+            }
+            if (!val) return val
+            return map[val] || val
+          })(user.factura.condicionIva),
           fecha: new Date()
         } ,
         external_reference: externalReference,

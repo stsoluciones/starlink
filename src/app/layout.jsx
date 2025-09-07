@@ -1,7 +1,7 @@
 // app/layout.tsx (o .jsx)
 import React from 'react';
 import './globals.css';
-import { Toaster } from 'react-hot-toast';
+// Toaster is provided by the client-only ToastClient component
 import dynamic from 'next/dynamic';
 import { ShoppingCartProvider } from '../components/Context/ShoopingCartContext';
 import Script from 'next/script';
@@ -45,8 +45,7 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://widget.cloudinary.com" />
         <link rel="preconnect" href="https://widget.cloudinary.com" crossOrigin="" />
       </head>
-          <ToastClient />
-      <body className="min-h-screen antialiased" data-theme="light">
+          <body className="min-h-screen antialiased" data-theme="light">
         {/* GA4: cargar la librería primero */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-JCX658JJ06"
@@ -70,7 +69,7 @@ export default function RootLayout({ children }) {
 
         <ShoppingCartProvider>
           {children}
-          <Toaster />
+          <ToastClient />
         </ShoppingCartProvider>
       </body>
     </html>
