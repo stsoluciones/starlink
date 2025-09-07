@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { FaBackward, FaForward } from 'react-icons/fa';
-import Swal from 'sweetalert2';
+// load Swal lazily to reduce initial bundle size
+let Swal
+const getSwal = async () => {
+  if (!Swal) {
+    Swal = (await import('sweetalert2')).default
+  }
+  return Swal
+}
 import Loading from '../../Loading/Loading';
 // import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
@@ -93,7 +100,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
 
     if (pedidosAActualizar.length === 0) {
-      Swal.fire("Atención", "No hay pedidos seleccionados para generar etiquetas.", "info");
+      (await getSwal()).fire("Atención", "No hay pedidos seleccionados para generar etiquetas.", "info");
       return;
     }
 
@@ -109,7 +116,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
     }
 
     try {
-      const result = await Swal.fire({
+  const result = await (await getSwal()).fire({
         title: '¿Estás seguro?',
         text: `Vas a generar etiquetas y actualizar ${pedidosAActualizar.length} pedido(s) a "enviado".`,
         icon: 'question',
@@ -121,13 +128,13 @@ const generarEtiquetas = async (pedidoUnico = null) => {
         reverseButtons: true
       });
 
-      if (!result.isConfirmed) {
-        Swal.fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
+  if (!result.isConfirmed) {
+  (await getSwal()).fire('Operación Cancelada', 'No se actualizaron los pedidos.', 'info');
         return;
       }
 
       // Mostrar cargando mientras se generan etiquetas
-      Swal.fire({
+  (await getSwal()).fire({
         title: 'Procesando...',
         html: `Generando etiquetas para ${pedidosAActualizar.length} pedido(s).`,
         allowOutsideClick: false,
@@ -183,8 +190,8 @@ const generarEtiquetas = async (pedidoUnico = null) => {
       // });
 
       // Finalizar
-      Swal.close();
-      Swal.fire('¡Pedidos actualizados!', 'Todos los pedidos fueron marcados como enviados.', 'success');
+  (await getSwal()).close();
+  (await getSwal()).fire('¡Pedidos actualizados!', 'Todos los pedidos fueron marcados como enviados.', 'success');
 
 
       const resultados = await Promise.all(
@@ -210,13 +217,13 @@ const generarEtiquetas = async (pedidoUnico = null) => {
         );
       }
 
-      Swal.fire({
+  (await getSwal()).fire({
         title: '¡Éxito!',
         text: `Se actualizaron ${actualizadosConExito} pedido(s) a "enviado".`,
         icon: 'success'
       });
 
-    await Promise.allSettled(
+  await Promise.allSettled(
       resultados
         .filter(r => r?.success && r.pedido && r.pedido.email && r.pedido.numeroPedido)
         .map(async (r) => {
@@ -249,7 +256,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
     } catch (error) {
       console.error("Error al generar etiquetas y actualizar pedidos:", error);
-      Swal.fire({
+      (await getSwal()).fire({
         title: 'Error General',
         text: error.message || "Ocurrió un error inesperado durante el proceso.",
         icon: 'error'
@@ -362,7 +369,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
           <section>
           {/* Filtros */}
           <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-4">
-            <input type="text" placeholder="Buscar por nombre o correo..." value={search} onChange={(e) => {setSearch(e.target.value); cambiarPagina(1);;}} className="border px-3 py-2 rounded w-full sm:w-60" />
+            <input type="text" placeholder="Buscar por nombre, correo o Id" value={search} onChange={(e) => {setSearch(e.target.value); cambiarPagina(1);;}} className="border px-3 py-2 rounded w-full sm:w-60" />
             <select value={filtroEstado} onChange={(e) => {setFiltroEstado(e.target.value); cambiarPagina(1);; }} className="border px-3 py-2 rounded w-full sm:w-auto">
               <option value="todos">Todos los estados</option>
               {estados.map((estado) => (

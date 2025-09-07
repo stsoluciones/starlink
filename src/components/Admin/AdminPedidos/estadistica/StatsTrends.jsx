@@ -1,9 +1,17 @@
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import React from 'react';
+import dynamic from 'next/dynamic';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+const Bar = dynamic(() => import('react-chartjs-2').then(mod => ({ default: mod.Bar })), { ssr: false });
 
 export default function StatsTrends({ data }) {
+  // registrar componentes de chart.js bajo demanda en el cliente
+  React.useEffect(() => {
+    (async () => {
+      const { Chart: ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } = await import('chart.js');
+      ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+    })();
+  }, []);
+
   const chartData = {
     labels: data.monthlyTrend.map(item => `${item.month}/${item.year}`),
     datasets: [

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import React from 'react';
 // import Banner from '../../components/Banner/Banner';
 import SliderBanner from '../../components/Banner/SliderBanner';

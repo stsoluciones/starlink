@@ -2,9 +2,12 @@
 import React from 'react';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
+import dynamic from 'next/dynamic';
 import { ShoppingCartProvider } from '../components/Context/ShoopingCartContext';
 import Script from 'next/script';
 
+// Load Toaster on client only to keep it out of the server/first bundle
+const ToastClient = dynamic(() => import('../components/Client/ToastClient'), { ssr: false });
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
 
 export const metadata = {
@@ -38,11 +41,11 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
         <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="" />
-        <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="" />
+        <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="lazyOnload" />
         <link rel="dns-prefetch" href="https://widget.cloudinary.com" />
         <link rel="preconnect" href="https://widget.cloudinary.com" crossOrigin="" />
       </head>
-
+          <ToastClient />
       <body className="min-h-screen antialiased" data-theme="light">
         {/* GA4: cargar la librería primero */}
         <Script

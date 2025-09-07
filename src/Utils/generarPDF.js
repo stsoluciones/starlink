@@ -1,13 +1,14 @@
 import userData from "../components/constants/userData"
 import logoEmpresa from '../../public/logos/logoBl.png'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import getImageBase64 from "./getImageBase64"
 
 
 const generarPDF = async (empresa, items) => {
-    const imageData = await getImageBase64(logoEmpresa.src)
-    const doc = new jsPDF()
+  const imageData = await getImageBase64(logoEmpresa.src)
+  // cargar jsPDF y autotable bajo demanda para evitar incluirlos en el bundle inicial
+  const { default: jsPDF } = await import('jspdf')
+  const autoTable = (await import('jspdf-autotable')).default
+  const doc = new jsPDF()
     const clienteX = 120 
 
     const img = new Image()
@@ -41,7 +42,7 @@ const generarPDF = async (empresa, items) => {
     doc.text(`Dólar: ${dolarValue}`, 30, 78)
     
     doc.setFontSize(12)
-    autoTable(doc, {
+  autoTable(doc, {
       head: [['Cantidad', 'Producto', 'Código', 'Precio', 'Total']],
       body: items.map(item => {
         const cantidad = Number(item.cantidad) || 0

@@ -1,4 +1,4 @@
-'use client';
+ 'use client';
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useContext, useState, useEffect } from "react";
 import { IoCartOutline } from 'react-icons/io5';

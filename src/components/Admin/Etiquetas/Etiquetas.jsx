@@ -1,7 +1,6 @@
-'use client'
+"use client"
 
 import React, { useState, useRef } from 'react';
-import html2pdf from 'html2pdf.js';
 import userData from '../../constants/userData';
 import CargarEmpresaModal from '../Comprobantes/CargarEmpresa';
 import useEmpresas from '../../../Hooks/useEmpresas';
@@ -110,7 +109,11 @@ export default function EtiquetaFormPDF() {
       pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
-    html2pdf().set(opt).from(element).save();
+    // cargar html2pdf bajo demanda para evitar incluir jspdf/html2canvas en el bundle inicial
+    (async () => {
+      const html2pdf = (await import('html2pdf.js')).default;
+      html2pdf().set(opt).from(element).save();
+    })();
   };
 
   const totalBultos = parseInt(formData.totalBulto, 10);

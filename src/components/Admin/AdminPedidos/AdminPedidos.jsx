@@ -58,6 +58,7 @@ const handleStados = (id, nuevoEstado) => {
     const texto = search.toLowerCase();
     const coincideBusqueda =
       pedido.usuarioInfo?.nombreCompleto?.toLowerCase().includes(texto) ||
+      pedido?._id?.toLowerCase().includes(texto) ||
       pedido.usuarioInfo?.correo?.toLowerCase().includes(texto);
     const coincideEstado = filtroEstado === "todos" || pedido.estado === filtroEstado;
     return coincideBusqueda && coincideEstado;
