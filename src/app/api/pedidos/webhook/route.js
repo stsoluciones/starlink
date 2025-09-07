@@ -109,16 +109,21 @@ export async function POST(req) {
 
     if (pasaAPagado && !order.pagoNotificado) {
       try {
-        const pedidoPlano = order.toObject ? order.toObject() : JSON.parse(JSON.stringify(order));
-        const resNotif = await notificador(pedidoPlano);
-        if (!resNotif?.success) {
-          console.error('❌ Falló notificador:', resNotif?.error || resNotif);
-        } else {
-          order.pagoNotificado = true;          // ✅ marcar como notificado
-          await order.save();                   // guardar flag
-        }
+        const clienteEmail = order.usuarioInfo?.correo || '';
+        const clienteNombre = order.usuarioInfo?.nombreCompleto || 'Cliente';
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@slsoluciones.com.ar';
+        const numeroPedido = order._id.toString();
+        const montoTotal = order.total || 0;
+
+        // enviar emails
+        const { sendEmail } = await import('../../../../lib/mailer');
+        await sendEmail({ to: clienteEmail, subject: `Tu pedido #${numeroPedido} ahora está: pagado`, html: `<p>Hola ${clienteNombre},</p><p>El estado de tu pedido #${numeroPedido} es: <strong>pagado</strong>.</p>` });
+        await sendEmail({ to: adminEmail, subject: `🔔 Pedido #${numeroPedido} en estado pagado`, html: `<p>Pedido #${numeroPedido} a nombre de ${clienteNombre} - estado: <strong>pagado</strong>. Monto: ${montoTotal}</p>` });
+
+        order.pagoNotificado = true;
+        await order.save();
       } catch (e) {
-        console.error('❌ Error ejecutando notificador:', e);
+        console.error('❌ Error ejecutando notificacion en webhook:', e);
       }
     }
 

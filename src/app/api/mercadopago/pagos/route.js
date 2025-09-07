@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { MercadoPagoConfig, Payment } from "mercadopago";
 import Order from "../../../../models/Order";
 import { connectDB } from "../../../../lib/mongodb";
-import notificador from "../../../../Utils/notificador";
+import { sendEmail } from "../../../../lib/mailer";
 
 const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN,
@@ -74,7 +74,29 @@ export async function POST(req) {
     // 📨 Enviar notificación solo si el nuevo estado es "pagado"
     if (newStatus === "pagado" && order.estado !== "pagado") {
       try {
-        await notificador(updatedOrder);
+        // si ya fue notificado, evitar reenviar
+        if (!updatedOrder.pagoNotificado) {
+          const clienteEmail = updatedOrder.usuarioInfo?.correo || '';
+          const clienteNombre = updatedOrder.usuarioInfo?.nombreCompleto || 'Cliente';
+          const adminEmail = process.env.ADMIN_EMAIL || 'admin@slsoluciones.com.ar';
+          const numeroPedido = updatedOrder._id.toString();
+          const montoTotal = updatedOrder.total || 0;
+
+          await sendEmail({
+            to: clienteEmail,
+            subject: `Tu pedido #${numeroPedido} ahora está: pagado`,
+            html: `<p>Hola ${clienteNombre},</p><p>El estado de tu pedido #${numeroPedido} es: <strong>pagado</strong>.</p>`,
+          });
+
+          await sendEmail({
+            to: adminEmail,
+            subject: `🔔 Pedido #${numeroPedido} en estado pagado`,
+            html: `<p>Pedido #${numeroPedido} a nombre de ${clienteNombre} - estado: <strong>pagado</strong>. Monto: ${montoTotal}</p>`,
+          });
+
+          updatedOrder.pagoNotificado = true;
+          await updatedOrder.save();
+        }
       } catch (error) {
         console.error(`⚠️ Error al notificar al cliente/admin por el pago del pedido #${updatedOrder._id}:`, error);
       }

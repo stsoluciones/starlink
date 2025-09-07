@@ -7,7 +7,7 @@ import actualizarEstado from "../../Utils/actualizarEstado"; // Asegúrate que l
 import Swal from 'sweetalert2';
 import userBank from '../constants/userBank';
 import userData from '../constants/userData';
-import notificador from '../../Utils/notificador';
+// notificador replaced by idempotent server endpoint /api/pedidos/notificar/:id
 
 
 // Define los posibles estados que esperas. Incluye los de MercadoPago y los personalizados.
@@ -117,7 +117,8 @@ const PedidoCard = ({ pedido }: { pedido: Pedido }) => {
         setShowUploadModal(false);
         setTicketFile(null);
         setNroComprobante('');
-        notificador(pedido)
+  // Llamada idempotente para notificar (evita duplicados)
+  fetch(`/api/pedidos/notificar/${pedido._id}`, { method: 'POST' }).catch(e => console.warn('no se pudo notificar pedido tras subir ticket', e));
       } else {
         toast.error('Error al subir el comprobante.');
       }

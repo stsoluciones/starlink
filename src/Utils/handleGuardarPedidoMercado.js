@@ -1,6 +1,6 @@
 //app/Utils/handleGuardarPedidoMercado.js
 
-import notificador from "./notificador";
+// notificador replaced by idempotent server endpoint /api/pedidos/notificar/:id
 
 const handleGuardarPedidoMercado = async (user, cart, compraData) => {
   // Validaciones iniciales
@@ -92,7 +92,14 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
     }
 
     const result = await response.json();
-    notificador(result.order)
+    try {
+      const orderId = (result.order && (result.order._id || result.order.id)) || result.orderId || null;
+      if (orderId) {
+        fetch(`/api/pedidos/notificar/${orderId}`, { method: 'POST' }).catch((e) => console.warn('no se pudo enviar notificacion POST:', e));
+      }
+    } catch (err) {
+      console.warn('handleGuardarPedidoMercado - no se pudo notificar', err);
+    }
     return { success: true, orderId: result.orderId };
 
   } catch (error) {

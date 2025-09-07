@@ -1,6 +1,6 @@
 // src/Utils/actualizarEstado.js
 import Swal from 'sweetalert2';
-import notificador from '../Utils/notificador';
+// notificador replaced by idempotent server endpoint /api/pedidos/notificar/:id
 
 const actualizarEstado = async (
   id,
@@ -60,14 +60,18 @@ const actualizarEstado = async (
         });
       }
 
-      // 🔔 Notificación por correo después del cambio de estado
+      // 🔔 Notificación por correo después del cambio de estado (idempotente)
       try {
         const pedidoActualizado = data.pedido;
-        await notificador(pedidoActualizado);
-   
+        if (pedidoActualizado && pedidoActualizado._id) {
+          const notifRes = await fetch(`/api/pedidos/notificar/${pedidoActualizado._id}`, { method: 'POST' });
+          if (!notifRes.ok) {
+            console.warn('actualizarEstado - notificar endpoint devolvió error', notifRes.status);
+          }
+        }
       } catch (error) {
-          console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
-          !skipConfirmation && Swal.fire({
+        console.error(`⚠️ Error al enviar notificación del pedido #${data.pedido?._id}:`, error);
+        !skipConfirmation && Swal.fire({
           title: 'Notificación fallida',
           text: 'El estado se actualizó pero hubo un error enviando la notificación',
           icon: 'warning',

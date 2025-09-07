@@ -1,23 +1,32 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { sendEmail } from '../../../lib/mailer'; // ajustá el path según la ubicación real
+import { NextResponse } from 'next/server';
+import { connectDB } from '../../../../../lib/mongodb';
+import Order from '../../../../../models/Order';
+import { sendEmail } from '../../../../../lib/mailer';
 
-export async function POST(req: NextRequest) {
+export async function POST(req, { params }) {
+  await connectDB();
+  const { id } = params;
   try {
-    const {
-      clienteEmail,
-      clienteNombre,
-      estadoPedido,
-      adminEmail,
-      numeroPedido,
-      montoTotal,
-    } = await req.json();
+    const order = await Order.findById(id);
+    if (!order) return NextResponse.json({ success: false, error: 'Orden no encontrada' }, { status: 404 });
 
-    // Enviar email al cliente
+    if (order.pagoNotificado) {
+      return NextResponse.json({ success: true, message: 'Orden ya notificada', alreadyNotified: true });
+    }
+
+    // preparar datos para el email
+    const clienteEmail = order.usuarioInfo?.correo || '';
+    const clienteNombre = order.usuarioInfo?.nombreCompleto || 'Cliente';
+    const estadoPedido = order.estado || 'pendiente';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@slsoluciones.com.ar';
+    const numeroPedido = order._id.toString();
+    const montoTotal = order.total || 0;
+
+    // enviar email al cliente
     await sendEmail({
       to: clienteEmail,
       subject: `Tu pedido #${numeroPedido} ahora está: ${estadoPedido}`,
-      html: `
-        <div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
+      html: `<div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
             <div style="background-color: #F3781B; padding: 16px; text-align: center;">
               <img src="https://slsoluciones.com.ar/logos/logo.webp" alt="Logo" style="height: 60px; margin: 0 auto;" />
@@ -41,18 +50,14 @@ export async function POST(req: NextRequest) {
               © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
             </div>
           </div>
-        </div>
-      `
-
-
+        </div>`,
     });
 
-    // Enviar email al administrador si el estado es "pagado"
-      await sendEmail({
-        to: adminEmail,
-        subject: `🔔 Pedido #${numeroPedido} en estado ${estadoPedido}`,
-        html: `
-        <div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
+    // email admin
+    await sendEmail({
+      to: adminEmail,
+      subject: `🔔 Pedido #${numeroPedido} en estado ${estadoPedido}`,
+      html: `<div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
         <h3>Notificación de Pago</h3>
                 <div style="background-color: #F3781B; padding: 16px; text-align: center;">
@@ -61,7 +66,7 @@ export async function POST(req: NextRequest) {
                 <div style="padding: 32px;">
                     <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS</h2>
                     <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
-                    Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> ha sido actualizado a: 
+                    Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> a nombre de ${clienteNombre} ha sido actualizado a: 
                     <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
                     </p>
                     <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
@@ -75,13 +80,15 @@ export async function POST(req: NextRequest) {
                     © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
                 </div>
             </div>
-        </div>
-        `,
-      });
+        </div>`,
+    });
 
-    return NextResponse.json({ ok: true, message: 'Correos enviados' });
+    order.pagoNotificado = true;
+    await order.save();
+
+    return NextResponse.json({ success: true, message: 'Notificación enviada' });
   } catch (error) {
-    console.error('Error al enviar correos:', error);
-    return NextResponse.json({ ok: false, error: 'Fallo el envío' }, { status: 500 });
+    console.error('Error en API notificar pedido:', error);
+    return NextResponse.json({ success: false, error: 'Error interno' }, { status: 500 });
   }
 }

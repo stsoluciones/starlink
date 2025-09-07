@@ -16,7 +16,7 @@ import handleComprarMercadoPago from '../../../Utils/handleCompraMercadoPago';
 import handleGuardarPedidoMercado from '../../../Utils/handleGuardarPedidoMercado';
 import FormularioFactura from '../../Perfil/FormularioFactura';
 import { solicitarNuevaDireccion } from '../../Perfil/solicitarNuevaDireccion';
-import notificador from '../../../Utils/notificador';
+// notificador replaced by idempotent server endpoint /api/pedidos/notificar/:id
 import notificarError from '../../../Utils/notificarError';
 
 const ShopCart = () => {
@@ -159,8 +159,26 @@ const handleComprar = async (nuevoDescuento) => {
     userCompleto.correo = userCompleto.correo || userCompleto.correo || userCompleto.email || '';
     userCompleto.direccion = userCompleto.direccionEnvio 
 
+    // Pre-check userCompleto required fields before attempting to guardarPedido
+    const requiredFields = ['nombreCompleto', 'telefono', 'direccion', 'correo'];
+    const missing = requiredFields.filter((f) => {
+      if (f === 'direccion') return !userCompleto.direccion || Object.keys(userCompleto.direccion).length === 0;
+      return !userCompleto[f] || (typeof userCompleto[f] === 'string' && userCompleto[f].trim() === '');
+    });
+
+    if (missing.length > 0) {
+      console.debug('handleComprar - userCompleto missing fields:', missing, 'userCompleto:', userCompleto);
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos para completar la compra',
+        html: `Faltan los siguientes campos: <strong>${missing.join(', ')}</strong>. Completa tu perfil antes de continuar.`,
+      });
+      setLoading(false);
+      return;
+    }
     if (result.isConfirmed) {
       const compraResponse = await handleComprarMercadoPago(cart, userCompleto);
+  console.log('handleComprar - compraResponse (raw):', compraResponse);
       if (!compraResponse.ok) throw new Error("Falló la creación de la orden con MercadoPago");
 
       const compraData = await compraResponse.json();
@@ -172,7 +190,9 @@ const handleComprar = async (nuevoDescuento) => {
 
     } else if (result.isDismissed) {
       
-      const guardarPedidoData = await handleGuardarPedido(userCompleto, cart, nuevoDescuento);
+  console.log('handleComprar - calling handleGuardarPedido with:', { userCompleto, cart, nuevoDescuento });
+  const guardarPedidoData = await handleGuardarPedido(userCompleto, cart, nuevoDescuento);
+  console.log('handleComprar - guardarPedidoData result:', guardarPedidoData);
       if (!guardarPedidoData.success) throw new Error(guardarPedidoData.error || 'No se pudo guardar el pedido');
 
       await Swal.fire({
@@ -271,7 +291,8 @@ const handleComprar = async (nuevoDescuento) => {
           icon: 'info',
         });
       }
-      await notificador(guardarPedidoData.orderId)
+  // Llamada idempotente: notificar y marcar en servidor (evita duplicados)
+  fetch(`/api/pedidos/notificar/${guardarPedidoData.orderId}`, { method: 'POST' }).catch(e => console.warn('no se pudo notificar pedido despues de guardar:', e));
       setCart([]);
     }
   } catch (error) {
