@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema({
     razonSocial: {type: String},
     telefono: {type: String},
     email: {type: String},
-    condicionIva: { type: String, enum: ['Responsable Inscripto', 'Monotributista', 'IVA Exento', 'consumidorFinal'], default: 'consumidorFinal' }
+    condicionIva: { type: String, enum: ['responsableInscripto', 'monotributista', 'exento', 'consumidorFinal'], default: 'consumidorFinal' }
   },
   direccionEnvio: {
     pais: {type: String},

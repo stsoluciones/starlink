@@ -68,7 +68,26 @@ export async function POST(req) {
 
     const usuario = await User.findOne({ uid });
     const direccionEnvio = body.direccionEnvio;
-    const tipoFactura = body.tipoFactura || null;
+    let tipoFactura = body.tipoFactura || null;
+    // Normalizar condicionIva para evitar errores de enum en el modelo
+    if (tipoFactura && typeof tipoFactura === 'object') {
+      const val = tipoFactura.condicionIva || '';
+      const norm = ('' + val).trim().toLowerCase();
+      const map = {
+        'consumidor final': 'consumidorFinal',
+        'consumidorfinal': 'consumidorFinal',
+        'consumidorfinal': 'consumidorFinal',
+        'consumidorFinal': 'consumidorFinal',
+        'responsable inscripto': 'Responsable Inscripto',
+        'responsableinscripto': 'Responsable Inscripto',
+        'responsable Inscripto': 'Responsable Inscripto',
+        'monotributista': 'Monotributista',
+        'iva exento': 'IVA Exento',
+        'ivaexento': 'IVA Exento',
+      };
+      const mapped = map[norm] || tipoFactura.condicionIva || 'consumidorFinal';
+      tipoFactura = { ...tipoFactura, condicionIva: mapped };
+    }
     const metadata = { uid: uid, cart: cart}
     const nuevaOrdenData = {
       paymentId: paymentId,

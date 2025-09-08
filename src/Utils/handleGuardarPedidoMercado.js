@@ -71,7 +71,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
           codigoPostal: user.factura.codigoPostal,
           condicionIva: (function(val){
             const map = {
-              'consumidorFinal': 'consumidorFinal',
+              'consumidorFinal': 'Consumidor Final',
               'responsableInscripto': 'Responsable Inscripto',
               'monotributista': 'Monotributista',
               'exento': 'IVA Exento'

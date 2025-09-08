@@ -101,7 +101,23 @@ export async function POST(req) {
       last_updated: payment.last_modified || payment.date_last_updated,
     };
 
-    await order.save();
+    // Usar findByIdAndUpdate para evitar revalidaciones inesperadas del documento completo
+    await Order.findByIdAndUpdate(order._id, {
+      $set: {
+        estado: order.estado,
+        paymentId: order.paymentId,
+        pref_id: order.pref_id,
+        collectionId: order.collectionId,
+        collectionStatus: order.collectionStatus,
+        paymentType: order.paymentType,
+        siteId: order.siteId,
+        processingMode: order.processingMode,
+        merchantAccountId: order.merchantAccountId,
+        payerEmail: order.payerEmail,
+        metadata: order.metadata,
+        paymentDetails: order.paymentDetails,
+      }
+    }, { new: true });
 
     //console.log(`✅ Pedido ${order._id} actualizado a estado: ${mappedInternalStatus}. Payment ID: ${payment.id}`);
 
@@ -111,7 +127,7 @@ export async function POST(req) {
       try {
         const clienteEmail = order.usuarioInfo?.correo || '';
         const clienteNombre = order.usuarioInfo?.nombreCompleto || 'Cliente';
-        const adminEmail = process.env.ADMIN_EMAIL || 'admin@slsoluciones.com.ar';
+        const adminEmail = process.env.ADMIN_EMAIL || 'infostarlinksoluciones@gmail.com';
         const numeroPedido = order._id.toString();
         const montoTotal = order.total || 0;
 
@@ -120,8 +136,8 @@ export async function POST(req) {
         await sendEmail({ to: clienteEmail, subject: `Tu pedido #${numeroPedido} ahora está: pagado`, html: `<p>Hola ${clienteNombre},</p><p>El estado de tu pedido #${numeroPedido} es: <strong>pagado</strong>.</p>` });
         await sendEmail({ to: adminEmail, subject: `🔔 Pedido #${numeroPedido} en estado pagado`, html: `<p>Pedido #${numeroPedido} a nombre de ${clienteNombre} - estado: <strong>pagado</strong>. Monto: ${montoTotal}</p>` });
 
-        order.pagoNotificado = true;
-        await order.save();
+  // marcar pagoNotificado sin revalidar todo el documento
+  await Order.updateOne({ _id: order._id }, { $set: { pagoNotificado: true } });
       } catch (e) {
         console.error('❌ Error ejecutando notificacion en webhook:', e);
       }

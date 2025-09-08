@@ -111,7 +111,7 @@ export default function EmpresaForm() {
           required
         >
           <option value="">Seleccionar tipo</option>
-          <option value="consumidorFinal">consumidorFinal</option>
+          <option value="consumidorFinal">Consumidor Final</option>
           <option value="Monotributo Social">Monotributo Social</option>
           <option value="Monotributo">Monotributo</option>
           <option value="Exento">IVA Exento</option>

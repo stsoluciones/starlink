@@ -98,7 +98,7 @@ const handleGuardarPedido = async (user, cart, nuevoDescuento = 0) => {
       condicionIva: (function(val){
         // map internal keys to Order schema labels
         const map = {
-          'consumidorFinal': 'consumidorFinal',
+          'consumidorFinal': 'Consumidor Final',
           'responsableInscripto': 'Responsable Inscripto',
           'monotributista': 'Monotributista',
           'exento': 'IVA Exento'

@@ -78,7 +78,7 @@ export async function POST(req) {
         if (!updatedOrder.pagoNotificado) {
           const clienteEmail = updatedOrder.usuarioInfo?.correo || '';
           const clienteNombre = updatedOrder.usuarioInfo?.nombreCompleto || 'Cliente';
-          const adminEmail = process.env.ADMIN_EMAIL || 'admin@slsoluciones.com.ar';
+          const adminEmail = process.env.ADMIN_EMAIL || 'infostarlinksoluciones@gmail.com';
           const numeroPedido = updatedOrder._id.toString();
           const montoTotal = updatedOrder.total || 0;
 
@@ -94,8 +94,7 @@ export async function POST(req) {
             html: `<p>Pedido #${numeroPedido} a nombre de ${clienteNombre} - estado: <strong>pagado</strong>. Monto: ${montoTotal}</p>`,
           });
 
-          updatedOrder.pagoNotificado = true;
-          await updatedOrder.save();
+          await Order.updateOne({ _id: updatedOrder._id }, { $set: { pagoNotificado: true } });
         }
       } catch (error) {
         console.error(`⚠️ Error al notificar al cliente/admin por el pago del pedido #${updatedOrder._id}:`, error);

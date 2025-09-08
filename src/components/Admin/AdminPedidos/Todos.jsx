@@ -452,7 +452,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between pt-2 border-t my-4">
                           <div className="">
                             <p className="text-sm text-gray-700">{pedido.tipoFactura?.razonSocial || "Sin nombre"}</p>
-                            <p className={`text-sm ${pedido.tipoFactura?.condicionIva === 'consumidorFinal'?'text-gray-500':'text-red-800 text-center px-1 rounded-md font-semibold bg-red-400'} `}>{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
+                            <p className={`text-sm ${pedido.tipoFactura?.condicionIva === 'consumidorFinal'|| pedido.tipoFactura?.condicionIva === 'Consumidor Final'?'text-gray-500':'text-red-800 text-center px-1 rounded-md font-semibold bg-red-400'} `}>{pedido.tipoFactura?.condicionIva || "Sin nombre"}</p>
                           </div>
                           {/* {console.log('pedido.usuarioInfo', pedido.usuarioInfo)} */}
                           

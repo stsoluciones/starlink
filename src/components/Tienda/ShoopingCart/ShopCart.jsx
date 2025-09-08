@@ -69,7 +69,7 @@ const handleComprar = async (nuevoDescuento) => {
       title: '¿Es consumidor final?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'consumidorFinal',
+      confirmButtonText: 'Consumidor Final',
       cancelButtonText: 'Empresa',
       reverseButtons: true,
       allowOutsideClick: true,
