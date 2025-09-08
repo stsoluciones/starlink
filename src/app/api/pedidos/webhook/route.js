@@ -141,10 +141,9 @@ export async function POST(req) {
             <div style="padding: 32px;">
               <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola ${clienteNombre},</h2>
               <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
-                Te informamos que el estado de tu pedido <strong>#${numeroPedido}</strong> ${estadoPedido === 'pendiente' ? 'está consolidado como' : 'ha sido actualizado a'} 
-                <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
+                Te informamos que el estado de tu pedido <strong>#${numeroPedido}</strong> ha sido actualizado a
+                <span style="font-weight: bold; color: #1a2f98;">Pagado</span>.
               </p>
-              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">${estadoPedido==='pendiente'? 'Se actualizara a PAGADO cuando corroboremos el ingreso del pago.':''}</p>
 
               <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
                 Gracias por confiar en nosotros. Si tenés alguna consulta, no dudes en responder a este correo.
@@ -168,7 +167,7 @@ export async function POST(req) {
               <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS</h2>
               <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
               Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> a nombre de ${clienteNombre} ha sido actualizado a: 
-              <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
+              <span style="font-weight: bold; color: #1a2f98;">Pagado</span>.
               </p>
               <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
               Por un monto Total: <span style="font-weight: bold; color: #1a2f98;">${montoTotal}</span>.
