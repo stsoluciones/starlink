@@ -4,6 +4,32 @@ import Order from '../../../../models/Order';
 import cloudinary from '../../../../lib/cloudinary';
 import mongoose from 'mongoose';
 
+function normalizeTipoFactura(tipoFactura: any) {
+  if (!tipoFactura || typeof tipoFactura !== 'object') return tipoFactura;
+
+  const raw = String(tipoFactura.condicionIva ?? '').trim().toLowerCase();
+  const map: Record<string, string> = {
+        "consumidor final": "consumidorFinal",
+        "consumidorFinal": "consumidorFinal",
+        "consumidorFInal": "consumidorFinal",
+        "ConsumidorFinal": "consumidorFinal",
+        "responsable inscripto": "responsableInscripto",
+        "responsableInscripto": "responsableInscripto",
+        "ResponsableInscripto": "responsableInscripto",
+        "responsableIncripto": "responsableInscripto",
+        "monotributista": "monotributista",
+        "Monotributista": "monotributista",
+        "iva exento": "exento",
+        "Iva Exento": "exento",
+        "ivaexento": "exento",
+        "exento": "exento",
+  };
+    const normalizado = map[raw] || 'consumidorFinal';
+  // Devolvemos un nuevo objeto para asegurar cambio de referencia (opcional)
+
+  return { ...tipoFactura, condicionIva: normalizado };
+}
+
 export async function POST(req: NextRequest) {
   await connectDB();
 
@@ -30,6 +56,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    if (pedido.tipoFactura && pedido.tipoFactura.condicionIva) {
+      pedido.tipoFactura = normalizeTipoFactura(pedido.tipoFactura);
+      pedido.markModified('tipoFactura'); // asegura detección del cambio en subdocument
+    }
     // Subir archivo a Cloudinary
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -52,11 +82,8 @@ export async function POST(req: NextRequest) {
 
     // Guardar comprobante y número de transferencia (sin validar pago)
     pedido.paymentId = numeroComprobante;
-    pedido.metadata = {
-      ...pedido.metadata,
-      ticketUrl,
-    };
-    await pedido.save();
+    pedido.metadata = { ...(pedido.metadata || {}), ticketUrl };
+    await pedido.save({ validateModifiedOnly: true });
 
     return Response.json({ success: true, ticketUrl });
   } catch (error) {
