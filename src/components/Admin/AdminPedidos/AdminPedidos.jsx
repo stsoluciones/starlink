@@ -60,7 +60,11 @@ const handleStados = (id, nuevoEstado) => {
       pedido.usuarioInfo?.nombreCompleto?.toLowerCase().includes(texto) ||
       pedido?._id?.toLowerCase().includes(texto) ||
       pedido.usuarioInfo?.correo?.toLowerCase().includes(texto);
-    const coincideEstado = filtroEstado === "todos" || pedido.estado === filtroEstado;
+    // Cuando estamos en la pestaña "TODOS" no queremos incluir los pedidos cancelados
+    // Esto mantiene consistente la paginación con lo que muestra el componente `Todos`.
+    const coincideEstado = filtroEstado === "todos"
+      ? (tabActivo === TABS.PEDIDOS ? pedido.estado !== 'cancelado' : true)
+      : pedido.estado === filtroEstado;
     return coincideBusqueda && coincideEstado;
   });
 
@@ -69,6 +73,23 @@ const handleStados = (id, nuevoEstado) => {
     (paginaActual - 1) * pedidosPorPagina,
     paginaActual * pedidosPorPagina
   );
+
+  // Asegurar que la página actual esté dentro del rango válido si cambian los filtros/datos
+  useEffect(() => {
+    if (totalPaginas === 0) {
+      setPaginaActual(1);
+    } else if (paginaActual > totalPaginas) {
+      setPaginaActual(totalPaginas);
+    }
+  }, [totalPaginas]);
+
+  // Dev logs para diagnosticar problemas de paginación
+  if (process.env.NODE_ENV !== 'production') {
+    console.debug('[AdminPedidos] pedidos total:', pedidos.length);
+    console.debug('[AdminPedidos] pedidosFiltrados length:', pedidosFiltrados.length);
+    console.debug('[AdminPedidos] pedidosPaginados length:', pedidosPaginados.length);
+    console.debug('[AdminPedidos] paginaActual / totalPaginas:', paginaActual, '/', totalPaginas);
+  }
 
   const cambiarPagina = (nuevaPagina) => {
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
