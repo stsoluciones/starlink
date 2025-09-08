@@ -133,8 +133,55 @@ export async function POST(req) {
 
         // enviar emails
         const { sendEmail } = await import('../../../../lib/mailer');
-        await sendEmail({ to: clienteEmail, subject: `Tu pedido #${numeroPedido} ahora está: pagado`, html: `<p>Hola ${clienteNombre},</p><p>El estado de tu pedido #${numeroPedido} es: <strong>pagado</strong>.</p>` });
-        await sendEmail({ to: adminEmail, subject: `🔔 Pedido #${numeroPedido} en estado pagado`, html: `<p>Pedido #${numeroPedido} a nombre de ${clienteNombre} - estado: <strong>pagado</strong>. Monto: ${montoTotal}</p>` });
+        await sendEmail({ to: clienteEmail, subject: `Tu pedido #${numeroPedido} ahora está: pagado`, html: `<div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+            <div style="background-color: #F3781B; padding: 16px; text-align: center;">
+              <img src="https://slsoluciones.com.ar/logos/logo.webp" alt="Logo" style="height: 60px; margin: 0 auto;" />
+            </div>
+            <div style="padding: 32px;">
+              <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola ${clienteNombre},</h2>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
+                Te informamos que el estado de tu pedido <strong>#${numeroPedido}</strong> ${estadoPedido === 'pendiente' ? 'está consolidado como' : 'ha sido actualizado a'} 
+                <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
+              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">${estadoPedido==='pendiente'? 'Se actualizara a PAGADO cuando corroboremos el ingreso del pago.':''}</p>
+
+              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
+                Gracias por confiar en nosotros. Si tenés alguna consulta, no dudes en responder a este correo.
+              </p>
+              <a href="https://slsoluciones.com.ar/Dashboard" style="display: inline-block; background-color: #F3781B; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px;">
+                Ver mi pedido
+              </a>
+            </div>
+            <div style="background-color: #f3f4f6; padding: 16px; text-align: center; font-size: 12px; color: #6b7280;">
+              © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
+            </div>
+          </div>
+        </div>` });
+        await sendEmail({ to: adminEmail, subject: `🔔 Pedido #${numeroPedido} en estado pagado`, html: `<div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+        <h3>Notificación de Pago</h3>
+            <div style="background-color: #F3781B; padding: 16px; text-align: center;">
+              <img src="https://slsoluciones.com.ar/logos/logo.webp" alt="Logo" style="height: 60px; margin: 0 auto;" />
+            </div>
+            <div style="padding: 32px;">
+              <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS</h2>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
+              Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> a nombre de ${clienteNombre} ha sido actualizado a: 
+              <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
+              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
+              Por un monto Total: <span style="font-weight: bold; color: #1a2f98;">${montoTotal}</span>.
+              </p>
+              <a href="https://slsoluciones.com.ar/Admin" style="display: inline-block; background-color: #F3781B; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px;">
+              Ver Panel de ADM
+              </a>
+            </div>
+            <div style="background-color: #F3781B; padding: 16px; text-align: center; font-size: 12px; color: #6b7280;">
+              © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
+            </div>
+          </div>
+        </div>` });
 
   // marcar pagoNotificado sin revalidar todo el documento
   await Order.updateOne({ _id: order._id }, { $set: { pagoNotificado: true } });

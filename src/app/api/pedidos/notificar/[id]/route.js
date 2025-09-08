@@ -62,32 +62,33 @@ export async function POST(req, { params }) {
     const res = await sendEmail({
       to: adminEmail,
       subject: `🔔 Pedido #${numeroPedido} en estado ${estadoPedido}`,
-      html: `<div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
-    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-    <h3>Notificación de Pago</h3>
-        <div style="background-color: #F3781B; padding: 16px; text-align: center;">
-          <img src="https://slsoluciones.com.ar/logos/logo.webp" alt="Logo" style="height: 60px; margin: 0 auto;" />
-        </div>
-        <div style="padding: 32px;">
-          <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS</h2>
-          <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
-          Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> a nombre de ${clienteNombre} ha sido actualizado a: 
-          <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
-          </p>
-          <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
-          Por un monto Total: <span style="font-weight: bold; color: #1a2f98;">${montoTotal}</span>.
-          </p>
-          <a href="https://slsoluciones.com.ar/Admin" style="display: inline-block; background-color: #F3781B; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px;">
-          Ver Panel de ADM
-          </a>
-        </div>
-        <div style="background-color: #F3781B; padding: 16px; text-align: center; font-size: 12px; color: #6b7280;">
-          © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
-        </div>
-      </div>
-    </div>`,
-    });
-        adminSendResult = { success: true, info: res };
+      html: `
+      <div style="font-family: 'Segoe UI', sans-serif; background-color: #F5F8FA; padding: 24px;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+        <h3>Notificación de Pago</h3>
+            <div style="background-color: #F3781B; padding: 16px; text-align: center;">
+              <img src="https://slsoluciones.com.ar/logos/logo.webp" alt="Logo" style="height: 60px; margin: 0 auto;" />
+            </div>
+            <div style="padding: 32px;">
+              <h2 style="font-size: 20px; margin-bottom: 16px; color: #F3781B;">Hola SLS</h2>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 16px;">
+              Te informamos que el estado del pedido <strong>#${numeroPedido}</strong> a nombre de ${clienteNombre} ha sido actualizado a: 
+              <span style="font-weight: bold; color: #1a2f98;">${estadoPedido}</span>.
+              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 24px;">
+              Por un monto Total: <span style="font-weight: bold; color: #1a2f98;">${montoTotal}</span>.
+              </p>
+              <a href="https://slsoluciones.com.ar/Admin" style="display: inline-block; background-color: #F3781B; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 16px;">
+              Ver Panel de ADM
+              </a>
+            </div>
+            <div style="background-color: #F3781B; padding: 16px; text-align: center; font-size: 12px; color: #6b7280;">
+              © ${new Date().getFullYear()} SLS. Todos los derechos reservados.
+            </div>
+          </div>
+        </div>`,
+      });
+      adminSendResult = { success: true, info: res };
 
   // marcar pagoNotificado sin revalidar todo el documento (evita errores por valores no conformes ya existentes)
   await Order.updateOne({ _id: order._id }, { $set: { pagoNotificado: true } });
