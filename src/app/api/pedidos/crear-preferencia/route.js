@@ -28,10 +28,21 @@ export async function POST(req) {
 
     const preference = new Preference(client);
     const external_reference = `order_${uid}_${new Date().getTime()}`; // Generar referencia externa única
+
+    // Construir items reducidos para metadata (evitar superar límite de MercadoPago)
+    const reducedItems = (cart || []).map((p) => ({
+      producto: p.cod_producto || p._id || null,
+      nombreProducto: p.nombre || p.titulo_de_producto || null,
+      cantidad: Number(p.quantity || 0),
+      precioUnitario: Number(p.precio || p.unit_price || 0),
+      _id: p._id || null,
+      foto_1_1: p.foto_1_1 || null,
+    }));
+
     const response = await preference.create({
       body: {
         items,
-        metadata: { uid, cart },
+        metadata: { uid, cart: reducedItems },
         notification_url: `${userData.urlHttps}/api/pedidos/webhook`,
         external_reference: external_reference,
         back_urls: {
