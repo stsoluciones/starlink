@@ -58,7 +58,7 @@ export async function generateMetadata() {
 //   import YouTubeLite from '@/Tutoriales/YouTubeLite';
 // - Si lo tenés en /components/Tutoriales/YouTubeLite.jsx:
 //   import YouTubeLite from '@/components/Tutoriales/YouTubeLite';
-import YouTubeLite from '@/Tutoriales/YouTubeLite';
+import YouTubeLite from '../../components/Tutoriales/Tutoriales';
 
 export default async function TutorialesPage() {
   const videos = await getVideos(10);
