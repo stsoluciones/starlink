@@ -439,9 +439,12 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                 unoptimized={true}
                               />
                               <div>
-                                <p className="text-sm font-semibold">{item.titulo_de_producto}</p>
+                                <p className="text-sm font-semibold">{item.titulo_de_producto?item.titulo_de_producto:item.nombre_producto}</p>
                                 <p className="text-xs text-gray-600">
-                                  Cantidad: <span className="text-red-500 font-bold text-xl">{item.quantity}</span>
+                                  CANT: <span className="text-red-500 font-bold text-xl">{item.quantity?item.quantity:item.cantidad}</span>
+                                </p>
+                                <p className="text-xs text-gray-600">
+                                  $ : <span className="text-slate-500 font-bold text-xl">{item.precio?item.precio:item.precio_unitario}</span>
                                 </p>
                               </div>
                             </div>
