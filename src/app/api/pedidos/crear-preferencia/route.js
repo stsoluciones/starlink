@@ -18,6 +18,7 @@ export async function POST(req) {
     const items = cart.map(item => ({
       id: item.cod_producto,
       title: item.nombre,
+      foto_1_1: item.foto_1_1,
       unit_price: Number(item.precio),
       quantity: Number(item.quantity),
       currency_id: "ARS",

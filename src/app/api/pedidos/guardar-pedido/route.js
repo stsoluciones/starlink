@@ -42,12 +42,9 @@ export async function POST(req) {
           nombreProducto: productoDb?.nombre || "Producto desconocido",
           cantidad,
           precioUnitario,
-          // Extras por si los querés usar más adelante (no se guardan en Opción A)
-          _extras: {
-            cod_producto: item.cod_producto,
-            titulo_de_producto: productoDb?.titulo_de_producto ?? "",
-            foto_1_1: item.foto_1_1 ?? productoDb?.foto_1_1 ?? "",
-          },
+          foto_1_1: item.foto_1_1 ?? productoDb?.foto_1_1 ?? "",
+          cod_producto: item.cod_producto,
+          titulo_de_producto: productoDb?.titulo_de_producto ?? "",
         };
       })
     );

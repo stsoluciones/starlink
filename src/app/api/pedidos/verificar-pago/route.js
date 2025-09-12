@@ -69,6 +69,21 @@ export async function GET(req) {
     const newEstado = mappedStatus || estadoAnterior;
 
     // Update order fields (use atomic update to avoid full-document validation problems)
+    // Merge metadata instead of overwriting to preserve existing fields like `cart`.
+    const mergedMetadata = {
+      ...(order.metadata || {}),
+      ...(paymentData.metadata || {}),
+      mp: {
+        id: paymentData.id,
+        status: (paymentData.status || '').toLowerCase(),
+        status_detail: paymentData.status_detail,
+        transaction_amount: paymentData.transaction_amount,
+        date_approved: paymentData.date_approved,
+        date_created: paymentData.date_created,
+        payer: paymentData.payer,
+      },
+    };
+
     const updatedOrder = await Order.findByIdAndUpdate(order._id, {
       $set: {
         estado: newEstado,
@@ -78,15 +93,7 @@ export async function GET(req) {
         collectionStatus: paymentData.status,
         paymentType: paymentData.payment_type_id,
         payerEmail: paymentData.payer?.email || order.payerEmail,
-        metadata: {
-          id: paymentData.id,
-          status: (paymentData.status || '').toLowerCase(),
-          status_detail: paymentData.status_detail,
-          transaction_amount: paymentData.transaction_amount,
-          date_approved: paymentData.date_approved,
-          date_created: paymentData.date_created,
-          payer: paymentData.payer,
-        },
+        metadata: mergedMetadata,
       }
     }, { new: true });
 

@@ -88,7 +88,19 @@ export async function POST(req) {
     order.processingMode = payment.processing_mode;
     order.merchantAccountId = payment.merchant_account_id;
     order.payerEmail = payment.payer?.email;
-    order.metadata = payment.metadata; // Metadata que enviaste originalmente
+    // Merge existing order.metadata with payment.metadata to avoid losing keys like `cart`.
+    // Preservamos `cart` y cualquier dato previo, y agregamos un resumen del pago en `mp`
+    order.metadata = {
+      ...(order.metadata || {}),
+      ...(payment.metadata || {}),
+      mp: {
+        id: payment.id,
+        status: payment.status,
+        status_detail: payment.status_detail,
+        date_approved: payment.date_approved,
+        date_created: payment.date_created,
+      },
+    };
     order.paymentDetails = {
       status: payment.status,
       status_detail: payment.status_detail,

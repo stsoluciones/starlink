@@ -50,6 +50,7 @@ const handleGuardarPedidoMercado = async (user, cart, compraData) => {
       body: JSON.stringify({
         cart: cart.map(item => ({
           cod_producto: item.cod_producto,
+          foto_1_1: item.foto_1_1,
           nombre: item.nombre,
           precio: item.precio,
           quantity: item.quantity,
