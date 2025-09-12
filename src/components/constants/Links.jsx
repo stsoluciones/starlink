@@ -11,6 +11,7 @@ const useLinks = () => {
 
     return [
         { name: 'Home', href: '#home' },
+        { name: 'Tutoriales', href: '/tutoriales' },
         { name: 'Productos', href: '#productos' },
         { name: 'Nosotros', href: '#nosotros' },
         { name: 'Contacto', href: '#contacto' },
