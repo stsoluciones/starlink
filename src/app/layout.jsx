@@ -44,6 +44,8 @@ export default function RootLayout({ children }) {
         <Script src="https://widget.cloudinary.com/v2.0/global/all.js" strategy="lazyOnload" />
         <link rel="dns-prefetch" href="https://widget.cloudinary.com" />
         <link rel="preconnect" href="https://widget.cloudinary.com" crossOrigin="" />
+        <link rel="preload" as="image" href="https://res.cloudinary.com/dtfibzv3v/image/upload/f_auto,q_auto,w_1600/v1747603752/conector_zh1hpb.webp" />
+
       </head>
           <body className="min-h-screen antialiased" data-theme="light">
         {/* GA4: cargar la librería primero */}
