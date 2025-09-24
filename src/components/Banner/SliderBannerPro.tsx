@@ -98,7 +98,7 @@ export default function SliderBannerPro({
   return (
     <section
       id="inicio"
-      className={`w-full flex flex-col p-2 md:p-6 justify-center items-center ${className}`}
+      className={`w-full max-w-7xl flex flex-col p-2 md:p-6 justify-center items-center ${className} mx-auto`}
     >
       <div className="flex flex-col-reverse md:flex-row items-center justify-center gap-4 md:gap-6 w-full">
         {/* Columna Izquierda (contenido libre) */}
