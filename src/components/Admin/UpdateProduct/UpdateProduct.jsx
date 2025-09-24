@@ -280,7 +280,7 @@ export default function UpdateProduct({
                <div className="grid gap-4 mb-4 sm:grid-cols-2">       
               {/* Nombre */}
                 <div>
-                  <label htmlFor="nombreUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Nombre<spam className='text-xs text-red-500'>*</spam></label>
+                  <label htmlFor="nombreUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Nombre<span className='text-xs text-red-500'>*</span></label>
                   <div className="flex">
                     <input onChange={handleChangeInput} type="text" name="nombre" id="nombreUpdate" value={producto.nombre} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Nombre del producto"/>
                     {producto.destacados
@@ -435,7 +435,7 @@ export default function UpdateProduct({
                     htmlFor="modeloUpdate"
                     className="block mb-2 text-sm font-medium text-gray-900"
                   >
-                    Modelo<spam className='text-xs text-red-500'>*</spam>
+                    Modelo<span className='text-xs text-red-500'>*</span>
                   </label>
                   <input
                     onChange={handleChangeInput}
@@ -502,7 +502,7 @@ export default function UpdateProduct({
                 {/* Precio */}
                 <div>
                     <label htmlFor="precioUpdate" className="block mb-2 text-sm font-medium text-gray-900">
-                      Precio<spam className='text-xs text-red-500'>*</spam>
+                      Precio<span className='text-xs text-red-500'>*</span>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -521,7 +521,7 @@ export default function UpdateProduct({
 
                 {/* Descripción */}
                 <div className="sm:col-span-2">
-                  <label htmlFor="descripcionUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Descripción<spam className='text-xs text-red-500'>*</spam></label>
+                  <label htmlFor="descripcionUpdate" className="block mb-2 text-sm font-medium text-gray-900" >Descripción<span className='text-xs text-red-500'>*</span></label>
                   <textarea
                     onChange={handleChangeInput}
                     id="descripcionUpdate"

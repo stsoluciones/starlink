@@ -315,7 +315,7 @@ const hasImageChanges = () => {
                       htmlFor="nombre"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Nombre<spam className='text-xs text-red-500'>*</spam>
+                      Nombre<span className='text-xs text-red-500'>*</span>
                     </label>
                     <div className='flex'>
 
@@ -456,7 +456,7 @@ const hasImageChanges = () => {
                       htmlFor="modeloAdd"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Modelo<spam className='text-xs text-red-500'>*</spam>
+                      Modelo<span className='text-xs text-red-500'>*</span>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -529,7 +529,7 @@ const hasImageChanges = () => {
                   {/* Precio */}
                   <div>
                     <label htmlFor="precioAdd" className="block mb-2 text-sm font-medium text-gray-900">
-                      Precio<spam className='text-xs text-red-500'>*</spam>
+                      Precio<span className='text-xs text-red-500'>*</span>
                     </label>
                     <input
                       onChange={handleChangeInput}
@@ -553,7 +553,7 @@ const hasImageChanges = () => {
                       htmlFor="descripcionAdd"
                       className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Descripción<spam className='text-xs text-red-500'>*</spam>
+                      Descripción<span className='text-xs text-red-500'>*</span>
                     </label>
                     <textarea
                       onChange={handleChangeInput}

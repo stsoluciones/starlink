@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, Button } from '@mui/material';
-import Image from 'next/image';
+import NextImage from 'next/image';
+import Loading from '../Loading/Loading';
+import { set } from 'mongoose';
 
 const modalStyle = {
   position: 'absolute',
@@ -23,12 +25,13 @@ const modalStyle = {
 
 export default function UploadImageEditor({ imageFile, open, onClose, onImageProcessed }) {
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (imageFile) {
       const objectUrl = URL.createObjectURL(imageFile);
       setPreview(objectUrl);
-
+      setLoading(false);
       return () => {
         URL.revokeObjectURL(objectUrl);
       };
@@ -39,7 +42,7 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
     const targetSize = 400;
 
     return new Promise((resolve, reject) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -78,16 +81,24 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
       };
 
       img.onerror = reject;
-      img.src = URL.createObjectURL(image);
+      const tmpUrl = URL.createObjectURL(image);
+      img.src = tmpUrl;
+      // Liberar el objeto URL temporal una vez cargado o si hay error
+      const cleanup = () => URL.revokeObjectURL(tmpUrl);
+      img.onload = ((origOnload) => (e) => { cleanup(); origOnload(e); })(img.onload);
+      img.onerror = ((origOnError) => (e) => { cleanup(); origOnError(e); })(img.onerror);
     });
   };
 
   const handleProcess = async (mode) => {
     try {
+      setLoading(true);
       const result = await processImage(imageFile, mode);
       onImageProcessed(result);
+      setLoading(false);
     } catch (error) {
       console.error("Error al procesar la imagen:", error);
+      setLoading(false);
     }
   };
 
@@ -96,7 +107,7 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
       <Box sx={modalStyle} display="flex" flexDirection="column" alignItems="center">
         <h2 className='text-primary font-bold my-2'>¿Cómo querés ajustar esta imagen?</h2>
         {preview && (
-          <Image
+          <NextImage
             src={preview}
             alt="Previsualización"
             style={{ maxWidth: '100%', maxHeight: 300, marginBottom: 16 }}
@@ -107,6 +118,7 @@ export default function UploadImageEditor({ imageFile, open, onClose, onImagePro
           />
         )}
         <Box display="flex" justifyContent="space-around" m={2} p={1} gap={2}>
+          {loading && <p className='text-secondary self-center'><Loading /></p>}
           <Button
             variant="contained"
             color="primary"
