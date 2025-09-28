@@ -11,7 +11,7 @@ import EmpresaForm from "./Empresas/Empresas";
 import Etiquetas from "./Etiquetas/Etiquetas";
 import AdminPedidos from "./AdminPedidos/AdminPedidos";
 import fetchFiltersData, { startAutoUpdateFilters } from "../../Hooks/useBrandsCategories";
-import Usuarios from "./Usuarios/usuarios";
+import Usuarios from "./Usuarios/Usuarios";
 
 // const Swal = dynamic(() => import("sweetalert2"), { ssr: false });
 // const AddProduct = dynamic(() => import("./AddProduct/AddProduct"), { ssr: false });
