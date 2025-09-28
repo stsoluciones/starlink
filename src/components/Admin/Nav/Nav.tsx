@@ -123,6 +123,7 @@ export default function Nav({ handleSelectSection }) {
           <NavItemButton label="Empresas" onClick={() => { handleSelectSection('Empresas'); toggleMenu(); }} />
           <NavItemButton label="Etiquetas Manuales" onClick={() => { handleSelectSection('Etiquetas'); toggleMenu(); }} />
           <NavItemButton label="Pedidos" onClick={() => { handleSelectSection('Pedidos'); toggleMenu(); }} />
+          <NavItemButton label="Usuarios" onClick={() => { handleSelectSection('Usuarios'); toggleMenu(); }} />
           <NavItemLink label="Regresar a la Web" href="/" onClick={toggleMenu} />
           <li><DownloadCSVButton toggleMenu={toggleMenu} /></li>
           <NavItemButton label="Logout" onClick={handleLogOut} />

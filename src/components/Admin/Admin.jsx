@@ -11,6 +11,7 @@ import EmpresaForm from "./Empresas/Empresas";
 import Etiquetas from "./Etiquetas/Etiquetas";
 import AdminPedidos from "./AdminPedidos/AdminPedidos";
 import fetchFiltersData, { startAutoUpdateFilters } from "../../Hooks/useBrandsCategories";
+import Usuarios from "./Usuarios/usuarios";
 
 // const Swal = dynamic(() => import("sweetalert2"), { ssr: false });
 // const AddProduct = dynamic(() => import("./AddProduct/AddProduct"), { ssr: false });
@@ -364,6 +365,11 @@ const handleDiscount = async (descuento) => {
           {section === 'Pedidos' && (
             <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
               <AdminPedidos />
+            </div>
+          )}
+          {section === 'Usuarios' && (
+            <div className="mx-auto max-w-screen-xl px-1 md:px-4 lg:px-12">
+              <Usuarios />
             </div>
           )}
         </div>

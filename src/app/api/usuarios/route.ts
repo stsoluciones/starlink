@@ -1,9 +1,103 @@
 //app/api/usuarios/route.ts
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { connectDB } from '../../../lib/mongodb';
 import Usuario from '../../../models/User';
+import Order from '../../../models/Order';
 import jwt from 'jsonwebtoken';
 import { auth } from '../../../../pages/api/firebaseAdminConfig';
+
+// Helper para validar token y rol admin
+function verifyAdmin(): { autorizado: boolean; error?: string; status?: number; decoded?: any } {
+    try {
+        const token = cookies().get('token')?.value;
+        if (!token) return { autorizado: false, error: 'No autorizado - token faltante', status: 401 };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+        // @ts-ignore
+        if (!decoded || decoded.rol !== 'admin') {
+            return { autorizado: false, error: 'Acceso denegado - requiere rol admin', status: 403 };
+        }
+        return { autorizado: true, decoded };
+    } catch (e) {
+        return { autorizado: false, error: 'Token inválido o expirado', status: 403 };
+    }
+}
+
+export async function GET(req: Request) {
+    try {
+        const authAdmin = verifyAdmin();
+        if (!authAdmin.autorizado) {
+            return NextResponse.json({ error: authAdmin.error }, { status: authAdmin.status });
+        }
+
+        await connectDB();
+        const { searchParams } = new URL(req.url);
+        const page = parseInt(searchParams.get('page') || '1', 10);
+        const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 200); // hard cap 200
+        const skip = (page - 1) * limit;
+
+        // Total usuarios para paginación
+        const totalUsuarios = await Usuario.countDocuments({});
+        const totalPages = Math.ceil(totalUsuarios / limit) || 1;
+
+        // Aggregation para traer usuarios con estadísticas de pedidos
+        const usuarios = await Usuario.aggregate([
+            { $sort: { fechaRegistro: -1 } },
+            { $skip: skip },
+            { $limit: limit },
+            {
+                $lookup: {
+                    from: 'orders',
+                    let: { userUid: '$uid' },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ['$usuarioUid', '$$userUid'] } } },
+                        {
+                            $group: {
+                                _id: null,
+                                totalPedidos: { $sum: 1 },
+                                entregadas: { $sum: { $cond: [{ $eq: ['$estado', 'entregado'] }, 1, 0] } },
+                                canceladas: { $sum: { $cond: [{ $eq: ['$estado', 'cancelado'] }, 1, 0] } }
+                            }
+                        }
+                    ],
+                    as: 'estadisticasPedidos'
+                }
+            },
+            {
+                $addFields: {
+                    totalPedidos: { $ifNull: [{ $arrayElemAt: ['$estadisticasPedidos.totalPedidos', 0] }, 0] },
+                    entregadas: { $ifNull: [{ $arrayElemAt: ['$estadisticasPedidos.entregadas', 0] }, 0] },
+                    canceladas: { $ifNull: [{ $arrayElemAt: ['$estadisticasPedidos.canceladas', 0] }, 0] },
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    uid: 1,
+                    nombreCompleto: 1,
+                    correo: 1,
+                    telefono: 1,
+                    rol: 1,
+                    fechaRegistro: 1,
+                    totalPedidos: 1,
+                    entregadas: 1,
+                    canceladas: 1
+                }
+            }
+        ]);
+
+        return NextResponse.json({
+            users: usuarios,
+            page,
+            limit,
+            totalPages,
+            totalUsers: totalUsuarios
+        });
+    } catch (error) {
+        console.error('Error GET /api/usuarios:', error);
+        return NextResponse.json({ error: 'Error al obtener usuarios' }, { status: 500 });
+    }
+}
 
 export async function POST(req: Request) {
     try {
