@@ -15,6 +15,7 @@ import Link from 'next/link';
 import { toast } from 'react-toastify';
 import userData from '../../constants/userData';
 import Image from 'next/image';
+import ModalInfoCompleta from './ModalInfoCompleta';
 
 
 const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedidosPaginados, actualizandoId, setActualizandoId, paginaActual, totalPaginas, handleStados, cambiarPagina, setPedidosProcesando }) => {
@@ -28,6 +29,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [trackingFile, setTrackingFile] = useState(null);
   const [mostrarEnvioModal, setMostrarEnvioModal] = useState(false);
+  const [mostrarInfoModal, setMostrarInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const objectIdRegex = /^[a-f\d]{24}$/i;
   
@@ -37,8 +39,13 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   };
 
   const cerrarModalFactura = () => {
-    setMostrarFacturaModal(false);
     setPedidoSeleccionado(null);
+    setMostrarFacturaModal(false);
+  };
+
+  const abrirModalInformacion = (pedido) => {
+    setPedidoSeleccionado(pedido);
+    setMostrarInfoModal(true);
   };
 
   useEffect(() => {
@@ -469,6 +476,9 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <button onClick={() => { setPedidoSeleccionado(pedido);setMostrarEnvioModal(true) }}  className="bg-primary my-1 hover:bg-primary text-white text-sm px-3 py-1 rounded md:ml-2">
                             Ver datos de Envío
                           </button>
+                          <button onClick={() => abrirModalInformacion(pedido)} className= "text-secondary-hover text-sm px-3 py-1 my-1 rounded md:ml-2">
+                            Ver mas
+                          </button>
                             {pedido.estado === 'enviado' && (
                               <button 
                                 onClick={() => {
@@ -684,6 +694,13 @@ const generarEtiquetas = async (pedidoUnico = null) => {
               </tbody>
             </table>
           </div>
+
+          {/* Modal de Información Completa */}
+          <ModalInfoCompleta 
+            pedido={pedidoSeleccionado}
+            isOpen={mostrarInfoModal}
+            onClose={() => setMostrarInfoModal(false)}
+          />
 
           {/* Paginación */}
           <div className="mt-4 flex justify-center flex-row items-center gap-2">
