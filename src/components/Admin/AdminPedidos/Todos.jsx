@@ -9,7 +9,7 @@ const getSwal = async () => {
   return Swal
 }
 import Loading from '../../Loading/Loading';
-// import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
+import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -85,6 +85,149 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
     );
   }
 
+const enviarRecordatorioPago = async (pedidoId) => {
+  try {
+    setLoading(true);
+    
+    const result = await (await getSwal()).fire({
+      title: '¿Enviar recordatorio de pago?',
+      text: 'Se enviará un email al cliente con el enlace para completar el pago.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
+      setLoading(false);
+      return;
+    }
+
+    (await getSwal()).fire({
+      title: 'Enviando...',
+      html: 'Enviando recordatorio de pago al cliente.',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    const response = await fetch('/api/pedidos/recordatorio-pago', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pedidoIds: [pedidoId] })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Error al enviar el recordatorio');
+    }
+
+    (await getSwal()).fire({
+      title: '¡Enviado!',
+      text: 'El recordatorio de pago fue enviado correctamente.',
+      icon: 'success'
+    });
+
+  } catch (error) {
+    console.error('Error al enviar recordatorio:', error);
+    (await getSwal()).fire({
+      title: 'Error',
+      text: error.message || 'Ocurrió un error al enviar el recordatorio.',
+      icon: 'error'
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
+const enviarRecordatoriosMasivos = async () => {
+  try {
+    // Filtrar pedidos pendientes de MercadoPago con init_point
+    const pedidosPendientesMercadoPago = pedidosPaginados.filter(
+      pedido => pedido.estado === 'pendiente' && 
+                pedido.paymentMethod === 'mercadopago' && 
+                pedido.init_point
+    );
+
+    if (pedidosPendientesMercadoPago.length === 0) {
+      (await getSwal()).fire({
+        title: 'Sin pedidos',
+        text: 'No hay pedidos pendientes de MercadoPago para enviar recordatorios.',
+        icon: 'info'
+      });
+      return;
+    }
+
+    const result = await (await getSwal()).fire({
+      title: '¿Enviar recordatorios masivos?',
+      html: `Se enviará un recordatorio de pago a <strong>${pedidosPendientesMercadoPago.length}</strong> cliente(s) con pedidos pendientes de MercadoPago.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, enviar',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
+      return;
+    }
+
+    setLoading(true);
+
+    (await getSwal()).fire({
+      title: 'Enviando...',
+      html: `Enviando recordatorios a ${pedidosPendientesMercadoPago.length} pedido(s).`,
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    const response = await fetch('/api/pedidos/recordatorio-pago', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        pedidoIds: pedidosPendientesMercadoPago.map(p => p._id) 
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Error al enviar los recordatorios');
+    }
+
+    const exitosos = data.resultados?.filter(r => r.success).length || 0;
+    const fallidos = data.resultados?.filter(r => !r.success).length || 0;
+
+    (await getSwal()).fire({
+      title: '¡Completado!',
+      html: `
+        <p>Se enviaron <strong>${exitosos}</strong> recordatorio(s) correctamente.</p>
+        ${fallidos > 0 ? `<p class="text-red-600">Fallaron <strong>${fallidos}</strong> envío(s).</p>` : ''}
+      `,
+      icon: exitosos > 0 ? 'success' : 'warning'
+    });
+
+  } catch (error) {
+    console.error('Error al enviar recordatorios masivos:', error);
+    (await getSwal()).fire({
+      title: 'Error',
+      text: error.message || 'Ocurrió un error al enviar los recordatorios.',
+      icon: 'error'
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 const generarEtiquetas = async (pedidoUnico = null) => {
   // console.log('Generando etiquetas para pedidos:', pedidoUnico);
   // console.log('Pedidos paginados:', pedidosPaginados)
@@ -150,55 +293,33 @@ const generarEtiquetas = async (pedidoUnico = null) => {
         }
       });
 
-      // Generar etiquetas (descomenta y adapta según tu lógica)
-      
-                      //***************************
-      // const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar.map(p => p._id));
+      // Generar etiquetas con Andreani
+      const etiquetasGeneradas = await handleGenerarAndreani(pedidosAActualizar.map(p => p._id));
 
-      // Mostrar mensaje de éxito y preguntar por impresión
-      // const imprimir = await Swal.fire({
-      //   title: `Se generaron ${etiquetasGeneradas.length} etiqueta(s).`,
-      //   icon: 'success',
-      //   showCancelButton: true,
-      //   confirmButtonText: 'Imprimir Etiquetas',
-      //   cancelButtonText: 'No Imprimir',
-      //   reverseButtons: true
-      // });
+      // Si hubo error en la generación de etiquetas, detener el proceso
+      if (etiquetasGeneradas.error) {
+        return;
+      }
 
-      // if (imprimir.isConfirmed) {
-      //   etiquetasGeneradas.forEach(({ pedidoId, etiqueta }) => {
-      //     const blob = new Blob(
-      //       [Uint8Array.from(atob(etiqueta), c => c.charCodeAt(0))],
-      //       { type: 'application/pdf' }
-      //     );
-      //     const url = URL.createObjectURL(blob);
-      //     const link = document.createElement('a');
-      //     link.href = url;
-      //     link.download = `Etiqueta-${pedidoId}.pdf`;
-      //     document.body.appendChild(link);
-      //     link.click();
-      //     URL.revokeObjectURL(url);
-      //     link.remove();
-      //   });
+      // Si no se generaron etiquetas, detener
+      if (!etiquetasGeneradas.etiquetas || etiquetasGeneradas.etiquetas.length === 0) {
+        (await getSwal()).fire({
+          title: 'Sin Resultados',
+          text: 'No se generaron etiquetas. Verifica el estado de los pedidos.',
+          icon: 'warning'
+        });
+        return;
+      }
 
-       // Swal.fire('Imprimiendo etiquetas...', 'Se guardaron las etiquetas en los pedidos.', 'info');
-      // } else {
-      //   Swal.fire('Etiquetas no impresas', 'Las etiquetas fueron generadas pero no se imprimieron.', 'info');
-      // }
-
-      // Finalmente actualizar el estado de los pedidos
-      // Swal.fire({
-      //   title: 'Actualizando pedidos...',
-      //   html: `Actualizando estado de ${pedidosAActualizar.length} pedido(s).`,
-      //   allowOutsideClick: false,
-      //   didOpen: () => {
-      //     Swal.showLoading();
-      //   }
-      // });
-
-      // Finalizar
-  (await getSwal()).close();
-  (await getSwal()).fire('¡Pedidos actualizados!', 'Todos los pedidos fueron marcados como enviados.', 'success');
+      // Actualizar el estado de los pedidos exitosos a "enviado"
+      (await getSwal()).fire({
+        title: 'Actualizando pedidos...',
+        html: `Actualizando estado de ${etiquetasGeneradas.exitosos || 0} pedido(s) exitosos.`,
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
 
 
       const resultados = await Promise.all(
@@ -388,6 +509,15 @@ const generarEtiquetas = async (pedidoUnico = null) => {
               <label htmlFor="seleccionarTodos" className="font-medium cursor-pointer">Imprimir todas las etiquetas</label>
             </div>
             <button onClick={(e) => { e.preventDefault(); generarEtiquetas()}} disabled={seleccionados.length === 0 || loading } className="bg-blue-600 text-white text-sm p-2 my-2 rounded hover:bg-blue-700 disabled:bg-gray-300">Generar y Enviar ({seleccionados.length})</button>
+            {filtroEstado === 'pendiente' && (
+              <button 
+                onClick={enviarRecordatoriosMasivos} 
+                disabled={loading}
+                className="bg-blue-600 text-white text-sm p-2 my-2 rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                📧 Recordar Pagos Pendientes
+              </button>
+            )}
           </div>
 
           {/* Tabla de pedidos */}
@@ -417,6 +547,16 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <div className=' flex gap-2 align-middle'>
                             {pedido?.estado !== 'pendiente' && pedido?.estado !== 'cancelado' && (
                               <button onClick={() => generarEtiquetas(pedido)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-1 md:p-2 my-1 md:my-2 rounded-md" >{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
+                            {/* Botón recordatorio de pago para pendientes de MercadoPago */}
+                            {pedido?.estado === 'pendiente' && pedido?.paymentMethod === 'mercadopago' && pedido?.init_point && (
+                              <button 
+                                onClick={() => enviarRecordatorioPago(pedido._id)}
+                                disabled={loading}
+                                className="text-white font-semibold bg-blue-600 hover:bg-blue-700 p-1 md:p-2 my-1 md:my-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                📧 Recordar Pago
+                              </button>
+                            )}
                             {/* Botón imprimir etiqueta */}
                             {pedido?.metadata?.ticketUrl && pedido?.paymentMethod === 'transferencia' && (
                               <a href={pedido?.metadata.ticketUrl} target="_blank" rel="noopener noreferrer" className={`bg-blue-600 hover:bg-blue-700 text-white text-sm p-1 md:p-2 my-1 md:my-2 rounded`}> ver ticket</a> )}

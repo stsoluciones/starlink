@@ -48,6 +48,7 @@ const orderSchema = new mongoose.Schema({
   estado: { type: String, enum: ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado'], default: 'pendiente' },
   total: { type: Number, required: true, min: 0 },
   pagoNotificado: { type: Boolean, default: false },
+  ultimoRecordatorio: { type: Date },
   collectionId: {type: String},
   collectionStatus: {type: String},
   paymentType: {type: String},
