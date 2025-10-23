@@ -34,7 +34,7 @@ export default async function sitemap() {
       .map(p => {
         const slug = toSlug(p.nombre);
         return {
-          url: `${SITE}/productos/${slug}`,
+          url: `${SITE}productos/${slug}`,
           lastModified: p.updatedAt || new Date(),
           // Next soporta imágenes en el sitemap (útil para rich results de imágenes)
           images: p.foto_1_1 ? [p.foto_1_1] : undefined,

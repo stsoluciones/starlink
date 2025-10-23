@@ -90,14 +90,41 @@ export const defaultMetadata = {
           '@id': SITE + '#org',
           name: 'SLSoluciones',
           url: SITE,
-          logo: SITE + '/logos/logo.webp'
+          logo: SITE + '/logos/logo.webp',
+          sameAs: [
+            'https://www.facebook.com/slsoluciones',
+            'https://www.instagram.com/slsoluciones',
+            'https://twitter.com/slsoluciones'
+          ],
+          contactPoint: [
+            {
+              '@type': 'ContactPoint',
+              telephone: '+54-11-0000-0000',
+              contactType: 'customer service',
+              areaServed: 'AR',
+              availableLanguage: ['es', 'en']
+            }
+          ]
         },
         {
           '@type': 'WebSite',
           '@id': SITE + '#website',
           url: SITE,
           name: 'SLSoluciones',
-          publisher: { '@id': SITE + '#org' }
+          publisher: { '@id': SITE + '#org' },
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: SITE + 'productos?search={search_term_string}',
+            'query-input': 'required name=search_term_string'
+          }
+        },
+        {
+          '@type': 'BreadcrumbList',
+          '@id': SITE + '#breadcrumbs',
+          itemListElement: [
+            { '@type': 'ListItem', 'position': 1, 'name': 'Inicio', 'item': SITE },
+            { '@type': 'ListItem', 'position': 2, 'name': 'Productos', 'item': SITE + 'productos' }
+          ]
         }
       ]
     })
