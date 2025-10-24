@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, ReactNode } from 'react';
+import React, { useEffect, useMemo, useRef, useState, ReactNode, Suspense } from 'react';
 import Image from 'next/image';
 
 /** Inserta transformaciones de Cloudinary /f_auto,q_auto,w_<w>/ luego de /upload/  */
@@ -51,13 +51,16 @@ export default function SliderBannerPro({
   showGradient = true,
   className = '',
   leftContent,
-  sliderHeightClass = 'h-80 md:h-96',
+  sliderHeightClass = 'h-56 sm:h-80 md:h-96',
   onSlideChange,
   footerText,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState(startIndex);
   const [isMobile, setIsMobile] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Helper para Cloudinary: usa w_800 en móvil
+  const getImgWidth = () => (isMobile ? 800 : imageWidth);
 
   // Lista según viewport
   const slides = useMemo<Slide[]>(
@@ -102,8 +105,11 @@ export default function SliderBannerPro({
     >
       <div className="flex flex-col-reverse md:flex-row items-center justify-center gap-4 md:gap-6 w-full">
         {/* Columna Izquierda (contenido libre) */}
-        <div className="w-full md:w-1/2 flex justify-center items-center">
-          {leftContent ?? null}
+        <div className="w-full md:w-1/2 flex justify-center items-center min-h-56">
+          {/* Skeleton loader para componentes dinámicos */}
+          <Suspense fallback={<div className="bg-gray-100 animate-pulse h-full w-full" />}>
+            {leftContent ?? null}
+          </Suspense>
         </div>
 
         {/* Columna Derecha: Slider */}
@@ -123,6 +129,8 @@ export default function SliderBannerPro({
                 }`}
                 aria-hidden={!active}
               >
+                {/* Placeholder de fondo para evitar layout shift */}
+                <div className="absolute inset-0 bg-gray-100 animate-pulse" />
                 {video ? (
                   <video
                     key={`v-${idx}`}
@@ -139,11 +147,11 @@ export default function SliderBannerPro({
                 ) : (
                   <Image
                     unoptimized={false}
-                    src={cldImg(src, imageWidth)}
+                    src={cldImg(src, getImgWidth())}
                     alt={`Slide ${idx + 1}`}
                     title={`Slide ${idx + 1}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes={isMobile ? "100vw" : "50vw"}
                     priority={activeIndex === startIndex && idx === startIndex}
                     loading={idx === activeIndex ? 'eager' : 'lazy'}
                     className="object-cover"
