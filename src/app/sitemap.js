@@ -5,7 +5,7 @@ export const revalidate = 60 * 60 * 24;
 import { connectDB } from '../lib/mongodb';
 import Producto from '../models/product';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar/';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar';
 
 // Helpers
 const toSlug = (nombre = '') =>
@@ -34,7 +34,7 @@ export default async function sitemap() {
       .map(p => {
         const slug = toSlug(p.nombre);
         return {
-          url: `${SITE}productos/${slug}`,
+          url: `${SITE}/productos/${slug}`,
           lastModified: p.updatedAt || new Date(),
           // Next soporta imágenes en el sitemap (útil para rich results de imágenes)
           images: p.foto_1_1 ? [p.foto_1_1] : undefined,
