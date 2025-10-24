@@ -45,6 +45,10 @@ export default function RootLayout({ children }) {
         <link rel="dns-prefetch" href="https://widget.cloudinary.com" />
         <link rel="preconnect" href="https://widget.cloudinary.com" crossOrigin="" />
         <link rel="preload" as="image" href="https://res.cloudinary.com/dtfibzv3v/image/upload/f_auto,q_auto,w_1600/v1747603752/conector_zh1hpb.webp" />
+    {/* Preload de imágenes principales del slider para mejorar LCP */}
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dtfibzv3v/image/upload/f_auto,q_auto,w_1600/v1747603345/antena_cvb9w0.webp" />
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dtfibzv3v/image/upload/f_auto,q_auto,w_1600/v1747603344/auto_qldyxb.webp" />
+    <link rel="preload" as="image" href="https://res.cloudinary.com/dtfibzv3v/image/upload/f_auto,q_auto,w_1600/v1747603344/antenaEnAuto_xw3yhy.webp" />
 
       </head>
           <body className="min-h-screen antialiased" data-theme="light">
