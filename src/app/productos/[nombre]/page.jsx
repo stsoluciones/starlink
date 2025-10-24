@@ -104,6 +104,40 @@ export async function generateMetadata({ params }) {
       follow: true,
       googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
     },
+    // Añadimos JSON-LD específico del producto y breadcrumbs en un @graph
+    other: {
+      'script:ld+json': JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Product',
+            name: nombre,
+            description: description,
+            sku: product?.sku || product?._id || undefined,
+            brand: { '@type': 'Brand', name: marca },
+            category: categoria || undefined,
+            image: [foto],
+            url: canonical,
+            offers: {
+              '@type': 'Offer',
+              url: canonical,
+              priceCurrency: product?.usd ? 'USD' : 'ARS',
+              price: product?.precio?.toString() || undefined,
+              availability: product?.vendido ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+              priceValidUntil: new Date(new Date().getFullYear() + 1, 0, 1).toISOString().slice(0,10)
+            }
+          },
+          {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE },
+              { '@type': 'ListItem', position: 2, name: 'Productos', item: SITE + 'productos' },
+              { '@type': 'ListItem', position: 3, name: nombre, item: canonical }
+            ]
+          }
+        ]
+      })
+    },
   };
 }
 
