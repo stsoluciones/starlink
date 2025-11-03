@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
 import { defaultMetadata } from '../../../lib/metadata';
 import fetchProduct from '../../../Utils/fetchProduct';
 import Productos from '../../../components/Tienda/Productos';
@@ -104,40 +105,6 @@ export async function generateMetadata({ params }) {
       follow: true,
       googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 },
     },
-    // Añadimos JSON-LD específico del producto y breadcrumbs en un @graph
-    other: {
-      'script:ld+json': JSON.stringify({
-        '@context': 'https://schema.org',
-        '@graph': [
-          {
-            '@type': 'Product',
-            name: nombre,
-            description: description,
-            sku: product?.sku || product?._id || undefined,
-            brand: { '@type': 'Brand', name: marca },
-            category: categoria || undefined,
-            image: [foto],
-            url: canonical,
-            offers: {
-              '@type': 'Offer',
-              url: canonical,
-              priceCurrency: product?.usd ? 'USD' : 'ARS',
-              price: product?.precio?.toString() || undefined,
-              availability: product?.vendido ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
-              priceValidUntil: new Date(new Date().getFullYear() + 1, 0, 1).toISOString().slice(0,10)
-            }
-          },
-          {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE },
-              { '@type': 'ListItem', position: 2, name: 'Productos', item: SITE + 'productos' },
-              { '@type': 'ListItem', position: 3, name: nombre, item: canonical }
-            ]
-          }
-        ]
-      })
-    },
   };
 }
 
@@ -154,14 +121,68 @@ export default async function ProductoPage({ params }) {
 
   if (!product) return notFound();
 
+  // Datos para JSON-LD
+  const nombre = clean(product.nombre || nameFromSlug);
+  const modelo = clean(product.modelo || '');
+  const categoria = clean(product.categoria || '');
+  const marca = clean(product.marca || 'SLS');
+  const descSrc = clean(product.descripcion || '');
+  const canonical = new URL(`productos/${encodeURIComponent(rawSlug)}`, SITE).toString();
+  
+  const defaultOg = defaultMetadata?.openGraph?.images?.[0];
+  const defaultOgUrl =
+    (typeof defaultOg === 'string' ? defaultOg : defaultOg?.url) ||
+    'https://slsoluciones.com.ar/og/og-sls-starlink-mini.jpg';
+  const foto = toAbs(product.foto_1_1) || defaultOgUrl;
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Product',
+        name: nombre,
+        description: descSrc || `${nombre} - ${marca}`,
+        sku: product?.sku || product?._id || undefined,
+        brand: { '@type': 'Brand', name: marca },
+        category: categoria || undefined,
+        image: [foto],
+        url: canonical,
+        offers: {
+          '@type': 'Offer',
+          url: canonical,
+          priceCurrency: product?.usd ? 'USD' : 'ARS',
+          price: product?.precio?.toString() || undefined,
+          availability: product?.vendido ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+          priceValidUntil: new Date(new Date().getFullYear() + 1, 0, 1).toISOString().slice(0,10)
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE },
+          { '@type': 'ListItem', position: 2, name: 'Productos', item: SITE + 'productos' },
+          { '@type': 'ListItem', position: 3, name: nombre, item: canonical }
+        ]
+      }
+    ]
+  };
+
   return (
-    <ClientLayout className="flex flex-col h-screen" title={product?.nombre || 'Producto'}>
-      <main className="flex-1 flex items-center justify-center bg-white">
-        <Modal selectedProduct={product} isDialog={false} />
-      </main>
-      <div>
-        <Productos />
-      </div>
-    </ClientLayout>
+    <>
+      <Script
+        id="product-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        strategy="beforeInteractive"
+      />
+      <ClientLayout className="flex flex-col h-screen" title={product?.nombre || 'Producto'}>
+        <main className="flex-1 flex items-center justify-center bg-white">
+          <Modal selectedProduct={product} isDialog={false} />
+        </main>
+        <div>
+          <Productos />
+        </div>
+      </ClientLayout>
+    </>
   );
 }

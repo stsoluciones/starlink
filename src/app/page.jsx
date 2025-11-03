@@ -1,5 +1,6 @@
 // app/(tu-ruta)/page.js o productos/[nombre]/page.js
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import ClientLayout from './ClientLayout';
 import { defaultMetadata } from '../lib/metadata';
 import fetchProduct from '../Utils/fetchProduct';
@@ -127,35 +128,71 @@ export async function generateMetadata({ params }) {
         'max-snippet': -1,
         'max-video-preview': -1
       }
-    },
-
-    // Opcional: Structured Data directo en metadata (si usás Next 14 con `other`)
-    other: {
-      'script:ld+json': JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Product',
-        name: nombre,
-        brand: { '@type': 'Brand', name: marca || 'SLS' },
-        category: categoria || 'Conectividad',
-        image: [foto],
-        description: clean(descSrc) || descripcion,
-        sku: product?.sku || product?._id || undefined,
-        offers: {
-          '@type': 'Offer',
-          url: canonical,
-          availability: 'https://schema.org/InStock',
-          priceCurrency: 'ARS',
-          price: product?.precio?.toString() || undefined
-        }
-      })
     }
   };
 }
 
 export default function HomePage() {
+  const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://slsoluciones.com.ar/';
+  
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${SITE}#organization`,
+        name: 'SLS Soluciones',
+        url: SITE,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${SITE}logos/logo_slsoluciones.png`,
+          width: 300,
+          height: 60
+        },
+        sameAs: [
+          'https://www.facebook.com/slsoluciones',
+          'https://www.instagram.com/slsoluciones'
+        ],
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'Ventas',
+          areaServed: 'AR',
+          availableLanguage: ['Spanish']
+        }
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${SITE}#website`,
+        url: SITE,
+        name: 'SLS Soluciones',
+        description: 'Internet satelital y soluciones de conectividad en Argentina.',
+        publisher: { '@id': `${SITE}#organization` },
+        inLanguage: 'es-AR'
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${SITE}#webpage`,
+        url: SITE,
+        name: 'SLS Soluciones - Internet Satelital Starlink en Argentina',
+        isPartOf: { '@id': `${SITE}#website` },
+        about: { '@id': `${SITE}#organization` },
+        description: 'Internet satelital y soluciones de conectividad en Argentina.',
+        inLanguage: 'es-AR'
+      }
+    ]
+  };
+
   return (
-    <ClientLayout>
-      <MainContent />
-    </ClientLayout>
+    <>
+      <Script
+        id="home-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        strategy="beforeInteractive"
+      />
+      <ClientLayout>
+        <MainContent />
+      </ClientLayout>
+    </>
   );
 }
