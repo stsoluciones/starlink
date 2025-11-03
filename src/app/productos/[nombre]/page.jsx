@@ -3,7 +3,6 @@ export const runtime = 'nodejs';
 
 import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
-import Script from 'next/script';
 import { defaultMetadata } from '../../../lib/metadata';
 import fetchProduct from '../../../Utils/fetchProduct';
 import Productos from '../../../components/Tienda/Productos';
@@ -142,7 +141,7 @@ export default async function ProductoPage({ params }) {
         '@type': 'Product',
         name: nombre,
         description: descSrc || `${nombre} - ${marca}`,
-        sku: product?.sku || product?._id || undefined,
+        sku: product?.sku || product?._id?.toString() || undefined,
         brand: { '@type': 'Brand', name: marca },
         category: categoria || undefined,
         image: [foto],
@@ -169,11 +168,9 @@ export default async function ProductoPage({ params }) {
 
   return (
     <>
-      <Script
-        id="product-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        strategy="beforeInteractive"
       />
       <ClientLayout className="flex flex-col h-screen" title={product?.nombre || 'Producto'}>
         <main className="flex-1 flex items-center justify-center bg-white">

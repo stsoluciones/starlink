@@ -1,6 +1,5 @@
 // app/(tu-ruta)/page.js o productos/[nombre]/page.js
 import dynamic from 'next/dynamic';
-import Script from 'next/script';
 import ClientLayout from './ClientLayout';
 import { defaultMetadata } from '../lib/metadata';
 import fetchProduct from '../Utils/fetchProduct';
@@ -145,7 +144,7 @@ export default function HomePage() {
         url: SITE,
         logo: {
           '@type': 'ImageObject',
-          url: `${SITE}logos/logo_slsoluciones.png`,
+          url: `${SITE.endsWith('/') ? SITE : SITE + '/'}logos/logo_slsoluciones.png`,
           width: 300,
           height: 60
         },
@@ -184,11 +183,9 @@ export default function HomePage() {
 
   return (
     <>
-      <Script
-        id="home-schema"
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        strategy="beforeInteractive"
       />
       <ClientLayout>
         <MainContent />
