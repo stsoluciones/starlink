@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
  * @param {Array<string>} pedidosIds - Array con los IDs de los pedidos
  * @returns {Promise<Object>} Resultado de la generación de etiquetas
  */
+
 const handleGenerarAndreani = async (pedidosIds) => {
   try {
     // Validar que haya pedidos
@@ -23,7 +24,7 @@ const handleGenerarAndreani = async (pedidosIds) => {
       }
     });
 
-    console.log('Generando etiquetas para pedidos:', pedidosIds);
+    console.log('handle: Generando etiquetas para pedidos:', pedidosIds);
 
     // Llamar a la API para generar etiquetas
     const response = await fetch('/api/etiquetasAndreani', {

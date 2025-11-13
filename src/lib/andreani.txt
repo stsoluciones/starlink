@@ -1,0 +1,22 @@
+andreani.com
+contrato": "400037229", 
+tipoDeServicio": "entrega en domicilio", 
+sucursalClienteID":"quilmes", 
+cliente 0012010820
+
+contrato": "400037231", 
+tipoDeServicio": "entrega en sucursal", 
+sucursalClienteID":"quilmes", 
+cliente 0012010820
+
+andreani web
+
+contrato": "400037230", 
+tipoDeServicio": "entrega en domicilio", 
+sucursalClienteID":"quilmes", 
+cliente 0012010820
+
+contrato": "400037232", 
+tipoDeServicio": "entrega en sucursal", 
+sucursalClienteID":"quilmes", 
+cliente 0012010820

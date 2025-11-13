@@ -17,7 +17,7 @@ export async function POST(req) {
       );
     }
 
-    console.log('Generando etiquetas para pedidos:', pedidos);
+    console.log('Backend: Generando etiquetas para pedidos:', pedidos);
 
     // Buscar pedidos válidos (pagados y sin etiqueta)
     const pedidosSeleccionados = await Order.find({
@@ -32,18 +32,18 @@ export async function POST(req) {
       );
     }
 
-    console.log(`Encontrados ${pedidosSeleccionados.length} pedidos válidos`);
+    console.log(`Backend: Encontrados ${pedidosSeleccionados.length} pedidos válidos`);
 
-    // Obtener token de Andreani
-    let token;
+    // Obtener API KEY de Andreani
+    let apiKey;
     try {
-      token = await obtenerTokenAndreani();
-      console.log('Token de Andreani obtenido exitosamente');
+      apiKey = await obtenerTokenAndreani(); // Retorna la APIKEY ahora
+      console.log('API KEY de Andreani configurada exitosamente');
     } catch (error) {
-      console.error('Error al obtener token de Andreani:', error);
+      console.error('Error al obtener API KEY de Andreani:', error);
       return NextResponse.json(
         { 
-          error: 'Error al autenticar con Andreani. Verifica tus credenciales en las variables de entorno.',
+          error: 'Error al autenticar con Andreani. Verifica que ANDREANI_API_KEY esté configurada en las variables de entorno.',
           detalle: error.message 
         },
         { status: 500 }
@@ -56,11 +56,11 @@ export async function POST(req) {
     // Procesar cada pedido
     for (const pedido of pedidosSeleccionados) {
       try {
-        console.log(`Procesando pedido ${pedido._id}...`);
+        console.log(`Backend: Procesando pedido ${pedido._id}...`);
 
         // Verificar si ya tiene etiqueta
         if (pedido.etiquetaEnvio && pedido.trackingCode) {
-          console.log(`Pedido ${pedido._id} ya tiene etiqueta`);
+          console.log(`Backend: Pedido ${pedido._id} ya tiene etiqueta`);
           etiquetas.push({
             pedidoId: pedido._id.toString(),
             mensaje: 'Ya tiene etiqueta generada',
@@ -71,18 +71,34 @@ export async function POST(req) {
         }
 
         // Crear envío en Andreani
-        const envio = await crearEnvio(pedido, token);
-        console.log(`Envío creado para pedido ${pedido._id}:`, envio);
+        const envio = await crearEnvio(pedido, apiKey);
+        console.log(`✅ Envío creado para pedido ${pedido._id}:`, JSON.stringify(envio, null, 2));
 
-        const numeroDeEnvio = envio.numeroDeEnvio || envio.id;
+        // La respuesta puede tener el número de envío en diferentes lugares
+        // Según la doc de Andreani: bultos[0].numeroDeEnvio o numeroDeEnvio directo
+        let numeroDeEnvio = null;
+        
+        if (envio.bultos && envio.bultos.length > 0 && envio.bultos[0].numeroDeEnvio) {
+          numeroDeEnvio = envio.bultos[0].numeroDeEnvio;
+        } else if (envio.numeroDeEnvio) {
+          numeroDeEnvio = envio.numeroDeEnvio;
+        } else if (envio.id) {
+          numeroDeEnvio = envio.id;
+        } else if (typeof envio === 'string') {
+          // Si la respuesta es solo el número de envío como string
+          numeroDeEnvio = envio;
+        }
         
         if (!numeroDeEnvio) {
-          throw new Error('No se recibió número de envío de Andreani');
+          console.error('Respuesta de Andreani sin número de envío:', envio);
+          throw new Error('No se recibió número de envío de Andreani. Verifica la respuesta de la API.');
         }
 
+        console.log(`📦 Número de envío obtenido: ${numeroDeEnvio}`);
+
         // Obtener etiqueta PDF
-        const etiquetaPDF = await obtenerEtiquetaPDF(numeroDeEnvio, token);
-        console.log(`Etiqueta obtenida para pedido ${pedido._id}`);
+        const etiquetaPDF = await obtenerEtiquetaPDF(numeroDeEnvio, apiKey);
+        console.log(`✅ Etiqueta PDF obtenida para pedido ${pedido._id} (${etiquetaPDF.byteLength} bytes)`);
 
         const etiquetaBase64 = Buffer.from(etiquetaPDF).toString('base64');
 
