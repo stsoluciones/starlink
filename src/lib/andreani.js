@@ -259,7 +259,12 @@ export async function crearOrdenAndreani(pedido) {
     throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
   }
 
-  const url = `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
+const url =
+  process.env.NODE_ENV === 'production'
+    ? `${BASE_URL}/v2/ordenes-de-envio`
+    : `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
+  
+  
   console.log('[Andreani] 🌐 URL destino:', url);
   console.log('[Andreani] 🔑 Token presente:', API_KEY ? 'Sí (oculto por seguridad)' : 'No');
   console.log('[Andreani] 📋 Contrato:', CONTRATO);
