@@ -38,7 +38,7 @@ global.window = {
   atob: vi.fn((str) => str), // Simplificado para tests
 };
 
-import handleGenerarAndreani from '../../src/Utils/handleGenerarAndreani';
+import {handleGenerarAndreani} from '../../src/Utils/handleGenerarAndreani';
 
 describe('handleGenerarAndreani', () => {
   

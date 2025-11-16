@@ -9,7 +9,7 @@ const getSwal = async () => {
   return Swal
 }
 import Loading from '../../Loading/Loading';
-import handleGenerarAndreani from '../../../Utils/handleGenerarAndreani'
+import {handleGenerarAndreani} from '../../../Utils/handleGenerarAndreani'
 import actualizarEstado from '../../../Utils/actualizarEstado';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
@@ -546,7 +546,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <p className="text-sm text-gray-700 md:p-2 md:my-2">Pedido N°: <span className="font-bold">{getUltimos6(pedido?._id)}</span></p>
                           <div className=' flex gap-2 align-middle'>
                             {pedido?.estado !== 'pendiente' && pedido?.estado !== 'cancelado' && (
-                              <button onClick={() => generarEtiquetas(pedido)} className="text-white font-semibold bg-orange-500 hover:bg-orange-600 p-1 md:p-2 my-1 md:my-2 rounded-md" >{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
+                              <button onClick={() => generarEtiquetas(pedido)} className={`text-white font-semibold bg-orange-500 hover:bg-orange-600 p-1 md:p-2 my-1 md:my-2 rounded-md ${pedido?.estado === 'enviado' || pedido?.estado === 'entregado' || pedido?.estado === 'cancelado' && pedido.etiquetaEnvio !== "" ? 'hidden' : ''}`}>{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
                             {/* Botón recordatorio de pago para pendientes de MercadoPago */}
                             {pedido?.estado === 'pendiente' && pedido?.paymentMethod === 'mercadopago' && pedido?.init_point && (
                               <button 

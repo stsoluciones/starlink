@@ -1,282 +1,304 @@
-//src/lib/andreani.js
+// lib/andreani.js
+import axios from 'axios';
 
-/**
- * Valida que exista la API KEY de Andreani
- * Documentación: https://developers-sandbox.andreani.com/
- */
-export function obtenerApiKeyAndreani() {
-  const apiKey = process.env.ANDREANI_API_KEY;
-  
-  if (!apiKey) {
-    throw new Error('Falta ANDREANI_API_KEY en las variables de entorno');
-  }
-  
-  console.log('API KEY de Andreani configurada correctamente');
-  return apiKey;
+const BASE_URL =
+  process.env.NODE_ENV === 'production'
+    ? process.env.ANDREANI_API_URL_PRODUCCION
+    : process.env.ANDREANI_API_URL_SANDBOX;
+
+const API_USER = process.env.ANDREANI_CLIENT_ID;
+const API_KEY  = process.env.ANDREANI_CLIENT_SECRET; // lo usamos como token
+const CONTRATO = process.env.ANDREANI_CONTRATO;
+const TIPO_SERVICIO = process.env.ANDREANI_TIPO_SERVICIO || 'estandar';
+
+// Datos fijos de remitente SL Soluciones
+const REMITENTE_NOMBRE   = 'SL soluciones';
+const REMITENTE_EMAIL    = 'infostarlinksoluciones@gmail.com';
+const REMITENTE_CP      = '1878';
+const REMITENTE_CALLE   = 'Roque Saenz Peña';
+const REMITENTE_NUMERO  = '529';
+const REMITENTE_LOCALID = 'Quilmes';
+const REMITENTE_REGION  = 'Buenos Aires';
+const REMITENTE_PAIS    = 'Argentina';
+const REMITENTE_TEL     = '+541151012478';
+const REMITENTE_DOC_TIPO   = 'CUIT';
+const REMITENTE_DOC_NUMERO = '20323868906'; // el CUIT de SL soluciones
+
+if (!API_KEY) {
+  console.warn('[Andreani] Falta ANDREANI_CLIENT_SECRET (token/JWT)');
 }
 
-/**
- * [OBSOLETA] Función antigua para OAuth - ahora se usa APIKEY
- * Se mantiene por compatibilidad pero siempre devuelve la APIKEY
- */
-export async function obtenerTokenAndreani() {
-  // Ahora retornamos la APIKEY directamente en lugar de hacer OAuth
-  return obtenerApiKeyAndreani();
-}
+export function buildAndreaniOrderPayloadFromPedido(pedido) {
+  console.log('[Andreani] 🔨 Construyendo payload para pedido:', pedido._id);
+  console.log('[Andreani] 📦 Datos del pedido:', {
+    numeroPedido: pedido._id,
+    usuarioInfo: pedido.usuarioInfo,
+    tipoFactura: pedido.tipoFactura,
+    direccionEnvio: pedido.direccionEnvio,
+    total: pedido.total,
+    pesoTotalKg: pedido.pesoTotalKg || 2,
+  });
 
+  // Extraer datos del pedido según el esquema correcto
+  const nombreCompleto = pedido.usuarioInfo?.nombreCompleto || pedido.tipoFactura?.razonSocial || 'Sin nombre';
+  const email = pedido.usuarioInfo?.correo || pedido.tipoFactura?.email || pedido.payerEmail || '';
+  const telefono = pedido.direccionEnvio?.telefono || pedido.usuarioInfo?.telefono || pedido.tipoFactura?.telefono || '';
+  const documento = pedido.tipoFactura?.cuit ||  pedido.usuarioInfo?.documento || '';
+  
+  // Datos de dirección
+  const direccion = pedido.direccionEnvio || {};
 
-/**
- * Crea un envío en Andreani y retorna el ID de la orden
- * Documentación: https://developers-sandbox.andreani.com/docs/andreani/beta/creacion-de-una-nueva-orden-de-envio
- */
-export async function crearEnvio(pedido, apiKey) {
-  try {
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? process.env.ANDREANI_API_URL_PRODUCCION || 'https://api.andreani.com'
-      : process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com';
+  const pesoKg  = pedido.pesoTotalKg || 2;
+  const total   = pedido.total || 0;
+  const numeroPedido = String(pedido.numeroPedido || pedido.external_reference || pedido._id);
+  const numeroRemito = numeroPedido.slice(0, 30);
 
-    const url = `${baseUrl}/beta/transporte-distribucion/ordenes-de-envio`;
+  console.log('[Andreani] 📋 Datos extraídos:', {
+    nombreCompleto,
+    email,
+    telefono,
+    documento,
+    direccion,
+  });
 
-    // Validar datos requeridos del destinatario
-    const nombreCompleto = pedido.usuarioInfo?.nombreCompleto || pedido.direccionEnvio?.nombreCompleto || "";
-    const email = pedido.usuarioInfo?.correo || pedido.usuarioInfo?.email || "";
-    const telefono = pedido.usuarioInfo?.telefono || pedido.direccionEnvio?.telefono || "";
-    
-    if (!nombreCompleto || !email || !telefono) {
-      throw new Error('Faltan datos del destinatario (nombre, email o teléfono)');
-    }
+  const payload = {
+    contrato: CONTRATO,
+    tipoDeServicio: TIPO_SERVICIO,
+    sucursalClienteID: API_USER,
+    idPedido: String(pedido.numeroPedido || pedido.external_reference || pedido._id),
 
-    // Validar dirección de destino
-    if (!pedido.direccionEnvio?.codigoPostal || !pedido.direccionEnvio?.calle || !pedido.direccionEnvio?.ciudad) {
-      throw new Error('Faltan datos de la dirección de envío (código postal, calle o ciudad)');
-    }
-
-    // Mapear los datos del pedido al formato EXACTO de la API de Andreani
-    const envioData = {
-      contrato: process.env.ANDREANI_CONTRATO || "400006637",
-      tipoDeServicio: process.env.ANDREANI_TIPO_SERVICIO || "estandar",
-      idPedido: pedido._id?.toString() || "",
-      origen: {
-        postal: {
-          codigoPostal: process.env.ANDREANI_ORIGEN_CP || "1878",
-          calle: process.env.ANDREANI_ORIGEN_CALLE || "Roque Saenz Peña",
-          numero: process.env.ANDREANI_ORIGEN_NUMERO || "529",
-          localidad: process.env.ANDREANI_ORIGEN_LOCALIDAD || "Quilmes",
-          region: process.env.ANDREANI_ORIGEN_REGION || "AR-B",
-          pais: "Argentina",
-          componentesDeDireccion: []
-        }
+    origen: {
+      postal: {
+        codigoPostal: REMITENTE_CP,
+        calle: REMITENTE_CALLE,
+        numero: REMITENTE_NUMERO,
+        piso: '',
+        departamento: '',
+        localidad: REMITENTE_LOCALID,
+        region: REMITENTE_REGION,
+        pais: REMITENTE_PAIS,
+        casillaDeCorreo: '',
+        componentesDeDireccion: [],
       },
-      destino: {
-        postal: {
-          codigoPostal: pedido.direccionEnvio.codigoPostal,
-          calle: pedido.direccionEnvio.calle,
-          numero: pedido.direccionEnvio.numero || "S/N",
-          piso: pedido.direccionEnvio.piso || "",
-          departamento: pedido.direccionEnvio.depto || pedido.direccionEnvio.departamento || "",
-          localidad: pedido.direccionEnvio.ciudad,
-          region: `AR-${getCodigoProvincia(pedido.direccionEnvio.provincia)}`,
-          pais: "Argentina",
-          componentesDeDireccion: pedido.direccionEnvio.entreCalles ? [
-            {
-              meta: "entreCalle1",
-              contenido: pedido.direccionEnvio.entreCalles
-            }
-          ] : []
-        }
+      // sucursal: {
+      //   id: '',
+      //   nomenclatura: '',
+      //   descripcion: '',
+      //   direccion: {
+      //     codigoPostal: REMITENTE_CP,
+      //     calle: REMITENTE_CALLE,
+      //     numero: REMITENTE_NUMERO,
+      //     piso: '',
+      //     departamento: '',
+      //     localidad: REMITENTE_LOCALID,
+      //     region: REMITENTE_REGION,
+      //     pais: REMITENTE_PAIS,
+      //     casillaDeCorreo: '',
+      //     componentesDeDireccion: [],
+      //   },
+      //   telefonos: {
+      //     telefono: [
+      //       {
+      //         tipo: 1, // 1 fijo / 2 celular, etc. Depende doc.
+      //         numero: REMITENTE_TEL,
+      //       },
+      //     ],
+      //   },
+      //   datosAdicionales: {
+      //     matadatos: [],
+      //   },
+      // },
+      coordenadas: {
+        elevacion: 0,
+        latitud: 0,
+        longitud: 0,
+        poligono: 0,
       },
-      remitente: {
-        nombreCompleto: process.env.ANDREANI_REMITENTE_NOMBRE || "SL Soluciones",
-        email: process.env.ANDREANI_REMITENTE_EMAIL || "infostarlinksoluciones@gmail.com",
-        documentoTipo: "CUIT",
-        documentoNumero: process.env.ANDREANI_REMITENTE_CUIT || "20312345678",
+    },
+
+    destino: {
+      postal: {
+        codigoPostal: direccion.codigoPostal || '',
+        calle: direccion.calle || '',
+        numero: direccion.numero || '',
+        piso: direccion.piso || '',
+        departamento: direccion.depto || '',
+        localidad: direccion.ciudad || '',
+        region: direccion.provincia || '',
+        pais: direccion.pais || 'Argentina',
+        casillaDeCorreo: '',
+        componentesDeDireccion: [],
+      },
+      // sucursal: {
+      //   id: '',
+      //   nomenclatura: '',
+      //   descripcion: '',
+      //   direccion: {
+      //     codigoPostal: direccion.codigoPostal || '',
+      //     calle: direccion.calle || '',
+      //     numero: direccion.numero || '',
+      //     piso: direccion.piso || '',
+      //     departamento: direccion.depto || '',
+      //     localidad: direccion.ciudad || '',
+      //     region: direccion.provincia || '',
+      //     pais: direccion.pais || 'Argentina',
+      //     casillaDeCorreo: '',
+      //     componentesDeDireccion: [],
+      //   },
+      //   telefonos: {
+      //     telefono: [
+      //       {
+      //         tipo: 1,
+      //         numero: telefono,
+      //       },
+      //     ],
+      //   },
+      //   datosAdicionales: {
+      //     matadatos: [],
+      //   },
+      // },
+      coordenadas: {
+        elevacion: 0,
+        latitud: 0,
+        longitud: 0,
+        poligono: 0,
+      },
+    },
+    idPedido: numeroPedido,
+    remitente: {
+      nombreCompleto: REMITENTE_NOMBRE,
+      email: REMITENTE_EMAIL,
+      documentoTipo: REMITENTE_DOC_TIPO,
+      documentoNumero: REMITENTE_DOC_NUMERO,
+      telefonos: [
+        {
+          tipo: 1,
+          numero: REMITENTE_TEL,
+        },
+      ],
+    },
+    destinatario: [
+      {
+        nombreCompleto,
+        email,
+        documentoTipo: 'DNI', // o CUIT, lo que corresponda
+        documentoNumero: documento,
         telefonos: [
-          { 
-            tipo: 1, 
-            numero: process.env.ANDREANI_REMITENTE_TEL || "1140000000" 
-          }
-        ]
+          {
+            tipo: 1,
+            numero: telefono,
+          },
+        ],
       },
-      destinatario: [
-        {
-          nombreCompleto: nombreCompleto,
-          email: email,
-          documentoTipo: "DNI",
-          documentoNumero: (pedido.tipoFactura?.cuit || pedido.usuarioInfo?.dni || "30123456").replace(/\D/g, ''),
-          telefonos: [
-            {
-              tipo: 1,
-              numero: telefono.replace(/\D/g, '')
-            }
-          ]
-        }
-      ],
-      bultos: [
-        {
-          kilos: calcularPesoTotal(pedido.items),
-          largoCm: 20,
-          altoCm: 10,
-          anchoCm: 15,
-          volumenCm: 3000, // largoCm * altoCm * anchoCm
-          valorDeclarado: Math.round(pedido.total || 0),
-          descripcion: pedido.items?.map(i => i.nombreProducto).slice(0, 3).join(', ') || "Productos varios"
-        }
-      ],
-      pagoPendienteEnMostrador: false
-    };
+    ],
 
-    console.log('📦 Creando orden en Andreani...');
-    console.log('URL:', url);
-    console.log('Payload:', JSON.stringify(envioData, null, 2));
+    remito: {
+      numeroRemito: numeroRemito,
+      complementarios: [],
+    },
 
-    const res = await fetch(url, {
-      method: 'POST',
+    centroDeCostos: '',
+    productoAEntregar: '',
+    productoARetirar: '',
+    tipoProducto: 'PAQUETE',
+    categoriaFacturacion: '',
+    pagoDestino: 0,
+    valorACobrar: 0,
+
+    fechaDeEntrega: {
+      fecha: '',      // si no usás ventana horaria, podés dejar vacío
+      horaDesde: '',
+      horaHasta: '',
+    },
+
+    codigoVerificadorDeEntrega: '',
+
+    bultos: [
+      {
+        kilos: pesoKg,
+        largoCm: 20,
+        altoCm: 20,
+        anchoCm: 20,
+        volumenCm: 20 * 20 * 20,
+        valorDeclaradoSinImpuestos: total,
+        valorDeclaradoConImpuestos: total,
+        referencias: [
+          {
+            meta: 'idCliente',
+            contenido: String(pedido._id),
+          },
+          {
+            meta: 'numeroPedido',
+            contenido: numeroPedido,
+          },
+        ],
+        descripcion: 'Mercadería',
+        numeroDeEnvio: '',
+        valorDeclarado: total,
+        componentes: {
+          numeroAgrupador: '',
+          componentesHijos: [],
+        },
+        ean: '',
+      },
+    ],
+
+    pagoPendienteEnMostrador: false,
+  };
+
+
+  console.log('[Andreani] ✅ Payload construido:', JSON.stringify(payload, null, 2));
+  return payload;
+}
+
+export async function crearOrdenAndreani(pedido) {
+  console.log('[Andreani] 🚀 Iniciando creación de orden para pedido:', pedido._id);
+  
+  if (!API_KEY) {
+    console.error('[Andreani] ❌ ANDREANI_CLIENT_SECRET no configurado');
+    throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
+  }
+
+  const url = `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
+  console.log('[Andreani] 🌐 URL destino:', url);
+  console.log('[Andreani] 🔑 Token presente:', API_KEY ? 'Sí (oculto por seguridad)' : 'No');
+  console.log('[Andreani] 📋 Contrato:', CONTRATO);
+  console.log('[Andreani] 🚚 Tipo de servicio:', TIPO_SERVICIO);
+  
+  const payload = buildAndreaniOrderPayloadFromPedido(pedido);
+
+  try {
+    console.log('[Andreani] 📤 Enviando request a Andreani...');
+    const response = await axios.post(url, payload, {
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'text/plain', // La documentación sugiere text/plain
-        'Authorization': apiKey // Según la doc: 'Authorization: <API_KEY_VALUE>'
+        'Accept': 'text/plain',
+        // Según el ejemplo oficial
+        Authorization: API_KEY, // si la doc dice Bearer, cambiar a `Bearer ${API_KEY}`
       },
-      body: JSON.stringify(envioData)
+      maxBodyLength: Infinity,
     });
 
-    const responseText = await res.text();
-    console.log('📨 Respuesta status:', res.status);
-    console.log('📨 Respuesta body:', responseText);
-
-    if (!res.ok) {
-      console.error('❌ Error de Andreani:', res.status, responseText);
-      throw new Error(`Error ${res.status}: ${responseText}`);
-    }
-
-    // Intentar parsear la respuesta como JSON
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      // Si no es JSON, usar el texto plano
-      data = { numeroDeEnvio: responseText, rawResponse: responseText };
-    }
-
-    console.log('✅ Orden creada exitosamente:', data);
-    return data;
+    console.log('[Andreani] ✅ Respuesta exitosa:', response.status);
+    console.log('[Andreani] 📥 Datos recibidos:', JSON.stringify(response.data, null, 2));
+    return response.data;
   } catch (error) {
-    console.error('❌ Error en crearEnvio:', error.message);
-    throw error;
+    console.error('[Andreani] ❌ Error creando orden');
+
+    if (error.response) {
+      console.error('[Andreani] Status:', error.response.status);
+      console.error('[Andreani] Data:', JSON.stringify(error.response.data, null, 2));
+      console.error('[Andreani] Headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('[Andreani] Sin respuesta, request:', error.request);
+    } else {
+      console.error('[Andreani] Error configurando request:', error.message);
+    }
+
+    const err = new Error('Error al crear la orden en Andreani');
+    err.status = error.response?.status || 500;
+    err.data = error.response?.data;
+    throw err;
   }
 }
 
-/**
- * Obtiene la etiqueta PDF de un envío
- * Documentación: https://developers-sandbox.andreani.com/
- */
-export async function obtenerEtiquetaPDF(numeroDeEnvio, apiKey) {
-  try {
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? process.env.ANDREANI_API_URL_PRODUCCION || 'https://api.andreani.com'
-      : process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com';
-
-    // Usar el número de envío correcto (puede venir en bultos[0].numeroDeEnvio)
-    const numeroLimpio = numeroDeEnvio?.trim();
-    if (!numeroLimpio) {
-      throw new Error('Número de envío inválido o vacío');
-    }
-
-    const url = `${baseUrl}/beta/transporte-distribucion/ordenes-de-envio/${numeroLimpio}/etiquetas`;
-    console.log('📄 Obteniendo etiqueta desde:', url);
-
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': apiKey, // Según doc: 'Authorization: <API_KEY_VALUE>'
-        'Accept': 'application/pdf'
-      },
-    });
-
-    console.log('📄 Respuesta etiqueta status:', res.status);
-    console.log('📄 Content-Type:', res.headers.get('content-type'));
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error('❌ Error al obtener etiqueta:', res.status, errorText);
-      throw new Error(`No se pudo obtener la etiqueta (${res.status}): ${errorText}`);
-    }
-
-    const arrayBuffer = await res.arrayBuffer();
-    console.log('✅ Etiqueta PDF obtenida:', arrayBuffer.byteLength, 'bytes');
-    
-    return arrayBuffer;
-  } catch (error) {
-    console.error('❌ Error en obtenerEtiquetaPDF:', error.message);
-    throw error;
-  }
-}
-
-/**
- * Consulta el estado de un envío
- */
-export async function consultarEstadoEnvio(numeroDeEnvio, apiKey) {
-  try {
-    const baseUrl = process.env.NODE_ENV === 'production'
-      ? process.env.ANDREANI_API_URL_PRODUCCION || 'https://api.andreani.com'
-      : process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com';
-    
-    const url = `${baseUrl}/beta/transporte-distribucion/ordenes-de-envio/${numeroDeEnvio}/trazas`;
-
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `APIKEY ${apiKey}`,
-        'Accept': 'application/json'
-      },
-    });
-
-    if (!res.ok) {
-      throw new Error(`No se pudo consultar el estado: ${res.status}`);
-    }
-
-    return await res.json();
-  } catch (error) {
-    console.error('Error en consultarEstadoEnvio:', error);
-    throw error;
-  }
-}
-
-// Funciones auxiliares
-function getCodigoProvincia(nombreProvincia) {
-  const provincias = {
-    'Buenos Aires': 'B',
-    'CABA': 'C',
-    'Ciudad Autónoma de Buenos Aires': 'C',
-    'Catamarca': 'K',
-    'Chaco': 'H',
-    'Chubut': 'U',
-    'Córdoba': 'X',
-    'Corrientes': 'W',
-    'Entre Ríos': 'E',
-    'Formosa': 'P',
-    'Jujuy': 'Y',
-    'La Pampa': 'L',
-    'La Rioja': 'F',
-    'Mendoza': 'M',
-    'Misiones': 'N',
-    'Neuquén': 'Q',
-    'Río Negro': 'R',
-    'Salta': 'A',
-    'San Juan': 'J',
-    'San Luis': 'D',
-    'Santa Cruz': 'Z',
-    'Santa Fe': 'S',
-    'Santiago del Estero': 'G',
-    'Tierra del Fuego': 'V',
-    'Tucumán': 'T',
-  };
-  
-  return provincias[nombreProvincia] || 'B'; // Default Buenos Aires
-}
-
-function calcularPesoTotal(items) {
-  if (!items || items.length === 0) return 1;
-  // Asume peso promedio de 1kg por producto
-  const totalItems = items.reduce((acc, item) => acc + (item.cantidad || 1), 0);
-  return Math.max(totalItems * 1, 0.5); // Mínimo 0.5kg
-}
