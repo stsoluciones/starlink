@@ -288,7 +288,7 @@ export async function crearOrdenAndreani(pedido) {
         'Content-Type': 'application/json',
         'Accept': 'text/plain',
         // Según el ejemplo oficial
-        Authorization: API_KEY, // si la doc dice Bearer, cambiar a `Bearer ${API_KEY}`
+        'x-authorization-token': API_KEY, // si la doc dice Bearer, cambiar a `Bearer ${API_KEY}`
       },
       maxBodyLength: Infinity,
     });
