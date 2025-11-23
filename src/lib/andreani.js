@@ -1,5 +1,6 @@
 // lib/andreani.js
 import axios from 'axios';
+import { createAndreaniOrder } from './andreaniClient';
 
 // Determinar el entorno: sandbox o producción
 // Si ANDREANI_ENVIRONMENT está definido, úsalo; si no, usa NODE_ENV
@@ -263,10 +264,9 @@ export async function crearOrdenAndreani(pedido) {
     throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
   }
 
-
   const ORDER_PATH = ANDREANI_ENV === 'production'
-    ? '/v2/ordenes-de-envio'                    
-    : '/beta/transporte-distribucion/ordenes-de-envio'; 
+    ? '/v2/ordenes-de-envio'
+    : '/beta/transporte-distribucion/ordenes-de-envio';
 
   const url = `${BASE_URL}${ORDER_PATH}`;
   
@@ -278,32 +278,39 @@ export async function crearOrdenAndreani(pedido) {
   console.log('[Andreani] 🔑 Token presente:', API_KEY ? 'Sí (oculto por seguridad)' : 'No');
   console.log('[Andreani] 📋 Contrato:', CONTRATO);
   console.log('[Andreani] 🚚 Tipo de servicio:', TIPO_SERVICIO);
-  
+
   const payload = buildAndreaniOrderPayloadFromPedido(pedido);
 
   try {
     console.log('[Andreani] 📤 Enviando request a Andreani...');
-    console.log('[Andreani] 🧭 ENV:', ANDREANI_ENV);
-    console.log('[Andreani] 🔐 Usando header:', 
-      ANDREANI_ENV === 'production' ? 'Authorization: Bearer' : 'x-authorization-token'
+    console.log(
+      '[Andreani] 🧭 ENV:',
+      ANDREANI_ENV,
+      '— Header:',
+      ANDREANI_ENV === 'production'
+        ? 'Authorization: Bearer <token>'
+        : 'x-authorization-token: <token>'
     );
 
-    const response = await axios.post(url, payload, {
-      headers:
-        ANDREANI_ENV === 'production'
-          ? {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': API_KEY, // si la doc dice Bearer, cambiar a `Bearer ${API_KEY}`
-            }
+    const headers =
+      ANDREANI_ENV === 'production'
+        ? {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            // PROD → Bearer
+            'x-authorization-token': API_KEY,
+          }
           : {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'x-authorization-token': API_KEY,
-            },
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            // SANDBOX → header especial
+            'Authorization': `Bearer ${API_KEY}`,
+          };
+
+    const response = await axios.post(url, payload, {
+      headers,
       maxBodyLength: Infinity,
     });
-
 
     console.log('[Andreani] ✅ Respuesta exitosa:', response.status);
     console.log('[Andreani] 📥 Datos recibidos:', JSON.stringify(response.data, null, 2));
@@ -327,4 +334,5 @@ export async function crearOrdenAndreani(pedido) {
     throw err;
   }
 }
+
 
