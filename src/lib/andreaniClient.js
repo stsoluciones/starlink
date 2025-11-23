@@ -1,8 +1,18 @@
 // lib/andreaniClient.js
 import axios from 'axios';
 
-const ANDREANI_LOGIN_URL = `${process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com'}/auth/login`;
-const ANDREANI_BASE_URL = process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com';
+const ANDREANI_ENV =
+  process.env.ANDREANI_ENVIRONMENT ||
+  (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox');
+
+const ANDREANI_LOGIN_URL = ANDREANI_ENV === 'production'
+  ? process.env.ANDREANI_LOGIN_URL_PROD
+  : `${process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com'}/auth/login`;
+
+const ANDREANI_BASE_URL = ANDREANI_ENV === 'production'
+  ? process.env.ANDREANI_API_URL_PRODUCCION
+  : process.env.ANDREANI_API_URL_SANDBOX || 'https://apissandbox.andreani.com';
+
 const ANDREANI_CONTRATO = process.env.ANDREANI_CONTRATO;
 const ANDREANI_TIPO_SERVICIO = process.env.ANDREANI_TIPO_SERVICIO || 'estandar';
 const ANDREANI_USER = process.env.ANDREANI_CLIENT_ID;
@@ -10,7 +20,11 @@ const ANDREANI_PASSWORD = process.env.ANDREANI_CLIENT_SECRET;
 
 //Endpoint según docs beta que estás usando
 // https://apissandbox.andreani.com/beta/transporte-distribucion/ordenes-de-envio
-const ANDREANI_ORDERS_URL = `${ANDREANI_BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
+// Endpoint órdenes por entorno
+const ANDREANI_ORDERS_URL =
+  ANDREANI_ENV === 'production'
+    ? `${ANDREANI_BASE_URL}/v2/ordenes-de-envio`
+    : `${ANDREANI_BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
 
 if (!ANDREANI_LOGIN_URL || !ANDREANI_USER || !ANDREANI_PASSWORD || !ANDREANI_CONTRATO) {
   console.warn(
@@ -37,6 +51,7 @@ async function loginAndreani() {
   }
 
   try {
+    console.log('[Andreani] 🔐 Login en:', ANDREANI_LOGIN_URL);
     const response = await axios.post(
       ANDREANI_LOGIN_URL,
       {}, // algunas APIs no necesitan body para login con Basic Auth
@@ -51,6 +66,12 @@ async function loginAndreani() {
     // ⚠️ Ajustar esto según el JSON real que devuelva Andreani
     // normalmente viene algo tipo { token: "xxx", expires_in: 3600 }
     const { token, expires_in } = response.data;
+    
+    if (!token) {
+      console.error('[Andreani] ❌ Login sin token en respuesta:', response.data);
+      throw new Error('Respuesta de login inválida');
+    }
+    console.log('[Andreani] ✅ Token recibido:', token);
 
     cachedToken = token;
     cachedTokenExpiresAt = Date.now() + (expires_in || 3600) * 1000;
@@ -87,8 +108,8 @@ function buildAndreaniOrderPayload({ orderId, customer, shipping, items, totals 
     remitente: {
       // tu depósito / origen (según doc)
       // datos fijos de tu comercio (pueden venir de config)
-      nombre: 'TU NOMBRE COMERCIAL',
-      email: 'tucorreo@dominio.com',
+      nombre: 'SL Soluciones ',
+      email: 'infostarlinksoluciones@gmail.com',
       // ...
     },
 
@@ -140,6 +161,10 @@ export async function createAndreaniOrder({ orderId, customer, shipping, items, 
   const payload = buildAndreaniOrderPayload({ orderId, customer, shipping, items, totals });
 
   try {
+    console.log('[Andreani] 🌐 ENV:', ANDREANI_ENV);
+    console.log('[Andreani] 🌐 Base URL:', ANDREANI_BASE_URL);
+    console.log('[Andreani] 🌐 Orders URL:', ANDREANI_ORDERS_URL);
+    
     const response = await axios.post(ANDREANI_ORDERS_URL, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
