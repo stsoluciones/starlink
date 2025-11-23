@@ -256,69 +256,21 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
   return payload;
 }
 
+
+
 export async function crearOrdenAndreani(pedido) {
   console.log('[Andreani] 🚀 Iniciando creación de orden para pedido:', pedido._id);
-  
-  if (!API_KEY) {
-    console.error('[Andreani] ❌ ANDREANI_CLIENT_SECRET no configurado');
-    throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
-  }
-
-  const ORDER_PATH =
-    ANDREANI_ENV === 'production'
-      ? '/v2/ordenes-de-envio'
-      : '/beta/transporte-distribucion/ordenes-de-envio';
-
-  const url = `${BASE_URL}${ORDER_PATH}`;
-  
-  console.log('[Andreani] 🌐 NODE_ENV:', process.env.NODE_ENV);
-  console.log('[Andreani] 🌐 ANDREANI_ENVIRONMENT:', process.env.ANDREANI_ENVIRONMENT || '(not set, using NODE_ENV)');
   console.log('[Andreani] 🌐 Entorno efectivo:', ANDREANI_ENV);
-  console.log('[Andreani] 🌐 BASE_URL:', BASE_URL);
-  console.log('[Andreani] 🌐 URL completa:', url);
-  console.log('[Andreani] 🔑 Token presente:', API_KEY ? 'Sí (oculto por seguridad)' : 'No');
-  console.log('[Andreani] 📋 Contrato:', CONTRATO);
-  console.log('[Andreani] 🚚 Tipo de servicio:', TIPO_SERVICIO);
 
   const payload = buildAndreaniOrderPayloadFromPedido(pedido);
 
   try {
-    // ⚠️ Usar SIEMPRE x-authorization-token, según doc Andreani
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'x-authorization-token': API_KEY,
-    };
-
-    console.log('[Andreani] 🧭 ENV:', ANDREANI_ENV, '— Header: x-authorization-token');
-
-    console.log('[Andreani] 📤 Enviando request a Andreani...');
-    const response = await axios.post(url, payload, {
-      headers,
-      maxBodyLength: Infinity,
-    });
-
-    console.log('[Andreani] ✅ Respuesta exitosa:', response.status);
-    console.log('[Andreani] 📥 Datos recibidos:', JSON.stringify(response.data, null, 2));
-    return response.data;
+    console.log('[Andreani] 📤 Enviando orden a Andreani a través de andreaniClient...');
+    const respAndreani = await createAndreaniOrder(payload);
+    console.log('[Andreani] ✅ Orden creada correctamente en Andreani');
+    return respAndreani;
   } catch (error) {
-    console.error('[Andreani] ❌ Error creando orden');
-
-    if (error.response) {
-      console.error('[Andreani] Status:', error.response.status);
-      console.error('[Andreani] Data:', JSON.stringify(error.response.data, null, 2));
-      console.error('[Andreani] Headers:', error.response.headers);
-    } else if (error.request) {
-      console.error('[Andreani] Sin respuesta, request:', error.request);
-    } else {
-      console.error('[Andreani] Error configurando request:', error.message);
-    }
-
-    const err = new Error('Error al crear la orden en Andreani');
-    err.status = error.response?.status || 500;
-    err.data = error.response?.data;
-    throw err;
+    console.error('[Andreani] ❌ Error creando orden en Andreani (wrapper crearOrdenAndreani):', error);
+    throw error; // lo captura tu API y arma el objeto de error que ya estás logueando
   }
 }
-
-
