@@ -1,10 +1,14 @@
 // lib/andreani.js
 import axios from 'axios';
 
-const BASE_URL =
-  process.env.NODE_ENV === 'production'
-    ? process.env.ANDREANI_API_URL_PRODUCCION
-    : process.env.ANDREANI_API_URL_SANDBOX;
+// Determinar el entorno: sandbox o producción
+// Si ANDREANI_ENVIRONMENT está definido, úsalo; si no, usa NODE_ENV
+const ANDREANI_ENV = process.env.ANDREANI_ENVIRONMENT || 
+  (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox');
+
+const BASE_URL = ANDREANI_ENV === 'production'
+  ? process.env.ANDREANI_API_URL_PRODUCCION
+  : process.env.ANDREANI_API_URL_SANDBOX;
 
 const API_USER = process.env.ANDREANI_CLIENT_ID;
 const API_KEY  = process.env.ANDREANI_CLIENT_SECRET; // lo usamos como token
@@ -259,9 +263,16 @@ export async function crearOrdenAndreani(pedido) {
     throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
   }
 
-  const url = `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
+
+  const ORDER_PATH = ANDREANI_ENV === 'production'
+    ? '/v2/ordenes-de-envio'                    
+    : '/beta/transporte-distribucion/ordenes-de-envio'; 
+
+  const url = `${BASE_URL}${ORDER_PATH}`;
   
-  console.log('[Andreani] 🌐 Environment:', process.env.NODE_ENV);
+  console.log('[Andreani] 🌐 NODE_ENV:', process.env.NODE_ENV);
+  console.log('[Andreani] 🌐 ANDREANI_ENVIRONMENT:', process.env.ANDREANI_ENVIRONMENT || '(not set, using NODE_ENV)');
+  console.log('[Andreani] 🌐 Entorno efectivo:', ANDREANI_ENV);
   console.log('[Andreani] 🌐 BASE_URL:', BASE_URL);
   console.log('[Andreani] 🌐 URL completa:', url);
   console.log('[Andreani] 🔑 Token presente:', API_KEY ? 'Sí (oculto por seguridad)' : 'No');
