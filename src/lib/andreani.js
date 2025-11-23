@@ -264,9 +264,10 @@ export async function crearOrdenAndreani(pedido) {
     throw new Error('No está configurado ANDREANI_CLIENT_SECRET');
   }
 
-  const ORDER_PATH = ANDREANI_ENV === 'production'
-    ? '/v2/ordenes-de-envio'
-    : '/beta/transporte-distribucion/ordenes-de-envio';
+  const ORDER_PATH =
+    ANDREANI_ENV === 'production'
+      ? '/v2/ordenes-de-envio'
+      : '/beta/transporte-distribucion/ordenes-de-envio';
 
   const url = `${BASE_URL}${ORDER_PATH}`;
   
@@ -282,31 +283,16 @@ export async function crearOrdenAndreani(pedido) {
   const payload = buildAndreaniOrderPayloadFromPedido(pedido);
 
   try {
+    // ⚠️ Usar SIEMPRE x-authorization-token, según doc Andreani
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'x-authorization-token': API_KEY,
+    };
+
+    console.log('[Andreani] 🧭 ENV:', ANDREANI_ENV, '— Header: x-authorization-token');
+
     console.log('[Andreani] 📤 Enviando request a Andreani...');
-    console.log(
-      '[Andreani] 🧭 ENV:',
-      ANDREANI_ENV,
-      '— Header:',
-      ANDREANI_ENV === 'production'
-        ? 'Authorization: Bearer <token>'
-        : 'x-authorization-token: <token>'
-    );
-
-    const headers =
-      ANDREANI_ENV === 'production'
-        ? {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            // PROD → Bearer
-            'x-authorization-token': API_KEY,
-          }
-          : {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            // SANDBOX → header especial
-            'Authorization': `Bearer ${API_KEY}`,
-          };
-
     const response = await axios.post(url, payload, {
       headers,
       maxBodyLength: Infinity,
