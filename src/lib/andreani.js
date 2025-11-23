@@ -283,15 +283,27 @@ export async function crearOrdenAndreani(pedido) {
 
   try {
     console.log('[Andreani] 📤 Enviando request a Andreani...');
+    console.log('[Andreani] 🧭 ENV:', ANDREANI_ENV);
+    console.log('[Andreani] 🔐 Usando header:', 
+      ANDREANI_ENV === 'production' ? 'Authorization: Bearer' : 'x-authorization-token'
+    );
+
     const response = await axios.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'text/plain',
-        // Según el ejemplo oficial
-        'x-authorization-token': API_KEY, // si la doc dice Bearer, cambiar a `Bearer ${API_KEY}`
-      },
+      headers:
+        ANDREANI_ENV === 'production'
+          ? {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              Authorization: `Bearer ${API_KEY}`,
+            }
+          : {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'x-authorization-token': API_KEY,
+            },
       maxBodyLength: Infinity,
     });
+
 
     console.log('[Andreani] ✅ Respuesta exitosa:', response.status);
     console.log('[Andreani] 📥 Datos recibidos:', JSON.stringify(response.data, null, 2));
