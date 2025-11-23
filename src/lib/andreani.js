@@ -261,7 +261,7 @@ export async function crearOrdenAndreani(pedido) {
 
 const url =
   process.env.NODE_ENV === 'production'
-    ? `${BASE_URL}/v2/ordenes-de-envio`
+    ? `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`
     : `${BASE_URL}/beta/transporte-distribucion/ordenes-de-envio`;
   
   
