@@ -13,16 +13,12 @@ const ANDREANI_BASE_URL =
     : (process.env.ANDREANI_API_URL_SANDBOX || 'https://apisqa.andreani.com');
 
 // 3) URL de LOGIN por entorno
-//    En prod te pasaron: https://apis.andreani.com/login
-//    En QA suele ser:    https://apisqa.andreani.com/login
 const ANDREANI_LOGIN_URL =
   ANDREANI_ENV === 'production'
     ? (process.env.ANDREANI_LOGIN_URL_PROD || `${ANDREANI_BASE_URL}/login`)
     : (process.env.ANDREANI_LOGIN_URL_SANDBOX || `${ANDREANI_BASE_URL}/login`);
 
 // 4) Endpoint de órdenes por entorno
-//    - Sandbox: beta/transporte-distribucion/ordenes-de-envio
-//    - Prod:    v2/ordenes-de-envio
 const ANDREANI_ORDERS_URL =
   ANDREANI_ENV === 'production'
     ? `${ANDREANI_BASE_URL}/v2/ordenes-de-envio`
@@ -72,11 +68,14 @@ export async function loginAndreani(): Promise<string> {
 
     const response = await axios.post(
       ANDREANI_LOGIN_URL,
-      {}, // muchas APIs de login con Basic Auth no requieren body
       {
-        auth: {
-          username: ANDREANI_USER!,
+          userName: ANDREANI_USER!,
           password: ANDREANI_PASSWORD!,
+      },
+       {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
       }
     );
