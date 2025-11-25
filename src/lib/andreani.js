@@ -69,7 +69,7 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
   const payload = {
     contrato: CONTRATO,
     tipoDeServicio: TIPO_SERVICIO,
-    sucursalClienteID: API_USER,
+    sucursalClienteID: process.env.ANDREANI_SUCURSAL_CLIENTE_ID,
     idPedido: String(pedido.numeroPedido || pedido.external_reference || pedido._id),
 
     origen: {
