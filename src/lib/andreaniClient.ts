@@ -115,6 +115,63 @@ export async function getAndreaniToken(): Promise<string> {
 }
 
 /**
+ * Descarga la etiqueta PDF desde Andreani usando el token de autenticación.
+ * @param etiquetaUrl - URL de la etiqueta proporcionada por Andreani
+ * @returns Buffer con el contenido del PDF
+ */
+export async function downloadEtiquetaPDF(etiquetaUrl: string): Promise<Buffer> {
+  const token = await loginAndreani();
+
+  try {
+    console.log('[Andreani] 📥 Descargando etiqueta PDF desde:', etiquetaUrl);
+    
+    const response = await axios.get(etiquetaUrl, {
+      headers: {
+        'x-authorization-token': token,
+        'Accept': 'application/pdf',
+      },
+      responseType: 'arraybuffer',
+    });
+
+    console.log('[Andreani] ✅ Etiqueta PDF descargada, tamaño:', response.data.byteLength, 'bytes');
+    return Buffer.from(response.data);
+  } catch (error: any) {
+    console.error('[Andreani] ❌ Error descargando etiqueta PDF:');
+    console.error('URL:', etiquetaUrl);
+    console.error('Status:', error.response?.status);
+    console.error('Headers enviados:', error.config?.headers);
+    
+    // Intentar con API KEY si el token falla
+    if (error.response?.status === 401) {
+      console.log('[Andreani] 🔄 Reintentando con API KEY...');
+      const apiKey = process.env.ANDREANI_API_KEY;
+      
+      if (apiKey) {
+        try {
+          const retryResponse = await axios.get(etiquetaUrl, {
+            headers: {
+              'apikey': apiKey,
+              'Accept': 'application/pdf',
+            },
+            responseType: 'arraybuffer',
+          });
+          
+          console.log('[Andreani] ✅ Etiqueta PDF descargada con API KEY, tamaño:', retryResponse.data.byteLength, 'bytes');
+          return Buffer.from(retryResponse.data);
+        } catch (retryError: any) {
+          console.error('[Andreani] ❌ Falló también con API KEY:', retryError.response?.status);
+        }
+      }
+    }
+
+    const err = new Error('Error al descargar la etiqueta PDF de Andreani');
+    (err as any).status = error.response?.status || 500;
+    (err as any).data = error.response?.data || null;
+    throw err;
+  }
+}
+
+/**
  * Crea la orden de envío EN ANDREANI usando un payload YA ARMADO
  * (por ejemplo, el que generás en buildAndreaniOrderPayloadFromPedido en lib/andreani.js).
  *
@@ -151,6 +208,27 @@ export async function createAndreaniOrder(payload: any): Promise<any> {
 
     console.log('[Andreani] ✅ Orden creada, status:', response.status);
     console.log('[Andreani] 📥 Respuesta Andreani:', JSON.stringify(response.data, null, 2));
+    
+    // Log detallado de la estructura de bultos y enlaces
+    if (response.data.bultos && response.data.bultos.length > 0) {
+      response.data.bultos.forEach((bulto: any, index: number) => {
+        console.log(`[Andreani] 📦 Bulto ${index + 1}:`, {
+          numeroDeEnvio: bulto.numeroDeEnvio,
+          kilos: bulto.kilos,
+          linking: bulto.linking
+        });
+        
+        if (bulto.linking && Array.isArray(bulto.linking)) {
+          bulto.linking.forEach((link: any) => {
+            console.log(`[Andreani] 🔗 Link encontrado:`, {
+              meta: link.meta,
+              contenido: link.contenido
+            });
+          });
+        }
+      });
+    }
+    
     return response.data;
   } catch (error: any) {
     console.error('[Andreani] ❌ Error creando orden en Andreani:');

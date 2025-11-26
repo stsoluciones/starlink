@@ -2,6 +2,7 @@
 import { connectDB } from '../../../src/lib/mongodb';
 import Pedido from '../../../src/models/Order';
 import { crearOrdenAndreani } from '../../../src/lib/andreani';
+import { downloadEtiquetaPDF } from '../../../src/lib/andreaniClient';
 
 export default async function handler(req, res) {
   console.log('[API Andreani] 🎯 Endpoint generar-etiquetas llamado');
@@ -61,8 +62,13 @@ export default async function handler(req, res) {
         // -----------------------------
         //   Extraer tracking + etiqueta
         // -----------------------------
+        console.log('[API Andreani] 🔍 Respuesta completa de Andreani:', JSON.stringify(respAndreani, null, 2));
+        
         const bultos = respAndreani.bultos || [];
         const primerBulto = bultos[0] || {};
+
+        console.log('[API Andreani] 📦 Primer bulto:', JSON.stringify(primerBulto, null, 2));
+        console.log('[API Andreani] 🔗 Linking del bulto:', JSON.stringify(primerBulto.linking, null, 2));
 
         const trackingCode = primerBulto.numeroDeEnvio || '';
 
@@ -73,17 +79,38 @@ export default async function handler(req, res) {
 
         const etiquetaUrl = urlEtiquetaBulto || respAndreani.etiquetaRemito || '';
 
-        console.log('[API Andreani] 📄 Datos de etiqueta:', {
+        console.log('[API Andreani] 📄 Datos de etiqueta extraídos:', {
           pedidoId: pedido._id,
           trackingCode,
           etiquetaUrl,
+          etiquetaLinking: etiquetaLinking,
+          urlEtiquetaBulto,
+          etiquetaRemito: respAndreani.etiquetaRemito,
         });
+        
+        // -----------------------------
+        //   Descargar etiqueta PDF y convertir a base64
+        // -----------------------------
+        let etiquetaBase64 = null;
+        
+        if (etiquetaUrl) {
+          try {
+            console.log('[API Andreani] 📥 Descargando etiqueta PDF...');
+            const pdfBuffer = await downloadEtiquetaPDF(etiquetaUrl);
+            etiquetaBase64 = pdfBuffer.toString('base64');
+            console.log('[API Andreani] ✅ Etiqueta PDF descargada y convertida a base64');
+          } catch (errorPDF) {
+            console.error('[API Andreani] ⚠️ Error descargando PDF, se guardará solo la URL:', errorPDF.message);
+            // Si falla la descarga, guardamos la URL de todas formas
+          }
+        }
         
         // -----------------------------
         //   Guardar en el pedido (Order)
         // -----------------------------
         pedido.trackingCode = trackingCode;
-        pedido.etiquetaEnvio = etiquetaUrl;
+        // Guardar el PDF en base64 si está disponible, sino la URL
+        pedido.etiquetaEnvio = etiquetaBase64 || etiquetaUrl;
 
         // Guardar metadata extra de Andreani
         pedido.metadata = {
@@ -108,7 +135,9 @@ export default async function handler(req, res) {
             pedidoId: String(pedido._id),
             numeroPedido: String(pedido.nroComprobante || pedido._id),
             trackingCode,
-            etiquetaEnvio: etiquetaUrl,
+            etiquetaEnvio: etiquetaBase64 || etiquetaUrl, // base64 si está disponible, sino URL
+            etiquetaUrl: etiquetaUrl, // También incluir la URL por si es útil
+            tipoEtiqueta: etiquetaBase64 ? 'base64' : 'url',
           },
         });
 
