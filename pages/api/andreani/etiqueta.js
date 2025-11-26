@@ -16,12 +16,40 @@ export default async function handler(req, res) {
     const token = await getAndreaniToken();
 
     // 2) FETCH a Andreani con Authorization
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    let resp = await fetch(url, {
+    headers: {
+        apikey: process.env.ANDREANI_API_KEY,
         Accept: "application/pdf",
-      },
+    },
     });
+    if (resp.status === 200) {
+        console.log('opc 1 es la que va');
+    }
+
+    // 2) Si falla, intento variante 2
+    if (resp.status === 401) {
+        resp = await fetch(url, {
+            headers: {
+            "x-authorization": process.env.ANDREANI_API_KEY,
+            Accept: "application/pdf",
+            },
+        });
+    }
+    if (resp.status === 200) {
+        console.log('opc 2 es la que va');
+    }
+    // 3) Variante 3
+    if (resp.status === 401) {
+        resp = await fetch(url, {
+            headers: {
+            Authorization: `Apikey ${process.env.ANDREANI_API_KEY}`,
+            Accept: "application/pdf",
+            },
+        });
+    }
+    if (resp.status === 200) {
+        console.log('opc 3 es la que va');
+    }
 
     if (!resp.ok) {
       const text = await resp.text();
