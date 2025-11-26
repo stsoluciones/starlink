@@ -195,7 +195,12 @@ const EnTransito= () => {
                         ? format(new Date(pedido.fechaPedido), "dd-MM-yyyy", { locale: es })
                         : ""}
                   </span>
-                  {pedido?.etiquetaEnvio && (<Link href={pedido.etiquetaEnvio} target="_blank"> - Reimprimir </Link>)}
+                  {pedido?.etiquetaEnvio && (<Link 
+                                            href={`/api/andreani/etiqueta?url=${encodeURIComponent(pedido.etiquetaEnvio)}&pedidoId=${pedido._id}`}
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="text-white bg-blue-600 py-2 px-4 rounded-md hover:bg-blue-700 text-xs md:text-sm mb-4"
+                                          > - Reimprimir </Link>)}
               </li>
             ))}
           </ul>
