@@ -1,10 +1,8 @@
 // src/app/api/etiquetasAndreani/route.js
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import Order from "../../../models/Order";
 import { connectDB } from "../../../lib/mongodb";
 import { obtenerTokenAndreani, crearEnvio, obtenerEtiquetaPDF } from "../../../lib/andreani";
-import { getAndreaniToken } from './andreaniClient';
-
 
 export async function POST(req) {
   try {
@@ -154,65 +152,48 @@ export async function POST(req) {
   }
 }
 
-// Endpoint para consultar el estado de un envío y obtener su etiqueta
+// Endpoint para consultar el estado de un envío
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const url = searchParams.get("url");
-    const pedidoId = searchParams.get("pedidoId");
-
-    if (!url) {
-      return NextResponse.json(
-        { error: "Falta parámetro 'url' de la etiqueta" },
-        { status: 400 }
-      );
-    }
+    const pedidoId = searchParams.get('pedidoId');
 
     if (!pedidoId) {
       return NextResponse.json(
-        { error: "Debe proporcionar un ID de pedido" },
+        { error: 'Debe proporcionar un ID de pedido' },
         { status: 400 }
       );
     }
 
-    // ⚠️ Usa tu login correcto
-    const token = await getAndreaniToken();
+    await connectDB();
 
-    // Llamada a Andreani enviando el token
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/pdf",
-      },
-    });
+    const pedido = await Order.findById(pedidoId).lean();
 
-    if (!resp.ok) {
-      const text = await resp.text();
-      console.error("[Andreani etiqueta] Error:", resp.status, text);
+    if (!pedido) {
       return NextResponse.json(
-        {
-          error: "Error al obtener etiqueta desde Andreani",
-          status: resp.status,
-          body: text,
-        },
-        { status: 500 }
+        { error: 'Pedido no encontrado' },
+        { status: 404 }
       );
     }
 
-    const buffer = await resp.arrayBuffer();
+    if (!pedido.trackingCode) {
+      return NextResponse.json(
+        { error: 'El pedido no tiene tracking code' },
+        { status: 400 }
+      );
+    }
 
-    return new NextResponse(buffer, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="etiqueta-${pedidoId}.pdf"`,
-      },
+    return NextResponse.json({
+      pedidoId: pedido._id,
+      trackingCode: pedido.trackingCode,
+      etiqueta: pedido.etiquetaEnvio,
+      estado: pedido.estado,
     });
 
   } catch (error) {
-    console.error("Error al consultar etiqueta:", error);
+    console.error('Error al consultar etiqueta:', error);
     return NextResponse.json(
-      { error: "Error al consultar etiqueta", detalle: error.message },
+      { error: 'Error al consultar etiqueta', detalle: error.message },
       { status: 500 }
     );
   }
