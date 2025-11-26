@@ -639,7 +639,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                     <div className="space-y-4">
                                       <div className="flex flex-col items-center">
                                           <Link 
-                                            href={pedidoSeleccionado.etiquetaEnvio}
+                                            href={`/api/andreani/etiqueta?url=${encodeURIComponent(pedidoSeleccionado.etiquetaEnvio)}&pedidoId=${pedidoSeleccionado._id}`}
                                             target="_blank" 
                                             rel="noopener noreferrer"
                                             className="text-white bg-blue-600 py-2 px-4 rounded-md hover:bg-blue-700 text-xs md:text-sm mb-4"
