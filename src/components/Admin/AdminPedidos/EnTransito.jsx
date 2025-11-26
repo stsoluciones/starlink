@@ -303,7 +303,7 @@ const EnTransito = () => {
                 )}
 
                 {/* 🔹 Botón Sync Andreani POR PEDIDO (ahora dentro del map) */}
-                {pedido.trackingCode && (
+                {/* {pedido.trackingCode && (
                   <button
                     disabled={actualizandoId === pedido._id}
                     onClick={() => handleSyncAndreani(pedido._id)}
@@ -311,7 +311,7 @@ const EnTransito = () => {
                   >
                     Sync Andreani
                   </button>
-                )}
+                )} */}
               </li>
             ))}
           </ul>
