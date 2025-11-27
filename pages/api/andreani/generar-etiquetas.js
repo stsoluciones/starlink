@@ -110,7 +110,7 @@ export default async function handler(req, res) {
         // -----------------------------
         pedido.trackingCode = trackingCode;
         // Guardar el PDF en base64 si está disponible, sino la URL
-        pedido.etiquetaEnvio = etiquetaBase64 || etiquetaUrl;
+        pedido.etiquetaEnvio = etiquetaUrl;
 
         // Guardar metadata extra de Andreani
         pedido.metadata = {
@@ -135,7 +135,7 @@ export default async function handler(req, res) {
             pedidoId: String(pedido._id),
             numeroPedido: String(pedido.nroComprobante || pedido._id),
             trackingCode,
-            etiquetaEnvio: etiquetaBase64 || etiquetaUrl, // base64 si está disponible, sino URL
+            etiquetaEnvio: etiquetaUrl, // base64 si está disponible, sino URL
             etiquetaUrl: etiquetaUrl, // También incluir la URL por si es útil
             tipoEtiqueta: etiquetaBase64 ? 'base64' : 'url',
           },
