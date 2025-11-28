@@ -70,7 +70,7 @@ export async function cancelarEnvioAndreani(params = {}) {
   console.log('[Andreani] 📦 Payload NuevaAccion:', JSON.stringify(payload, null, 2));
 
   const url = `${ANDREANI_BASE_URL}/v2/api/NuevaAccion`;
-  const apiKey = process.env.ANDREANI_API_KEY || '';
+  const apiKey = process.env.ANDREANI_CLIENT_SECRET || '';
   const token = await getAndreaniToken().catch((err) => {
     console.error('[Andreani] ⚠ No se pudo obtener token (puede que no haga falta para este endpoint):', err?.message);
     return null;
