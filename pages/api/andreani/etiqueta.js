@@ -1,135 +1,197 @@
-import { getAndreaniToken } from '../../../src/lib/andreaniClient';
+// lib/andreaniEliminar.js
+import axios from 'axios';
+import { getAndreaniToken } from './andreaniClient';
 
-export default async function handler(req, res) {
-  try {
-    const { url, pedidoId } = req.query;
+// 1) Detectar entorno: sandbox o producción
+const ANDREANI_ENV =
+  process.env.ANDREANI_ENVIRONMENT ||
+  (process.env.NODE_ENV === 'production' ? 'production' : 'sandbox');
 
-    console.log('[ETIQUETA] 📋 Solicitud recibida:', { url, pedidoId });
+const ANDREANI_BASE_URL =
+  ANDREANI_ENV === 'production'
+    ? process.env.ANDREANI_API_URL_PRODUCCION || 'https://apis.andreani.com'
+    : process.env.ANDREANI_API_URL_SANDBOX || 'https://apisqa.andreani.com';
 
-    if (!url) {
-      return res.status(400).json({ error: "Falta parámetro 'url'" });
-    }
+/**
+ * Cancela uno o varios envíos en Andreani usando la API NuevaAccion.
+ *
+ * POST {BASE}/v2/api/NuevaAccion
+ *
+ * Body:
+ * {
+ *   "accion": "cancelacion",
+ *   "datos": {
+ *     "contrato": "string",
+ *     "numeroAndreani": ["string"],
+ *     "componentes": ["string"]
+ *   }
+ * }
+ */
+export async function cancelarEnvioAndreani(params = {}) {
+  const { numeroAndreani, componentes, contrato: contratoParam } = params;
 
-    if (!pedidoId) {
-      return res.status(400).json({ error: "Falta 'pedidoId'" });
-    }
+  if (!numeroAndreani) {
+    throw new Error('❌ cancelarEnvioAndreani: falta numeroAndreani');
+  }
 
-    // 1) TOKEN CORRECTO (login con user/pass)
-    console.log('[ETIQUETA] 🔑 Obteniendo token de Andreani...');
-    const token = await getAndreaniToken();
-    console.log('[ETIQUETA] ✅ Token obtenido:', token ? 'OK' : 'NO');
+  const contrato = contratoParam || process.env.ANDREANI_CONTRATO;
 
-    // 2) FETCH a Andreani con Authorization
-    console.log('[ETIQUETA] 🌐 Intentando OPCIÓN 1: header "apikey"');
-    let resp = await fetch(url, {
-    headers: {
-        apikey: process.env.ANDREANI_API_KEY,
-        Accept: "application/pdf",
-    },
-    });
-    console.log('[ETIQUETA] 📡 Respuesta OPCIÓN 1:', resp.status, resp.statusText);
-    
-    if (resp.status === 200) {
-        console.log('[ETIQUETA] ✅ OPCIÓN 1 funcionó: header "apikey"');
-    }
-
-    // 2) Si falla, intento variante 2
-    if (resp.status === 401) {
-        console.log('[ETIQUETA] 🌐 Intentando OPCIÓN 2: header "x-authorization"');
-        resp = await fetch(url, {
-            headers: {
-            "x-authorization": process.env.ANDREANI_API_KEY,
-            Accept: "application/pdf",
-            },
-        });
-        console.log('[ETIQUETA] 📡 Respuesta OPCIÓN 2:', resp.status, resp.statusText);
-    }
-    if (resp.status === 200) {
-        console.log('[ETIQUETA] ✅ OPCIÓN 2 funcionó: header "x-authorization"');
-    }
-    
-    // 3) Variante 3
-    if (resp.status === 401) {
-        console.log('[ETIQUETA] 🌐 Intentando OPCIÓN 3: header "Authorization: Apikey"');
-        resp = await fetch(url, {
-            headers: {
-            Authorization: `Apikey ${process.env.ANDREANI_API_KEY}`,
-            Accept: "application/pdf",
-            },
-        });
-        console.log('[ETIQUETA] 📡 Respuesta OPCIÓN 3:', resp.status, resp.statusText);
-    }
-    if (resp.status === 200) {
-        console.log('[ETIQUETA] ✅ OPCIÓN 3 funcionó: header "Authorization: Apikey"');
-    }
-    
-    // 4) Intentar con Bearer token
-    if (resp.status === 401 && token) {
-        console.log('[ETIQUETA] 🌐 Intentando OPCIÓN 4: Bearer token');
-        resp = await fetch(url, {
-            headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/pdf",
-            },
-        });
-        console.log('[ETIQUETA] 📡 Respuesta OPCIÓN 4:', resp.status, resp.statusText);
-        if (resp.status === 200) {
-            console.log('[ETIQUETA] ✅ OPCIÓN 4 funcionó: Bearer token');
-        }
-    }
-    
-    // 5) Intentar con x-authorization-token (como en andreaniClient)
-    if (resp.status === 401 && token) {
-        console.log('[ETIQUETA] 🌐 Intentando OPCIÓN 5: x-authorization-token');
-        resp = await fetch(url, {
-            headers: {
-            "x-authorization-token": token,
-            Accept: "application/pdf",
-            },
-        });
-        console.log('[ETIQUETA] 📡 Respuesta OPCIÓN 5:', resp.status, resp.statusText);
-        if (resp.status === 200) {
-            console.log('[ETIQUETA] ✅ OPCIÓN 5 funcionó: x-authorization-token');
-        }
-    }
-
-    if (!resp.ok) {
-      console.error('[ETIQUETA] ❌ Error final al obtener etiqueta');
-      console.error('[ETIQUETA] Status:', resp.status);
-      console.error('[ETIQUETA] URL intentada:', url);
-      const text = await resp.text();
-      console.error('[ETIQUETA] Respuesta:', text);
-      
-      return res.status(500).json({
-        error: "Error al obtener etiqueta - Todas las opciones de autenticación fallaron",
-        status: resp.status,
-        body: text,
-        url: url
-      });
-    }
-
-    // 3) Convertir PDF
-    console.log('[ETIQUETA] 📄 Convirtiendo PDF a buffer...');
-    const buffer = await resp.arrayBuffer();
-    console.log('[ETIQUETA] ✅ PDF obtenido, tamaño:', buffer.byteLength, 'bytes');
-
-    // 4) Enviar PDF al navegador
-    console.log('[ETIQUETA] 📤 Enviando PDF al navegador...');
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="etiqueta-${pedidoId}.pdf"`
+  if (!contrato) {
+    throw new Error(
+      '❌ cancelarEnvioAndreani: falta ANDREANI_CONTRATO en las variables de entorno'
     );
+  }
 
-    console.log('[ETIQUETA] ✅ Etiqueta enviada exitosamente para pedido:', pedidoId);
-    return res.send(Buffer.from(buffer));
+  // Normalizar a arrays de strings
+  const numeroAndreaniArray = Array.isArray(numeroAndreani)
+    ? numeroAndreani.map(String)
+    : [String(numeroAndreani)];
 
-  } catch (error) {
-    console.error("[ETIQUETA] ❌ Error inesperado obteniendo etiqueta:", error);
-    console.error("[ETIQUETA] Stack:", error.stack);
-    return res.status(500).json({ 
-      error: "Error interno",
-      detalle: error.message 
+  const componentesArray = componentes
+    ? Array.isArray(componentes)
+      ? componentes.map(String)
+      : [String(componentes)]
+    : [];
+
+  const payload = {
+    accion: 'cancelacion',
+    datos: {
+      contrato,
+      numeroAndreani: numeroAndreaniArray,
+    },
+  };
+
+  if (componentesArray.length > 0) {
+    payload.datos.componentes = componentesArray;
+  }
+
+  console.log('[Andreani] 🛑 Enviando solicitud de cancelación...');
+  console.log('[Andreani] 🌍 Base URL:', ANDREANI_BASE_URL);
+  console.log('[Andreani] 📦 Payload NuevaAccion:', JSON.stringify(payload, null, 2));
+
+  const url = `${ANDREANI_BASE_URL}/v2/api/NuevaAccion`;
+  const apiKey = process.env.ANDREANI_API_KEY || '';
+  const token = await getAndreaniToken().catch((err) => {
+    console.error('[Andreani] ⚠ No se pudo obtener token (puede que no haga falta para este endpoint):', err?.message);
+    return null;
+  });
+
+  // Headers comunes para todas las variantes
+  const baseHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  // Igual que en tu código de etiquetas: armamos las distintas opciones
+  const attempts = [];
+
+  if (apiKey) {
+    attempts.push({
+      label: 'OPCIÓN 1: header "apikey"',
+      headers: { apikey: apiKey },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 2: header "x-authorization"',
+      headers: { 'x-authorization': apiKey },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 3: header "Authorization: Apikey"',
+      headers: { Authorization: `Apikey ${apiKey}` },
     });
   }
+
+  if (token) {
+    attempts.push({
+      label: 'OPCIÓN 4: Bearer token',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 5: x-authorization-token',
+      headers: { 'x-authorization-token': token },
+    });
+  }
+
+  if (attempts.length === 0) {
+    throw new Error(
+      '❌ cancelarEnvioAndreani: no hay ANDREANI_API_KEY ni token disponible para probar autenticación'
+    );
+  }
+
+  let lastError = null;
+
+  for (const attempt of attempts) {
+    console.log(`[Andreani] 🌐 Intentando ${attempt.label}`);
+
+    try {
+      const response = await axios.post(url, payload, {
+        headers: {
+          ...baseHeaders,
+          ...attempt.headers,
+        },
+      });
+
+      console.log(
+        `[Andreani] 📡 Respuesta ${attempt.label}:`,
+        response.status,
+        response.statusText
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log(`[Andreani] ✅ ${attempt.label} funcionó`);
+        console.log('[Andreani] 🔁 Respuesta:', response.data);
+        return response.data;
+      }
+
+      // Si no es 2xx, logueamos y probamos la siguiente
+      console.warn(
+        `[Andreani] ⚠ ${attempt.label} no devolvió 2xx:`,
+        response.status,
+        response.statusText
+      );
+      lastError = new Error(
+        `Error Andreani NuevaAccion (${attempt.label}): ${response.status} - ${response.statusText}`
+      );
+    } catch (error) {
+      if (error.response) {
+        const { status, data } = error.response;
+
+        console.error(
+          `[Andreani] ❌ ${attempt.label} devolvió error:`,
+          status,
+          data
+        );
+
+        // Guardamos el último error
+        lastError = new Error(
+          `Error Andreani NuevaAccion (${attempt.label}): ${status} - ${JSON.stringify(
+            data
+          )}`
+        );
+
+        // Si es 401/403 seguimos probando las otras variantes
+        if (status === 401 || status === 403) {
+          console.warn(
+            `[Andreani] ⚠ ${attempt.label} devolvió ${status}, probando siguiente variante...`
+          );
+          continue;
+        }
+
+        // Otros códigos los cortamos directo
+        throw lastError;
+      } else {
+        console.error(`[Andreani] ❌ Error de red en ${attempt.label}:`, error);
+        lastError = error;
+        // Puede ser un problema de red / DNS / etc → corto
+        throw error;
+      }
+    }
+  }
+
+  // Si llegamos acá, ninguna variante funcionó
+  console.error('[Andreani] ❌ Ninguna variante de autenticación funcionó en NuevaAccion');
+  if (lastError) throw lastError;
+  throw new Error('Error Andreani NuevaAccion: no se pudo autenticar con ninguna variante');
 }
