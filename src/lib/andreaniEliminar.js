@@ -103,13 +103,28 @@ export async function cancelarEnvioAndreani(params = {}) {
   }
 
   if (token) {
+        attempts.push({
+      label: 'OPCIÓN 4: header "apikey"',
+      headers: { apikey: token },
+    });
+
     attempts.push({
-      label: 'OPCIÓN 4: Bearer token',
+      label: 'OPCIÓN 5: header "x-authorization"',
+      headers: { 'x-authorization': token },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 6: header "Authorization: Apikey"',
+      headers: { Authorization: `Apikey ${token}` },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 7: Bearer token',
       headers: { Authorization: `Bearer ${token}` },
     });
 
     attempts.push({
-      label: 'OPCIÓN 5: x-authorization-token',
+      label: 'OPCIÓN 8: x-authorization-token',
       headers: { 'x-authorization-token': token },
     });
   }
