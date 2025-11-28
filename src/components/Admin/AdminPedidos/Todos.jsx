@@ -492,6 +492,58 @@ const generarEtiquetas = async (pedidoUnico = null) => {
     const d = new Date(f);
     return isNaN(d) ? "-" : d.toLocaleString("es-AR");
   };
+  const [loadingCancelar, setLoadingCancelar] = useState(false);
+
+  const handleCancelarEnvio = async (pedidoSeleccionado) => {
+      if (!pedidoSeleccionado?.trackingCode) {
+        toast.warning("Este pedido no tiene número de tracking de Andreani.");
+        return;
+      }
+
+      // Confirmación 1
+      const c1 = confirm("⚠ ¿Seguro que deseas cancelar el envío en Andreani?");
+      if (!c1) return;
+
+      // Confirmación 2
+      const c2 = confirm("Esto anulará el envío y NO podrá recuperarse.\n¿Continuar?");
+      if (!c2) return;
+
+      try {
+        setLoadingCancelar(true); // opcional si querés mostrar spinner
+
+        const res = await fetch("/api/andreani/cancelar-envio", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            numeroAndreani: pedidoSeleccionado.trackingCode, // número de tracking
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          toast.error("❌ Error al cancelar: " + (data.mensaje || "Error desconocido"));
+          return;
+        }
+
+        toast.success("✅ Envío cancelado correctamente en Andreani.");
+        const c3 = confirm('¿Queres eliminar la etiqueta y el tracking del pedido ?');
+        if (c3) {
+          setPedidoSeleccionado(pedidoSeleccionado);
+          await handleEliminarEtiqueta();
+        }
+
+        // opcional: refrescar la lista de pedidos
+        if (typeof fetchPedidos === "function") fetchPedidos();
+
+      } catch (error) {
+        console.error("Error cancelando envío:", error);
+        toast.error("❌ No se pudo cancelar el envío.");
+      } finally {
+        setLoadingCancelar(false);
+      }
+    };
+
 
   return (
           <section>
@@ -667,6 +719,17 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                                           className="text-white bg-red-500 py-2 px-4 rounded-md hover:bg-red-600 text-xs md:text-sm"
                                         >
                                           Eliminar Etiqueta
+                                        </button>
+                                        <button 
+                                          disabled={loadingCancelar}
+                                          onClick={() => handleCancelarEnvio(pedidoSeleccionado)}
+                                          className={`text-white py-2 px-4 rounded-md text-xs md:text-sm ${
+                                            loadingCancelar
+                                              ? "bg-gray-400 cursor-not-allowed"
+                                              : "bg-red-700 hover:bg-red-800"
+                                          }`}
+                                        >
+                                          {loadingCancelar ? "Cancelando..." : "Cancelar Envío Andreani"}
                                         </button>
                                       </div>
                                     </div>
