@@ -31,6 +31,7 @@ const Todos = ({search, filtroEstado, setSearch, setFiltroEstado, estados, pedid
   const [mostrarEnvioModal, setMostrarEnvioModal] = useState(false);
   const [mostrarInfoModal, setMostrarInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingCancelar, setLoadingCancelar] = useState(false);
   const objectIdRegex = /^[a-f\d]{24}$/i;
   
   const abrirModalFactura = (pedido) => {
@@ -492,7 +493,6 @@ const generarEtiquetas = async (pedidoUnico = null) => {
     const d = new Date(f);
     return isNaN(d) ? "-" : d.toLocaleString("es-AR");
   };
-  const [loadingCancelar, setLoadingCancelar] = useState(false);
 
   const handleCancelarEnvio = async (pedidoSeleccionado) => {
       if (!pedidoSeleccionado?.trackingCode) {
