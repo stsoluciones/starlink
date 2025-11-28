@@ -28,13 +28,13 @@ const ANDREANI_BASE_URL =
  * }
  */
 export async function cancelarEnvioAndreani(params = {}) {
-  const { numeroAndreani } = params;
+  const { numeroAndreani, componentes, contrato: contratoParam } = params;
 
   if (!numeroAndreani) {
     throw new Error('❌ cancelarEnvioAndreani: falta numeroAndreani');
   }
 
-  const contrato = process.env.ANDREANI_CONTRATO;
+  const contrato = contratoParam || process.env.ANDREANI_CONTRATO;
 
   if (!contrato) {
     throw new Error(
@@ -47,6 +47,12 @@ export async function cancelarEnvioAndreani(params = {}) {
     ? numeroAndreani.map(String)
     : [String(numeroAndreani)];
 
+  const componentesArray = componentes
+    ? Array.isArray(componentes)
+      ? componentes.map(String)
+      : [String(componentes)]
+    : [];
+
   const payload = {
     accion: 'cancelacion',
     datos: {
@@ -55,42 +61,137 @@ export async function cancelarEnvioAndreani(params = {}) {
     },
   };
 
+  if (componentesArray.length > 0) {
+    payload.datos.componentes = componentesArray;
+  }
+
   console.log('[Andreani] 🛑 Enviando solicitud de cancelación...');
   console.log('[Andreani] 🌍 Base URL:', ANDREANI_BASE_URL);
   console.log('[Andreani] 📦 Payload NuevaAccion:', JSON.stringify(payload, null, 2));
 
-  try {
-    const token = await getAndreaniToken();
-    const url = `${ANDREANI_BASE_URL}/v2/api/NuevaAccion`;
+  const url = `${ANDREANI_BASE_URL}/v2/api/NuevaAccion`;
+  const apiKey = process.env.ANDREANI_API_KEY || '';
+  const token = await getAndreaniToken().catch((err) => {
+    console.error('[Andreani] ⚠ No se pudo obtener token (puede que no haga falta para este endpoint):', err?.message);
+    return null;
+  });
 
-    const response = await axios.post(url, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
+  // Headers comunes para todas las variantes
+  const baseHeaders = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  };
+
+  // Igual que en tu código de etiquetas: armamos las distintas opciones
+  const attempts = [];
+
+  if (apiKey) {
+    attempts.push({
+      label: 'OPCIÓN 1: header "apikey"',
+      headers: { apikey: apiKey },
     });
 
-    const data = response.data;
+    attempts.push({
+      label: 'OPCIÓN 2: header "x-authorization"',
+      headers: { 'x-authorization': apiKey },
+    });
 
-    console.log('[Andreani] ✅ Cancelación ejecutada correctamente');
-    console.log('[Andreani] 🔁 Respuesta:', data);
-
-    return data;
-  } catch (error) {
-    console.error('[Andreani] ❌ Error al cancelar envío');
-
-    if (error.response) {
-      console.error('[Andreani] Status:', error.response.status);
-      console.error('[Andreani] Data:', error.response.data);
-      throw new Error(
-        `Error Andreani NuevaAccion: ${error.response.status} - ${JSON.stringify(
-          error.response.data
-        )}`
-      );
-    }
-
-    console.error(error);
-    throw error;
+    attempts.push({
+      label: 'OPCIÓN 3: header "Authorization: Apikey"',
+      headers: { Authorization: `Apikey ${apiKey}` },
+    });
   }
+
+  if (token) {
+    attempts.push({
+      label: 'OPCIÓN 4: Bearer token',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    attempts.push({
+      label: 'OPCIÓN 5: x-authorization-token',
+      headers: { 'x-authorization-token': token },
+    });
+  }
+
+  if (attempts.length === 0) {
+    throw new Error(
+      '❌ cancelarEnvioAndreani: no hay ANDREANI_API_KEY ni token disponible para probar autenticación'
+    );
+  }
+
+  let lastError = null;
+
+  for (const attempt of attempts) {
+    console.log(`[Andreani] 🌐 Intentando ${attempt.label}`);
+
+    try {
+      const response = await axios.post(url, payload, {
+        headers: {
+          ...baseHeaders,
+          ...attempt.headers,
+        },
+      });
+
+      console.log(
+        `[Andreani] 📡 Respuesta ${attempt.label}:`,
+        response.status,
+        response.statusText
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        console.log(`[Andreani] ✅ ${attempt.label} funcionó`);
+        console.log('[Andreani] 🔁 Respuesta:', response.data);
+        return response.data;
+      }
+
+      // Si no es 2xx, logueamos y probamos la siguiente
+      console.warn(
+        `[Andreani] ⚠ ${attempt.label} no devolvió 2xx:`,
+        response.status,
+        response.statusText
+      );
+      lastError = new Error(
+        `Error Andreani NuevaAccion (${attempt.label}): ${response.status} - ${response.statusText}`
+      );
+    } catch (error) {
+      if (error.response) {
+        const { status, data } = error.response;
+
+        console.error(
+          `[Andreani] ❌ ${attempt.label} devolvió error:`,
+          status,
+          data
+        );
+
+        // Guardamos el último error
+        lastError = new Error(
+          `Error Andreani NuevaAccion (${attempt.label}): ${status} - ${JSON.stringify(
+            data
+          )}`
+        );
+
+        // Si es 401/403 seguimos probando las otras variantes
+        if (status === 401 || status === 403) {
+          console.warn(
+            `[Andreani] ⚠ ${attempt.label} devolvió ${status}, probando siguiente variante...`
+          );
+          continue;
+        }
+
+        // Otros códigos los cortamos directo
+        throw lastError;
+      } else {
+        console.error(`[Andreani] ❌ Error de red en ${attempt.label}:`, error);
+        lastError = error;
+        // Puede ser un problema de red / DNS / etc → corto
+        throw error;
+      }
+    }
+  }
+
+  // Si llegamos acá, ninguna variante funcionó
+  console.error('[Andreani] ❌ Ninguna variante de autenticación funcionó en NuevaAccion');
+  if (lastError) throw lastError;
+  throw new Error('Error Andreani NuevaAccion: no se pudo autenticar con ninguna variante');
 }
