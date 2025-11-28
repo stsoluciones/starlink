@@ -45,10 +45,16 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
   });
 
   // Extraer datos del pedido según el esquema correcto
-  const nombreCompleto = pedido.usuarioInfo?.nombreCompleto || pedido.tipoFactura?.razonSocial || 'Sin nombre';
+  const nombreCompleto = pedido.tipoFactura?.razonSocial || pedido.usuarioInfo?.nombreCompleto ;
   const email = pedido.usuarioInfo?.correo || pedido.tipoFactura?.email || pedido.payerEmail || '';
   const telefono = pedido.direccionEnvio?.telefono || pedido.usuarioInfo?.telefono || pedido.tipoFactura?.telefono || '';
   const documento = pedido.tipoFactura?.cuit ||  pedido.usuarioInfo?.documento || '';
+  const observaciones = String(pedido.direccionEnvio?.referencia || '').trim();
+
+  const cleanObs =
+    observaciones.length > 140
+      ? observaciones.substring(0, 140)
+      : observaciones;
   
   // Datos de dirección
   const direccion = pedido.direccionEnvio || {};
@@ -64,6 +70,7 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
     telefono,
     documento,
     direccion,
+    observaciones,
   });
 
   const payload = {
@@ -85,34 +92,6 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
         casillaDeCorreo: '',
         componentesDeDireccion: [],
       },
-      // sucursal: {
-      //   id: '',
-      //   nomenclatura: '',
-      //   descripcion: '',
-      //   direccion: {
-      //     codigoPostal: REMITENTE_CP,
-      //     calle: REMITENTE_CALLE,
-      //     numero: REMITENTE_NUMERO,
-      //     piso: '',
-      //     departamento: '',
-      //     localidad: REMITENTE_LOCALID,
-      //     region: REMITENTE_REGION,
-      //     pais: REMITENTE_PAIS,
-      //     casillaDeCorreo: '',
-      //     componentesDeDireccion: [],
-      //   },
-      //   telefonos: {
-      //     telefono: [
-      //       {
-      //         tipo: 1, // 1 fijo / 2 celular, etc. Depende doc.
-      //         numero: REMITENTE_TEL,
-      //       },
-      //     ],
-      //   },
-      //   datosAdicionales: {
-      //     matadatos: [],
-      //   },
-      // },
       coordenadas: {
         elevacion: 0,
         latitud: 0,
@@ -132,36 +111,15 @@ export function buildAndreaniOrderPayloadFromPedido(pedido) {
         region: direccion.provincia || '',
         pais: direccion.pais || 'Argentina',
         casillaDeCorreo: '',
-        componentesDeDireccion: [],
+        componentesDeDireccion: observaciones
+        ? [
+            {
+              meta: 'observaciones',
+              contenido: cleanObs,
+            },
+          ]
+        : [],
       },
-      // sucursal: {
-      //   id: '',
-      //   nomenclatura: '',
-      //   descripcion: '',
-      //   direccion: {
-      //     codigoPostal: direccion.codigoPostal || '',
-      //     calle: direccion.calle || '',
-      //     numero: direccion.numero || '',
-      //     piso: direccion.piso || '',
-      //     departamento: direccion.depto || '',
-      //     localidad: direccion.ciudad || '',
-      //     region: direccion.provincia || '',
-      //     pais: direccion.pais || 'Argentina',
-      //     casillaDeCorreo: '',
-      //     componentesDeDireccion: [],
-      //   },
-      //   telefonos: {
-      //     telefono: [
-      //       {
-      //         tipo: 1,
-      //         numero: telefono,
-      //       },
-      //     ],
-      //   },
-      //   datosAdicionales: {
-      //     matadatos: [],
-      //   },
-      // },
       coordenadas: {
         elevacion: 0,
         latitud: 0,
