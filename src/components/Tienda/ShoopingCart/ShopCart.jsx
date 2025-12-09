@@ -122,13 +122,17 @@ const handleComprar = async (nuevoDescuento) => {
       confirmButtonText: 'Tarjeta',
       cancelButtonText: 'Transferencia',
       reverseButtons: true,
-      html: `
+      html: nuevoDescuento !== 0 ? `
         <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 1rem;">
           <span style="color: #15803d;">Transferencia (${nuevoDescuento}% OFF)</span>
-          <span>MercadoPago</span>
+          <span>Tarjeta</span>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
           <span style="color: #15803d;">${formatCurrency(transferenciaPrecio)}</span>
+          <span>${formatCurrency(mercadoPagoPrecio)}</span>
+        </div>
+      ` : `
+        <div style="font-size: 1.2rem; margin-top: 1rem;">
           <span>${formatCurrency(mercadoPagoPrecio)}</span>
         </div>
       `,
