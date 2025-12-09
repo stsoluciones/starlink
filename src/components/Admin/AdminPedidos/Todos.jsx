@@ -594,11 +594,26 @@ const generarEtiquetas = async (pedidoUnico = null) => {
 
                         {/* Encabezado: Estado, Fecha y Botón de etiqueta */}
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+                          {pedido?.estado === 'pagado' && !pedido?.direccionEnvio?.retiraPersona && (
+                            <input 
+                              type="checkbox" 
+                              checked={seleccionados.includes(pedido._id)} 
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSeleccionados([...seleccionados, pedido._id]);
+                                } else {
+                                  setSeleccionados(seleccionados.filter(id => id !== pedido._id));
+                                }
+                              }}
+                              className="w-5 h-5 cursor-pointer"
+                            />
+                          )}
                           <p className="text-xs text-gray-500 md:p-2 md:my-2">{fmtFecha(pedido?.fechaPedido)}</p>
                           <p className="text-sm text-gray-700 md:p-2 md:my-2">Pedido N°: <span className="font-bold">{getUltimos6(pedido?._id)}</span></p>
                           <div className=' flex gap-2 align-middle'>
-                            {pedido?.estado !== 'pendiente' && pedido?.estado !== 'cancelado' && (
-                              <button onClick={() => generarEtiquetas(pedido)} className={`text-white font-semibold bg-orange-500 hover:bg-orange-600 p-1 md:p-2 my-1 md:my-2 rounded-md ${pedido?.estado === 'enviado' || pedido?.estado === 'entregado' || pedido?.estado === 'cancelado' && pedido.etiquetaEnvio !== "" ? 'hidden' : ''}`}>{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>)}
+                            {pedido?.estado !== 'pendiente' && pedido?.estado !== 'cancelado' && !pedido?.direccionEnvio?.retiraPersona && (
+                              <button onClick={() => generarEtiquetas(pedido)} className={`text-white font-semibold bg-orange-500 hover:bg-orange-600 p-1 md:p-2 my-1 md:my-2 rounded-md ${pedido?.estado === 'enviado' || pedido?.estado === 'entregado' || pedido?.estado === 'cancelado' && pedido.etiquetaEnvio !== "" ? 'hidden' : ''}`}>{pedido?.estado === 'pagado' ? 'Imprimir etiqueta' : 'Reimprimir etiqueta'}</button>
+                            )}
                             {/* Botón recordatorio de pago para pendientes de MercadoPago */}
                             {pedido?.estado === 'pendiente' && pedido?.paymentMethod === 'mercadopago' && pedido?.init_point && (
                               <button 
@@ -671,7 +686,7 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                           <button onClick={() => abrirModalInformacion(pedido)} className= "text-secondary-hover text-sm px-3 py-1 my-1 rounded md:ml-2">
                             Ver mas
                           </button>
-                            {pedido.estado === 'enviado' && (
+                            {pedido.estado === 'enviado' && !pedido?.direccionEnvio?.retiraPersona && (
                               <button 
                                 onClick={() => {
                                   setPedidoSeleccionado(pedido);
@@ -865,6 +880,14 @@ const generarEtiquetas = async (pedidoUnico = null) => {
                               <div className="fixed inset-0 bg-black/5 flex justify-center items-center z-50 p-2 rounded-md">
                                 <div className="bg-white p-6 rounded shadow-md w-[90%] max-w-md">
                                   <h2 className="text-lg font-semibold mb-4">Datos de Envío</h2>
+                                  {pedidoSeleccionado.direccionEnvio?.retiraPersona && (
+                                    <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                                      <p className="text-blue-700 font-semibold flex items-center gap-2">
+                                        <span>🏪</span>
+                                        <span>RETIRO EN PERSONA - Quilmes, Buenos Aires</span>
+                                      </p>
+                                    </div>
+                                  )}
                                   <ul className="text-sm grid grid-cols-2 gap-2 p-2">
                                     <li className='col-span-1'><strong>Email:</strong> {pedidoSeleccionado.usuarioInfo?.correo}</li><br/>
                                     <li><strong>Nombre:</strong> {pedidoSeleccionado.tipoFactura?.razonSocial}</li>

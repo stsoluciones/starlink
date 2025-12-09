@@ -44,6 +44,7 @@ const orderSchema = new mongoose.Schema({
     entreCalles: {type: String},
     codigoPostal: {type: String},
     referencia: {type: String},
+    retiraPersona: {type: Boolean, default: false},
   },
   estado: { type: String, enum: ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado'], default: 'pendiente' },
   total: { type: Number, required: true, min: 0 },
