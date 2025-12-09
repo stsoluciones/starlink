@@ -119,7 +119,7 @@ const handleComprar = async (nuevoDescuento) => {
       title: '¿Cómo deseas pagar?',
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'MercadoPago',
+      confirmButtonText: 'Tarjeta',
       cancelButtonText: 'Transferencia',
       reverseButtons: true,
       html: `
